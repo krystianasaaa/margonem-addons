@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kaczor Addons Manager - Dream
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.0
 // @description  loader
 // @author       kaczka
 // @match        https://dream.margonem.pl/*
