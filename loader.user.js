@@ -20,27 +20,6 @@
         SERVER_URL: 'https://krystianasaaa.github.io/margonem-addons',
         CHECK_INTERVAL: 30000,
         VERSION_KEY: 'margonem_addons_version'
-    }
-    
-    // Sprawdź czy gra jest już załadowana
-    function isGameLoaded() {
-        return !!(
-            (window.g && window.g.nick) ||
-            (window.Engine && window.Engine.hero && window.Engine.hero.d && window.Engine.hero.d.nick) ||
-            (window.hero && window.hero.nick) ||
-            (document.querySelector('#game') && document.querySelector('.stats'))
-        );
-    }
-    
-    // Wykonaj kod dodatków
-    function executeAddons(addonsCode) {
-        const script = document.createElement('script');
-        script.id = 'margonem-addons';
-        script.textContent = addonsCode;
-        document.head.appendChild(script);
-        
-        addonsLoaded = true;
-        console.log('Dodatki załadowane pomyślnie!');
     };
     
     let addonsLoaded = false;
@@ -124,17 +103,19 @@
                     oldScript.remove();
                 }
                 
-                // Sprawdź czy gra już jest załadowana
-                if (isGameLoaded()) {
-                    console.log('Gra już załadowana - wykonuję kod dodatków natychmiast');
-                    executeAddons(addonsCode);
-                } else {
-                    console.log('Gra nie jest jeszcze załadowana - czekam...');
-                    waitForGame().then(() => {
-                        console.log('Gra załadowana - wykonuję kod dodatków');
-                        executeAddons(addonsCode);
-                    });
-                }
+                // Poczekaj na załadowanie gry
+                waitForGame().then(() => {
+                    console.log('Gra załadowana - wykonuję kod dodatków');
+                    
+                    // Dodaj nowy kod
+                    const script = document.createElement('script');
+                    script.id = 'margonem-addons';
+                    script.textContent = addonsCode;
+                    document.head.appendChild(script);
+                    
+                    addonsLoaded = true;
+                    console.log('Dodatki załadowane pomyślnie!');
+                });
             })
             .catch(error => {
                 console.error('Błąd ładowania dodatków:', error);
@@ -146,37 +127,19 @@
         return new Promise((resolve) => {
             console.log('Czekam na załadowanie gry...');
             
-            let attempts = 0;
-            const maxAttempts = 30; // maksymalnie 30 sekund
-            
             function checkGame() {
-                attempts++;
-                console.log(`Próba ${attempts}/${maxAttempts} - sprawdzam czy gra załadowana`);
-                
-                // Debug - sprawdź co jest dostępne
-                console.log('window.g:', !!window.g);
-                console.log('window.Engine:', !!window.Engine);
-                console.log('window.hero:', !!window.hero);
-                console.log('#game element:', !!document.querySelector('#game'));
-                
                 // Sprawdź różne wskaźniki że gra się załadowała
                 if (window.g && window.g.nick) {
-                    console.log('✅ Gra załadowana - window.g.nick:', window.g.nick);
+                    console.log('Gra załadowana - gracz:', window.g.nick);
                     resolve();
-                } else if (window.Engine && window.Engine.hero && window.Engine.hero.d && window.Engine.hero.d.nick) {
-                    console.log('✅ Gra załadowana - Engine.hero.d.nick:', window.Engine.hero.d.nick);
+                } else if (window.Engine && window.Engine.hero && window.Engine.hero.d) {
+                    console.log('Gra załadowana - Engine hero');
                     resolve();
-                } else if (window.hero && window.hero.nick) {
-                    console.log('✅ Gra załadowana - window.hero.nick:', window.hero.nick);
-                    resolve();
-                } else if (document.querySelector('#game') && document.querySelector('.stats')) {
-                    console.log('✅ Gra załadowana - elementy UI dostępne');
-                    resolve();
-                } else if (attempts >= maxAttempts) {
-                    console.log('⚠️ Timeout - uruchamiam dodatki mimo braku pełnej detekcji gry');
+                } else if (document.querySelector('#game')) {
+                    console.log('Gra załadowana - element #game');
                     resolve();
                 } else {
-                    console.log('❌ Gra jeszcze się ładuje... czekam');
+                    console.log('Gra jeszcze się ładuje... czekam');
                     setTimeout(checkGame, 1000);
                 }
             }
