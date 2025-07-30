@@ -11,7 +11,103 @@
 // @updateURL    https://krystianasaaa.github.io/margonem-addons/loader.user.js
 // @downloadURL  https://krystianasaaa.github.io/margonem-addons/loader.user.js
 // ==/UserScript==
+
 (function() {
     'use strict';
-const _0x1285c2=_0x223d;(function(_0x7b8a90,_0x1d47b1){const _0x5aefa2=_0x223d,_0x4f2593=_0x7b8a90();while(!![]){try{const _0x58e4ca=-parseInt(_0x5aefa2(0x183))/(-0x7b0*0x2+-0x1e76+-0x1*-0x2dd7)+parseInt(_0x5aefa2(0x1c1))/(-0x1f*-0x93+-0xeb7*0x1+0xc5*-0x4)+-parseInt(_0x5aefa2(0x176))/(0x10*-0x212+-0x6ee+-0xd*-0x315)*(parseInt(_0x5aefa2(0x17f))/(-0xa08+-0x100*-0xa+0xc))+parseInt(_0x5aefa2(0x186))/(0x2*-0x4dc+0xa9c+0x1*-0xdf)*(parseInt(_0x5aefa2(0x1a8))/(0x1*-0x132d+-0x35c*-0x5+0x267))+parseInt(_0x5aefa2(0x171))/(-0x982*0x2+-0x2cd*0x9+0x588*0x8)*(-parseInt(_0x5aefa2(0x181))/(-0xf6*0x1c+0x2*0x12fd+-0x585*0x2))+-parseInt(_0x5aefa2(0x17c))/(0x1087*-0x1+0x1*0x24f5+-0x1465)*(parseInt(_0x5aefa2(0x178))/(0x1298+-0x2424+0x1196))+-parseInt(_0x5aefa2(0x1ac))/(-0x1f*-0x1f+-0x1f1d+0x1b67)*(-parseInt(_0x5aefa2(0x188))/(0xcc2+0x28d*-0x1+-0x121*0x9));if(_0x58e4ca===_0x1d47b1)break;else _0x4f2593['push'](_0x4f2593['shift']());}catch(_0x2b8cdd){_0x4f2593['push'](_0x4f2593['shift']());}}}(_0x4ab7,-0xfe672+0xa1a3a+-0x12069*-0x10));const CONFIG={'SERVER_URL':_0x1285c2(0x1b5)+_0x1285c2(0x1bd)+_0x1285c2(0x1bc)+_0x1285c2(0x189)+_0x1285c2(0x1bb),'CHECK_INTERVAL':0x7530,'VERSION_KEY':_0x1285c2(0x1b1)+_0x1285c2(0x18d)+_0x1285c2(0x165)};let addonsLoaded=![],currentVersion=GM_getValue(CONFIG[_0x1285c2(0x166)+'Y'],'0');if(!window[_0x1285c2(0x193)][_0x1285c2(0x167)][_0x1285c2(0x175)](_0x1285c2(0x168)+_0x1285c2(0x17e)))return;console[_0x1285c2(0x1b7)](_0x1285c2(0x173)+_0x1285c2(0x1be)+_0x1285c2(0x1ae)+_0x1285c2(0x169));function fetchFromServer(_0x593019){const _0x5bfb9b=_0x1285c2,_0x4bd86d={'ohWej':function(_0x548455,_0x114bde){return _0x548455(_0x114bde);},'UsjsT':function(_0x449bf2,_0x5f0ad1){return _0x449bf2===_0x5f0ad1;},'oOYyL':_0x5bfb9b(0x18a)};return new Promise((_0x203bb2,_0x59c77a)=>{const _0x521032=_0x5bfb9b,_0x2f545c={'YfNxs':function(_0x3577f3,_0x2f58fc){const _0x4bedd1=_0x223d;return _0x4bd86d[_0x4bedd1(0x180)](_0x3577f3,_0x2f58fc);},'xFxrU':function(_0xe3d14,_0x483e53){const _0x29963a=_0x223d;return _0x4bd86d[_0x29963a(0x1b4)](_0xe3d14,_0x483e53);}};_0x4bd86d[_0x521032(0x1b4)](GM_xmlhttpRequest,{'method':_0x4bd86d[_0x521032(0x187)],'url':_0x593019,'onload':function(_0x34ebf6){const _0x221d12=_0x521032;_0x2f545c[_0x221d12(0x184)](_0x34ebf6[_0x221d12(0x1b8)],0xb86+-0x1227*0x2+-0x332*-0x8)?_0x2f545c[_0x221d12(0x179)](_0x203bb2,_0x34ebf6[_0x221d12(0x16c)+'xt']):_0x2f545c[_0x221d12(0x179)](_0x59c77a,new Error(_0x221d12(0x1aa)+_0x34ebf6[_0x221d12(0x1b8)]));},'onerror':function(_0x562756){const _0x321c05=_0x521032;_0x4bd86d[_0x321c05(0x1b4)](_0x59c77a,_0x562756);}});});}function checkVersion(){const _0x5c6d46=_0x1285c2,_0x47c7e2={'hSmbS':function(_0x45b7c2,_0x3f7ea9,_0x1f1607){return _0x45b7c2(_0x3f7ea9,_0x1f1607);},'sVaFY':function(_0x7d4dac,_0x5c445a){return _0x7d4dac!==_0x5c445a;},'iovuC':_0x5c6d46(0x16e)+_0x5c6d46(0x194)+_0x5c6d46(0x164),'qaQRa':function(_0x1211b9){return _0x1211b9();},'VRKZh':_0x5c6d46(0x1a1)+_0x5c6d46(0x1b9)+_0x5c6d46(0x19d),'tnNTf':function(_0x339ba0,_0x4006c4){return _0x339ba0(_0x4006c4);}};_0x47c7e2[_0x5c6d46(0x1a0)](fetchFromServer,CONFIG[_0x5c6d46(0x1a6)]+(_0x5c6d46(0x1ad)+_0x5c6d46(0x192))+Date[_0x5c6d46(0x17b)]())[_0x5c6d46(0x17d)](_0x288b3e=>{const _0x2d1c8a=_0x5c6d46,_0x248e87={'BbWRu':function(_0x19f722,_0x3b3642,_0xf46e6d){const _0x4776d9=_0x223d;return _0x47c7e2[_0x4776d9(0x163)](_0x19f722,_0x3b3642,_0xf46e6d);}},_0x27115d=JSON[_0x2d1c8a(0x18f)](_0x288b3e);if(_0x47c7e2[_0x2d1c8a(0x17a)](_0x27115d[_0x2d1c8a(0x1a3)],currentVersion))return console[_0x2d1c8a(0x1b7)](_0x47c7e2[_0x2d1c8a(0x162)],_0x27115d[_0x2d1c8a(0x1a3)]),_0x47c7e2[_0x2d1c8a(0x190)](loadAddons)[_0x2d1c8a(0x17d)](()=>{const _0x3031a6=_0x2d1c8a;_0x248e87[_0x3031a6(0x195)](GM_setValue,CONFIG[_0x3031a6(0x166)+'Y'],_0x27115d[_0x3031a6(0x1a3)]),currentVersion=_0x27115d[_0x3031a6(0x1a3)];});})[_0x5c6d46(0x16f)](_0x461e60=>{const _0x4d6a42=_0x5c6d46;console[_0x4d6a42(0x1a7)](_0x47c7e2[_0x4d6a42(0x1b6)],_0x461e60);});}function loadAddons(){const _0x49f77e=_0x1285c2,_0x151726={'rkIks':_0x49f77e(0x16a)+_0x49f77e(0x182),'nxRhO':_0x49f77e(0x191),'fICJG':_0x49f77e(0x1b3)+_0x49f77e(0x18b)+_0x49f77e(0x1a5),'PkQjU':_0x49f77e(0x19a)+_0x49f77e(0x1b2)+_0x49f77e(0x197),'drMTF':function(_0x1bd37e,_0x5ae0d7){return _0x1bd37e(_0x5ae0d7);}};return _0x151726[_0x49f77e(0x1c0)](fetchFromServer,CONFIG[_0x49f77e(0x1a6)]+(_0x49f77e(0x16d)+_0x49f77e(0x185))+Date[_0x49f77e(0x17b)]())[_0x49f77e(0x17d)](_0x331122=>{const _0x230bff=_0x49f77e,_0x5d03f6=document[_0x230bff(0x1bf)+_0x230bff(0x172)](_0x151726[_0x230bff(0x19f)]);_0x5d03f6&&_0x5d03f6[_0x230bff(0x198)]();const _0x18fe2b=document[_0x230bff(0x19e)+_0x230bff(0x1ab)](_0x151726[_0x230bff(0x177)]);_0x18fe2b['id']=_0x151726[_0x230bff(0x19f)],_0x18fe2b[_0x230bff(0x1b0)+'t']=_0x331122,document[_0x230bff(0x19b)][_0x230bff(0x196)+'d'](_0x18fe2b),addonsLoaded=!![],console[_0x230bff(0x1b7)](_0x151726[_0x230bff(0x1a2)]);})[_0x49f77e(0x16f)](_0xa391a2=>{const _0x421f9f=_0x49f77e;console[_0x421f9f(0x1a7)](_0x151726[_0x421f9f(0x170)],_0xa391a2);});}function _0x223d(_0x3d4f1d,_0x28d714){const _0x1f89dc=_0x4ab7();return _0x223d=function(_0x155fca,_0x13f429){_0x155fca=_0x155fca-(-0xf*-0x155+0x171*-0x1+-0x1128);let _0x14581e=_0x1f89dc[_0x155fca];return _0x14581e;},_0x223d(_0x3d4f1d,_0x28d714);}function _0x4ab7(){const _0x12dd86=['iovuC','hSmbS','\x20dostępna:','ion','VERSION_KE','href','dream.marg','oader...','margonem-a','Loaded','responseTe','/addons.js','Nowa\x20wersj','catch','PkQjU','7477225IlFKxA','ById','Uruchamian','addEventLi','includes','9651gFBxwq','nxRhO','2651630OlxWvm','xFxrU','sVaFY','now','36NfcyBH','then','onem','692UHCvCW','UsjsT','8sOgyWi','ddons','1007182PZZoXo','YfNxs','?t=','5Shgaaw','oOYyL','98196fSjqGc','o/margonem','GET','ładowane\x20p','CHECK_INTE','ddons_vers','glUrK','parse','qaQRa','script','son?t=','location','a\x20dodatków','BbWRu','appendChil','ków:','remove','loading','Błąd\x20ładow','head','Xwfyu','sji:','createElem','rkIks','tnNTf','Błąd\x20spraw','fICJG','version','RVAL','omyślnie','SERVER_URL','error','341016upOfpB','stener','HTTP\x20','ent','4906caIrTs','/version.j','m\x20Addons\x20L','DOMContent','textConten','margonem_a','ania\x20dodat','Dodatki\x20za','ohWej','https://kr','VRKZh','log','status','dzania\x20wer','readyState','-addons','a.github.i','ystianasaa','ie\x20Margone','getElement','drMTF','1574928motwGn'];_0x4ab7=function(){return _0x12dd86;};return _0x4ab7();}function init(){const _0x588fd6=_0x1285c2,_0x24ffb0={'Xwfyu':function(_0x4ba394){return _0x4ba394();},'glUrK':function(_0x2edca0,_0x2e2c6e,_0x3abf41){return _0x2edca0(_0x2e2c6e,_0x3abf41);}};_0x24ffb0[_0x588fd6(0x19c)](checkVersion),_0x24ffb0[_0x588fd6(0x18e)](setInterval,checkVersion,CONFIG[_0x588fd6(0x18c)+_0x588fd6(0x1a4)]);}document[_0x1285c2(0x1ba)]===_0x1285c2(0x199)?document[_0x1285c2(0x174)+_0x1285c2(0x1a9)](_0x1285c2(0x1af)+_0x1285c2(0x16b),init):init();
+    
+    const CONFIG = {
+        SERVER_URL: 'https://krystianasaaa.github.io/margonem-addons',
+        CHECK_INTERVAL: 30000, // sprawdzaj co 30 sekund
+        VERSION_KEY: 'margonem_addons_version'
+    };
+    
+    let addonsLoaded = false;
+    let currentVersion = GM_getValue(CONFIG.VERSION_KEY, '0');
+    
+    // Sprawdź czy jesteśmy na Dream Margonem
+    if (!window.location.href.includes('dream.margonem')) {
+        return;
+    }
+    
+    console.log('Uruchamianie Margonem Addons Loader...');
+    
+    // Funkcja do pobierania pliku z serwera
+    function fetchFromServer(url) {
+        return new Promise((resolve, reject) => {
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: url,
+                onload: function(response) {
+                    if (response.status === 200) {
+                        resolve(response.responseText);
+                    } else {
+                        reject(new Error(`HTTP ${response.status}`));
+                    }
+                },
+                onerror: function(error) {
+                    reject(error);
+                }
+            });
+        });
+    }
+    
+    // Sprawdź wersję na serwerze
+    function checkVersion() {
+        fetchFromServer(`${CONFIG.SERVER_URL}/version.json?t=${Date.now()}`)
+            .then(versionData => {
+                const serverVersion = JSON.parse(versionData);
+                
+                if (serverVersion.version !== currentVersion) {
+                    console.log('Nowa wersja dodatków dostępna:', serverVersion.version);
+                    return loadAddons().then(() => {
+                        GM_setValue(CONFIG.VERSION_KEY, serverVersion.version);
+                        currentVersion = serverVersion.version;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Błąd sprawdzania wersji:', error);
+            });
+    }
+    
+    // Załaduj dodatki z serwera
+    function loadAddons() {
+        return fetchFromServer(`${CONFIG.SERVER_URL}/addons.js?t=${Date.now()}`)
+            .then(addonsCode => {
+                // Usuń stare dodatki jeśli istnieją
+                const oldScript = document.getElementById('margonem-addons');
+                if (oldScript) {
+                    oldScript.remove();
+                }
+                
+                // Dodaj nowy kod
+                const script = document.createElement('script');
+                script.id = 'margonem-addons';
+                script.textContent = addonsCode;
+                document.head.appendChild(script);
+                
+                addonsLoaded = true;
+                console.log('Dodatki załadowane pomyślnie');
+            })
+            .catch(error => {
+                console.error('Błąd ładowania dodatków:', error);
+            });
+    }
+    
+    // Inicjalizacja
+    function init() {
+        // Załaduj dodatki przy pierwszym uruchomieniu
+        checkVersion();
+        
+        // Sprawdzaj aktualizacje regularnie
+        setInterval(checkVersion, CONFIG.CHECK_INTERVAL);
+    }
+    
+    // Czekaj na załadowanie strony
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    
 })();
