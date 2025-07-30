@@ -1,5 +1,25 @@
 (function() {
     'use strict';
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+        return null;
+    }
+
+
+    const allowedUsers = ['6122094', '6210905', '9110806', '3543472', '4965363', '6793254', '4633387', '1661718', '7164363', '5109521', '8370413', '8228619', '7172886', '8357394', '6936569', '874973', '8144729', '1521186', '594120', '8839561', '5906841', '8824864', '2885972', '8776354', '7520102', '9269588', '7316243', '8432475', '5295667', '4664363', '9392055', '530596', '6244754', '8200643']; // <-- Tutaj wklej swoje ID
+
+    const userId = getCookie('user_id');
+    if (!allowedUsers.includes(userId)) {
+        console.log('🚫 Brak uprawnień dla użytkownika:', userId);
+        console.log('✅ Dozwoleni użytkownicy:', allowedUsers);
+        return; 
+    }
+
+    console.log('✅ Użytkownik autoryzowany:', userId);
     // System do śledzenia elementów i eventów każdego dodatku
     const addonTrackers = {
         addon1: {
