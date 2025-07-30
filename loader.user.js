@@ -1,109 +1,56 @@
 // ==UserScript==
-// @name         Margonem Addons Loader
+// @name         Test Margonem Loader
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Ładuje dodatki do Margonem z serwera
-// @author       TwojeImie
-// @match        https://margonem.pl/*
-// @match        https://www.margonem.pl/*
-// @match        https://margonem.com/*
-// @match        https://www.margonem.com/*
+// @description  Test
+// @author       You
+// @match        https://dream.margonem.pl/*
 // @grant        GM_xmlhttpRequest
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @updateURL    https://krystianasaaa.github.io/margonem-addons/loader.user.js
-// @downloadURL  https://krystianasaaa.github.io/margonem-addons/loader.user.js
 // ==/UserScript==
 
 (function() {
     'use strict';
     
-    const CONFIG = {
-        SERVER_URL: 'https://krystianasaaa.github.io/margonem-addons',
-        CHECK_INTERVAL: 30000, // sprawdzaj co 30 sekund
-        VERSION_KEY: 'margonem_addons_version'
-    };
+    // Sprawdź czy jesteśmy na Dream Margonem
+    if (!window.location.href.includes('dream.margonem')) {
+        console.log('NIE JESTEŚMY NA DREAM MARGONEM, URL:', window.location.href);
+        return;
+    }
     
-    let addonsLoaded = false;
-    let currentVersion = GM_getValue(CONFIG.VERSION_KEY, '0');
+    console.log('JESTEŚMY NA DREAM MARGONEM!', window.location.href);
     
-    // Funkcja do pobierania pliku z serwera
-    function fetchFromServer(url) {
-        return new Promise((resolve, reject) => {
+    // Test 1: Sprawdź czy GM_xmlhttpRequest działa
+    console.log('Testuje GM_xmlhttpRequest...');
+    
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: 'https://krystianasaaa.github.io/margonem-addons/version.json',
+        onload: function(response) {
+            console.log('SUKCES! Odpowiedź serwera:', response.responseText);
+            
+            // Test 2: Załaduj addons.js
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: url,
-                onload: function(response) {
-                    if (response.status === 200) {
-                        resolve(response.responseText);
-                    } else {
-                        reject(new Error(`HTTP ${response.status}`));
+                url: 'https://krystianasaaa.github.io/margonem-addons/addons.js',
+                onload: function(response2) {
+                    console.log('ADDONS.JS ZAŁADOWANY!');
+                    
+                    // Test 3: Wykonaj kod
+                    try {
+                        eval(response2.responseText);
+                        console.log('KOD WYKONANY POMYŚLNIE!');
+                    } catch (error) {
+                        console.error('BŁĄD WYKONANIA KODU:', error);
                     }
                 },
                 onerror: function(error) {
-                    reject(error);
+                    console.error('BŁĄD ŁADOWANIA ADDONS.JS:', error);
                 }
             });
-        });
-    }
-    
-    // Sprawdź wersję na serwerze
-    async function checkVersion() {
-        try {
-            const versionData = await fetchFromServer(`${CONFIG.SERVER_URL}/version.json?t=${Date.now()}`);
-            const serverVersion = JSON.parse(versionData);
-            
-            if (serverVersion.version !== currentVersion) {
-                console.log('Nowa wersja dodatków dostępna:', serverVersion.version);
-                await loadAddons();
-                GM_setValue(CONFIG.VERSION_KEY, serverVersion.version);
-                currentVersion = serverVersion.version;
-            }
-        } catch (error) {
-            console.error('Błąd sprawdzania wersji:', error);
+        },
+        onerror: function(error) {
+            console.error('BŁĄD ŁADOWANIA VERSION.JSON:', error);
         }
-    }
+    });
     
-    // Załaduj dodatki z serwera
-    async function loadAddons() {
-        try {
-            const addonsCode = await fetchFromServer(`${CONFIG.SERVER_URL}/addons.js?t=${Date.now()}`);
-            
-            // Usuń stare dodatki jeśli istnieją
-            const oldScript = document.getElementById('margonem-addons');
-            if (oldScript) {
-                oldScript.remove();
-            }
-            
-            // Dodaj nowy kod
-            const script = document.createElement('script');
-            script.id = 'margonem-addons';
-            script.textContent = addonsCode;
-            document.head.appendChild(script);
-            
-            addonsLoaded = true;
-            console.log('Dodatki załadowane pomyślnie');
-            
-        } catch (error) {
-            console.error('Błąd ładowania dodatków:', error);
-        }
-    }
-    
-    // Inicjalizacja
-    async function init() {
-        console.log('Uruchamianie Margonem Addons Loader...');
-        
-        // Załaduj dodatki przy pierwszym uruchomieniu
-        await checkVersion();
-        
-        // Sprawdzaj aktualizacje regularnie
-        setInterval(checkVersion, CONFIG.CHECK_INTERVAL);
-    }
-    
-    // Czekaj na załadowanie strony
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
 })();
