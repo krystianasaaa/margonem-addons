@@ -88,7 +88,7 @@
     // Configuration for addons
     const addons = {
         addon1: {
-            name: 'Players Online - gowno',
+            name: 'Players Online',
             enabled: false,
             init: function() {
                 console.log('Players Online');
