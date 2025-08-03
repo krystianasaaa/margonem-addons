@@ -119,7 +119,7 @@
     // Configuration for addons
     const addons = {
         addon1: {
-            name: 'Players Online kiri chuj',
+            name: 'Players Online',
             enabled: false,
             init: function() {
                 console.log('Players Online');
