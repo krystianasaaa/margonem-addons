@@ -1,26 +1,76 @@
 (function() {
     'use strict';
     
-    // DODAJ TO NA POCZĄTKU:
     const GITHUB_API_URL = 'https://krystianasaaa.github.io/margonem-addons/api/';
+    
+    // Funkcja powiadomień
+    function showNotification(message, type = 'info') {
+        const colors = {
+            success: '#4caf50',
+            warning: '#ff9800',
+            error: '#f44336',
+            info: '#2196f3'
+        };
+
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${colors[type]};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            z-index: 20000;
+            font-weight: bold;
+            font-size: 12px;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => notification.remove(), 3000);
+    }
     
     async function updateFromAPI() {
         try {
-            const response = await fetch(`${GITHUB_API_URL}users.json`);
+            console.log('🔄 Pobieranie listy z GitHub API...');
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            
+            const response = await fetch(`${GITHUB_API_URL}users.json?t=${Date.now()}`, {
+                signal: controller.signal,
+                cache: 'no-cache'
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
             const data = await response.json();
-            if (data.users && data.users.length > 0) {
+            
+            if (data.users && Array.isArray(data.users) && data.users.length > 0) {
                 localStorage.setItem('margonem_allowed_users', JSON.stringify(data.users));
+                localStorage.setItem('margonem_last_api_sync', Date.now().toString());
+                
                 console.log('✅ Lista zaktualizowana z API');
+                console.log(`👥 Użytkowników: ${data.users.length}`);
+                console.log(`📅 Ostatnia aktualizacja: ${data.lastUpdated || 'nieznana'}`);
+                
+                showNotification(`✅ Lista zaktualizowana (${data.users.length} użytkowników)`, 'success');
+                return data.users;
+            } else {
+                throw new Error('Nieprawidłowa struktura danych');
             }
         } catch (error) {
-            console.log('⚠️ API niedostępne');
+            console.log('⚠️ Błąd API:', error.message);
+            showNotification('⚠️ Nie można pobrać najnowszej listy', 'warning');
+            return null;
         }
     }
     
-    // Aktualizuj w tle (nie blokuj)
-    updateFromAPI();
-    
-    // TWÓJ ISTNIEJĄCY KOD BEZ ZMIAN:
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -30,18 +80,56 @@
         return null;
     }
     
-    let allowedUsers;
-    const savedUsers = localStorage.getItem('margonem_allowed_users');
-    if (savedUsers) {
-        try {
-            allowedUsers = JSON.parse(savedUsers);
-            console.log('📂 Użyto zaktualizowanej listy');
-        } catch (e) {
-            allowedUsers = ['6122094', '6210905', '9110806', '3543472', '4965363', '6793254', '4633387', '1661718', '7164363', '5109521', '8370413', '8228619', '7172886', '8357394', '6936569', '874973', '8144729', '1521186', '594120', '8839561', '5906841', '8824864', '2885972', '8776354', '7520102', '9269588', '7316243', '8432475', '5295667', '4664363', '9392055', '530596', '6244754', '8200643'];
+    // Domyślna lista (fallback)
+    const defaultUsers = ['6122094', '6210905', '9110806', '3543472', '4965363', '6793254', '4633387', '1661718', '7164363', '5109521', '8370413', '8228619', '7172886', '8357394', '6936569', '874973', '8144729', '1521186', '594120', '8839561', '5906841', '8824864', '2885972', '8776354', '7520102', '9269588', '7316243', '8432475', '5295667', '4664363', '9392055', '530596', '6244754', '8200643'];
+    
+    // Główna logika
+    async function init() {
+        let allowedUsers;
+        
+        // Spróbuj zaktualizować z API
+        const apiUsers = await updateFromAPI();
+        
+        if (apiUsers) {
+            // Udało się pobrać z API
+            allowedUsers = apiUsers;
+        } else {
+            // Spróbuj użyć lokalnej kopii
+            const savedUsers = localStorage.getItem('margonem_allowed_users');
+            if (savedUsers) {
+                try {
+                    allowedUsers = JSON.parse(savedUsers);
+                    console.log('📂 Użyto lokalnej kopii zapasowej');
+                    showNotification('📂 Używam lokalnej kopii (API niedostępne)', 'info');
+                } catch (e) {
+                    allowedUsers = defaultUsers;
+                    console.log('📋 Użyto domyślnej listy (błąd parsowania)');
+                }
+            } else {
+                allowedUsers = defaultUsers;
+                console.log('📋 Użyto domyślnej listy');
+            }
         }
-    } else {
-        allowedUsers = ['6122094', '6210905', '9110806', '3543472', '4965363', '6793254', '4633387', '1661718', '7164363', '5109521', '8370413', '8228619', '7172886', '8357394', '6936569', '874973', '8144729', '1521186', '594120', '8839561', '5906841', '8824864', '2885972', '8776354', '7520102', '9269588', '7316243', '8432475', '5295667', '4664363', '9392055', '530596', '6244754', '8200643'];
+        
+        // Sprawdź autoryzację
+        const userId = getCookie('user_id');
+        if (!allowedUsers.includes(userId)) {
+            console.log('🚫 Brak uprawnień dla:', userId);
+            showNotification(`🚫 Brak dostępu dla ID: ${userId}`, 'error');
+            return; 
+        }
+        
+        console.log('✅ Użytkownik autoryzowany:', userId);
+        showNotification(`✅ Dostęp przyznany dla ID: ${userId}`, 'success');
+        
+        // Zapisz zaktualizowaną listę globalnie (dla innych skryptów)
+        window.margonemupdatedAllowedUsers = allowedUsers;
     }
+    
+    // Uruchom inicjalizację
+    init();
+    
+})();
     
     const userId = getCookie('user_id');
     if (!allowedUsers.includes(userId)) {
