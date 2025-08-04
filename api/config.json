@@ -1,0 +1,14 @@
+{
+  "apiVersion": "1.0.0",
+  "endpoints": {
+    "users": "/api/users.json",
+    "logs": "/api/logs.json",
+    "sync": "/api/sync.js"
+  },
+  "admins": ["5906841"],
+  "settings": {
+    "syncInterval": 60000,
+    "maxRetries": 3,
+    "timeout": 10000
+  }
+}
