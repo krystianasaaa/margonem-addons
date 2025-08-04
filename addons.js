@@ -1,5 +1,23 @@
 (function() {
     'use strict';
+    
+    const GITHUB_API_URL = 'https://krystianasaaa.github.io/margonem-addons/api/';
+    
+    async function loadUsersFromAPI() {
+        try {
+            const response = await fetch(`${GITHUB_API_URL}users.json`);
+            const data = await response.json();
+            if (data.users && data.users.length > 0) {
+                localStorage.setItem('margonem_allowed_users', JSON.stringify(data.users));
+                return data.users;
+            }
+            throw new Error('Pusta lista');
+        } catch (error) {
+            console.log('⚠️ API niedostępne, używam lokalnych danych');
+            return null;
+        }
+    }
+    
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -9,29 +27,27 @@
         return null;
     }
     
-    // Sprawdź czy jest zaktualizowana lista z panelu administratora
-    let allowedUsers;
-    const savedUsers = localStorage.getItem('margonem_allowed_users');
-    if (savedUsers) {
-        try {
-            allowedUsers = JSON.parse(savedUsers);
-            console.log('📂 Użyto zaktualizowanej listy z panelu administratora');
-        } catch (e) {
-            // Jeśli błąd, użyj domyślnej listy
-            allowedUsers = ['6122094', '6210905', '9110806', '3543472', '4965363', '6793254', '4633387', '1661718', '7164363', '5109521', '8370413', '8228619', '7172886', '8357394', '6936569', '874973', '8144729', '1521186', '594120', '8839561', '5906841', '8824864', '2885972', '8776354', '7520102', '9269588', '7316243', '8432475', '5295667', '4664363', '9392055', '530596', '6244754', '8200643'];
+    async function init() {
+        // Załaduj użytkowników (API -> localStorage -> domyślna lista)
+        let allowedUsers = await loadUsersFromAPI();
+        
+        if (!allowedUsers) {
+            const saved = localStorage.getItem('margonem_allowed_users');
+            if (saved) {
+                allowedUsers = JSON.parse(saved);
+            } else {
+                allowedUsers = ['6122094', '6210905', '9110806']; 
+            }
         }
-    } else {
-        // Domyślna lista
-        allowedUsers = ['6122094', '6210905', '9110806', '3543472', '4965363', '6793254', '4633387', '1661718', '7164363', '5109521', '8370413', '8228619', '7172886', '8357394', '6936569', '874973', '8144729', '1521186', '594120', '8839561', '5906841', '8824864', '2885972', '8776354', '7520102', '9269588', '7316243', '8432475', '5295667', '4664363', '9392055', '530596', '6244754', '8200643'];
-    }
-    
-    const userId = getCookie('user_id');
-    if (!allowedUsers.includes(userId)) {
-        console.log('🚫 Brak uprawnień dla użytkownika:', userId);
-        console.log('✅ Dozwoleni użytkownicy:', allowedUsers);
-        return; 
-    }
-    console.log('✅ Użytkownik autoryzowany:', userId);
+        
+        // Sprawdź autoryzację
+        const userId = getCookie('user_id');
+        if (!allowedUsers.includes(userId)) {
+            console.log('🚫 Brak uprawnień dla:', userId);
+            return;
+        }
+        
+        console.log('✅ Autoryzowany:', userId);
     // System do śledzenia elementów i eventów każdego dodatku
     const addonTrackers = {
         addon1: {
