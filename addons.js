@@ -24,11 +24,16 @@
             z-index: 20000;
             font-weight: bold;
             font-size: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         `;
         notification.textContent = message;
         document.body.appendChild(notification);
 
-        setTimeout(() => notification.remove(), 3000);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
     
     async function updateFromAPI() {
@@ -59,14 +64,12 @@
                 console.log(`👥 Użytkowników: ${data.users.length}`);
                 console.log(`📅 Ostatnia aktualizacja: ${data.lastUpdated || 'nieznana'}`);
                 
-                showNotification(`✅ Lista zaktualizowana (${data.users.length} użytkowników)`, 'success');
                 return data.users;
             } else {
                 throw new Error('Nieprawidłowa struktura danych');
             }
         } catch (error) {
             console.log('⚠️ Błąd API:', error.message);
-            showNotification('⚠️ Nie można pobrać najnowszej listy', 'warning');
             return null;
         }
     }
@@ -83,6 +86,33 @@
     // Domyślna lista (fallback)
     const defaultUsers = ['6122094', '6210905', '9110806', '3543472', '4965363', '6793254', '4633387', '1661718', '7164363', '5109521', '8370413', '8228619', '7172886', '8357394', '6936569', '874973', '8144729', '1521186', '594120', '8839561', '5906841', '8824864', '2885972', '8776354', '7520102', '9269588', '7316243', '8432475', '5295667', '4664363', '9392055', '530596', '6244754', '8200643'];
     
+    // KLUCZOWA FUNKCJA - ładowanie dodatków
+    function loadAddons() {
+        console.log('🚀 Ładowanie dodatków Kaczor...');
+        
+        // Lista dodatków do załadowania
+        const addons = [
+            'https://krystianasaaa.github.io/margonem-addons/main.js',
+            // Dodaj tutaj więcej dodatków jeśli są potrzebne
+        ];
+        
+        // Załaduj każdy dodatek
+        addons.forEach((addonUrl, index) => {
+            const script = document.createElement('script');
+            script.src = addonUrl;
+            script.onload = () => {
+                console.log(`✅ Dodatek ${index + 1} załadowany: ${addonUrl}`);
+            };
+            script.onerror = () => {
+                console.error(`❌ Błąd ładowania dodatku ${index + 1}: ${addonUrl}`);
+                showNotification(`❌ Błąd ładowania dodatku ${index + 1}`, 'error');
+            };
+            document.head.appendChild(script);
+        });
+        
+        showNotification('🚀 Ładowanie dodatków Kaczor...', 'info');
+    }
+    
     // Główna logika
     async function init() {
         let allowedUsers;
@@ -93,6 +123,7 @@
         if (apiUsers) {
             // Udało się pobrać z API
             allowedUsers = apiUsers;
+            showNotification(`✅ Lista zaktualizowana (${apiUsers.length} użytkowników)`, 'success');
         } else {
             // Spróbuj użyć lokalnej kopii
             const savedUsers = localStorage.getItem('margonem_allowed_users');
@@ -100,7 +131,7 @@
                 try {
                     allowedUsers = JSON.parse(savedUsers);
                     console.log('📂 Użyto lokalnej kopii zapasowej');
-                    showNotification('📂 Używam lokalnej kopii (API niedostępne)', 'info');
+                    showNotification('📂 Używam lokalnej kopii', 'warning');
                 } catch (e) {
                     allowedUsers = defaultUsers;
                     console.log('📋 Użyto domyślnej listy (błąd parsowania)');
@@ -108,11 +139,19 @@
             } else {
                 allowedUsers = defaultUsers;
                 console.log('📋 Użyto domyślnej listy');
+                showNotification('📋 Używam domyślnej listy', 'info');
             }
         }
         
         // Sprawdź autoryzację
         const userId = getCookie('user_id');
+        
+        if (!userId) {
+            console.log('❌ Nie można pobrać ID użytkownika z cookies');
+            showNotification('❌ Błąd pobierania ID użytkownika', 'error');
+            return;
+        }
+        
         if (!allowedUsers.includes(userId)) {
             console.log('🚫 Brak uprawnień dla:', userId);
             showNotification(`🚫 Brak dostępu dla ID: ${userId}`, 'error');
@@ -124,19 +163,21 @@
         
         // Zapisz zaktualizowaną listę globalnie (dla innych skryptów)
         window.margonemupdatedAllowedUsers = allowedUsers;
+        
+        // NAJWAŻNIEJSZE - załaduj dodatki!
+        setTimeout(() => {
+            loadAddons();
+        }, 1000); // Krótkie opóźnienie żeby upewnić się że strona jest gotowa
     }
     
-    // Uruchom inicjalizację
-    init();
+    // Uruchom inicjalizację po załadowaniu strony
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
     
 })();
-    
-    const userId = getCookie('user_id');
-    if (!allowedUsers.includes(userId)) {
-        console.log('🚫 Brak uprawnień dla:', userId);
-        return; 
-    }
-    console.log('✅ Użytkownik autoryzowany:', userId);
     // System do śledzenia elementów i eventów każdego dodatku
     const addonTrackers = {
         addon1: {
