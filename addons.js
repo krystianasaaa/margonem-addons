@@ -120,7 +120,7 @@
     let currentPlayersData = null;
     const titanList = [
         {level: 64, name: "Orla/Kic"}, {level: 65, name: "Kic"}, {level: 83, name: "Kic"}, {level: 88, name: "Rene"},
-        {level: 114, name: "Rene"}, {level: 118, name: "Arcy"}, {level: 144, name: "Arcy"}, {level: 164, name: "Zoons/Łowka"}, {level: 167, name: "Zoons/Łowka"},
+        {level: 114, name: "Rene"}, {level: 120, name: "Arcy"}, {level: 144, name: "Arcy"}, {level: 164, name: "Zoons/Łowka"}, {level: 167, name: "Zoons/Łowka"},
         {level: 180, name: "Łowka"}, {level: 190, name: "Łowka"}, {level: 191, name: "Przyzy"}, {level: 210, name: "Przyzy"},
         {level: 217, name: "Przyzy"}, {level: 218, name: "Magua"}, {level: 244, name: "Magua"}, {level: 245, name: "Teza"},
         {level: 271, name: "Teza"}, {level: 272, name: "Barba/Tan"}, {level: 300, name: "Barba/Tan"}
@@ -183,8 +183,8 @@ const themes = {
 }
 
 .guild-player {
-    background: linear-gradient(135deg, rgba(40,167,69,0.15), rgba(32,201,151,0.15)) !important;
-    border-left: 3px solid #28a745 !important;
+    background: linear-gradient(135deg, rgba(40,167,69,0.15), rgba(32,201,151,0.15));
+    border-left: 3px solid #28a745;
 }
 
 .guild-player .col-nick {
@@ -327,8 +327,8 @@ black: `#online-box{position:fixed;background:linear-gradient(135deg,#000000,#1a
 }
 
 .guild-player {
-    background: linear-gradient(135deg, rgba(40,167,69,0.15), rgba(32,201,151,0.15)) !important;
-    border-left: 3px solid var(--guild-color, #28a745) !important;
+    background: linear-gradient(135deg, rgba(40,167,69,0.15), rgba(32,201,151,0.15));
+    border-left: 3px solid var(--guild-color, #28a745);
 }
 
 .guild-player .col-nick {
@@ -587,6 +587,14 @@ function getSelectedGuilds() {
 
 function setSelectedGuilds(guilds) {
     localStorage.setItem('selectedGuilds', JSON.stringify(guilds));
+}
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
 }
 
 function toggleGuildSelection(guild) {
@@ -1817,13 +1825,16 @@ const finalClass = isCreator ? 'creator-player' :
 
 row.className = `player-row ${finalClass}`;
 
-// Ustaw kolor paska klanowego
 if (playerGuild && !isCreator && !isVip) {
     const guildColor = getGuildColor(playerGuild);
     row.style.setProperty('--guild-color', guildColor);
-    row.style.setProperty('--guild-text-color', guildColor);
 
-    // Bezpośrednio ustaw kolor border-left dla paska
+    // Ustaw tło z przezroczystością
+    const rgbColor = hexToRgb(guildColor);
+    if (rgbColor) {
+        row.style.background = `linear-gradient(135deg, rgba(${rgbColor.r},${rgbColor.g},${rgbColor.b},0.15), rgba(${rgbColor.r},${rgbColor.g},${rgbColor.b},0.1))`;
+    }
+
     if (selectedGuilds.length > 0 && selectedGuilds.includes(playerGuild)) {
         row.style.borderLeft = `3px solid ${guildColor}`;
     } else if (selectedGuilds.length === 0) {
