@@ -1,3 +1,12 @@
+// ==UserScript==
+// @name         Kaczor Addons Manager - Dream - aaa
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  manager bo co
+// @author       Kaczka
+// @match        https://dream.margonem.pl/*
+// @grant        none
+// ==/UserScript==
 (function() {
     'use strict';
     function getCookie(name) {
@@ -1222,7 +1231,7 @@ function showWebhookSettings() {
     modal.onclick = e => e.target === modal && document.body.removeChild(modal);
 }
 
-ToDiscord(titanName, players) {
+async function sendToDiscord(titanName, players) {
     const webhookUrl = getDiscordWebhookUrl();
     if (!webhookUrl) {
         alert('❌ Nie ustawiono URL webhook Discord!\nUstaw go klikając na przedział w podsumowaniu, następnie klikając zębatkę.');
@@ -1299,7 +1308,7 @@ ToDiscord(titanName, players) {
         alert(`❌ Błąd wysyłania na Discord:\n${error.message}`);
     }
 }
-AllTitansToDiscord() {
+async function sendAllTitansToDiscord() {
     const webhookUrl = getDiscordWebhookUrl();
     if (!webhookUrl) {
         alert('❌ Nie ustawiono URL webhook Discord!\nUstaw go klikając na przedział w podsumowaniu, następnie klikając zębatkę.');
@@ -2320,7 +2329,7 @@ if (savedGuilds) {
     }
 
     // Funkcja wysyłania na Discord
-    DiscordNotification(titanName, players) {
+    async function sendDiscordNotification(titanName, players) {
         const webhookUrl = getDiscordWebhookUrl();
         if (!webhookUrl || !isNotifierEnabled()) return false;
 
@@ -3157,8 +3166,8 @@ async function sendTitanRespawnNotification(titanName, titanLevel, titanData = {
     const finderName = titanData.finderName || getCurrentPlayerName() || 'Nieznany gracz';
 
     const embed = {
-        title: `!#TYTAN#!`,
-        description: `**${titanName} (Lvl ${titanLevel})**\n${rolePing}\n\n` +
+        title: `TYTAN ZRESPIŁ!`,
+        description: `**${titanName} (Lvl ${titanLevel})**\n\n` +
                     `**Mapa:** ${mapName}\n` +
                     `**Znalazł:** ${finderName}\n` +
                     `**Świat:** ${worldName}`,
@@ -3176,8 +3185,8 @@ async function sendTitanRespawnNotification(titanName, titanLevel, titanData = {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                content: '', // Usunięto ping z content
-                embeds: [embed]    // Ping teraz jest w embed description
+                content: rolePing, // Ping tutaj
+                embeds: [embed]    // Embed bez pingu
             })
         });
 
@@ -3700,55 +3709,34 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
         }
     };
 
-       const styles = `
+    // CSS Styles
+    const styles = `
         .addon-manager {
             position: fixed;
             top: 10px;
             right: 10px;
             z-index: 10000;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .addon-toggle-btn {
-            background: #2f3136;
-            border: 1px solid #40444b;
-            color: #dcddde;
-            padding: 8px 12px;
-            border-radius: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
             cursor: move;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
             user-select: none;
             position: relative;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            min-width: 120px;
-        }
-
-        .addon-toggle-btn::before {
-            content: '';
-            width: 16px;
-            height: 16px;
-            background-image: url('https://media.discordapp.net/attachments/793585855717048343/1402060185220157480/raw.png?ex=6894840d&is=6893328d&hm=419bd627f091951fc1ac2f8a1396bd59700961b93eaf760431f28f57747da87f&=&format=webp&quality=lossless&width=960&height=960');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
         }
 
         .addon-toggle-btn:hover {
-            background: #36393f;
-            border-color: #4f545c;
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-        }
-
-        .addon-toggle-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
         .addon-toggle-btn.dragging {
@@ -3760,24 +3748,25 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
             position: absolute;
             top: 50px;
             right: 0;
-            background: #2f3136;
-            border: 1px solid #40444b;
-            border-radius: 6px;
-            padding: 16px;
-            min-width: 280px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
             display: none;
+            backdrop-filter: blur(10px);
         }
 
         .addon-menu.active {
             display: block;
-            animation: slideIn 0.2s ease;
+            animation: slideIn 0.3s ease;
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(-8px);
+                transform: translateY(-10px);
             }
             to {
                 opacity: 1;
@@ -3786,69 +3775,60 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
         }
 
         .addon-menu-header {
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            text-align: left;
-            border-bottom: 1px solid #40444b;
-            padding-bottom: 8px;
+            color: #ecf0f1;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
             cursor: move;
             user-select: none;
             position: relative;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .addon-menu-header::before {
-            content: '';
-            width: 18px;
-            height: 18px;
-            background-image: url('https://media.discordapp.net/attachments/793585855717048343/1402060185220157480/raw.png?ex=6894840d&is=6893328d&hm=419bd627f091951fc1ac2f8a1396bd59700961b93eaf760431f28f57747da87f&=&format=webp&quality=lossless&width=960&height=960');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
+            margin-left: -10px;
+            margin-right: -10px;
+            padding-left: 10px;
+            padding-right: 10px;
         }
 
         .addon-menu.dragging {
             transition: none !important;
         }
 
+
+
         .addon-close-btn {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #36393f;
-            border: 1px solid #40444b;
-            color: #dcddde;
-            width: 24px;
-            height: 24px;
+            top: -20px;
+            right: -10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #ecf0f1;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 16px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             line-height: 1;
         }
 
         .addon-close-btn:hover {
-            background: #ed4245;
-            border-color: #ed4245;
-            color: white;
+            background: rgba(231, 76, 60, 0.8);
+            transform: scale(1.1);
         }
 
         .addon-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #40444b;
-            transition: all 0.2s ease;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
         }
 
         .addon-item:last-child {
@@ -3856,60 +3836,63 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
         }
 
         .addon-item:hover {
-            background: rgba(255,255,255,0.04);
-            margin: 0 -8px;
-            padding: 10px 8px;
-            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            margin: 0 -10px;
+            padding: 12px 10px;
+            border-radius: 8px;
         }
 
         .addon-name {
-            color: #dcddde;
+            color: #ecf0f1;
             font-size: 14px;
             font-weight: 500;
         }
 
         .addon-switch {
             position: relative;
-            width: 44px;
-            height: 22px;
-            background: #4f545c;
-            border-radius: 11px;
+            width: 50px;
+            height: 24px;
+            background: #34495e;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.1);
         }
 
         .addon-switch.active {
-            background: #3ba55d;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-color: #4CAF50;
         }
 
         .addon-switch::after {
             content: '';
             position: absolute;
-            top: 2px;
+            top: 50%;
             left: 2px;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transform: translateY(-50%);
         }
 
         .addon-switch.active::after {
-            left: 24px;
+            left: 28px;
+            transform: translateY(-50%);
         }
 
         .addon-status {
-            font-size: 11px;
-            color: #72767d;
-            margin-top: 2px;
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 5px;
         }
 
         .addon-refresh-notice {
-            font-size: 10px;
-            color: #ed4245;
-            margin-top: 2px;
+            font-size: 11px;
+            color: #e74c3c;
+            margin-top: 3px;
             font-style: italic;
             display: none;
         }
@@ -3919,50 +3902,37 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
         }
 
         .addon-controls {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #40444b;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .control-btn {
             flex: 1;
-            padding: 6px 10px;
-            border: 1px solid #40444b;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            color: #dcddde;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
         .enable-all-btn {
-            background: #3ba55d;
-            border-color: #3ba55d;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
             color: white;
         }
 
         .disable-all-btn {
-            background: #ed4245;
-            border-color: #ed4245;
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
             color: white;
-        }
-
-        .enable-all-btn:hover {
-            background: #2d7d32;
-            border-color: #2d7d32;
-        }
-
-        .disable-all-btn:hover {
-            background: #c62828;
-            border-color: #c62828;
         }
 
         .control-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
     `;
 
@@ -4077,7 +4047,7 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
 
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'addon-toggle-btn';
-        toggleBtn.textContent = ' Kaczor Manager';
+        toggleBtn.textContent = '⚙️ Dodatki';
 
         // Make button draggable and get function to check if was dragged
         const wasDragged = makeDraggable(container, toggleBtn);
@@ -4320,3 +4290,4 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
 
     init();
 })();
+
