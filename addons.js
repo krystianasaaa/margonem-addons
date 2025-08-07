@@ -3728,16 +3728,16 @@ const styles = `
             min-width: 120px;
         }
 
-        .addon-toggle-btn::before {
-            content: '';
-            width: 16px;
-            height: 16px;
-            background-image: url('https://imgur.com/a/6gE7Sye');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
-        }
+    .addon-toggle-btn::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/main/images/ikonka.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
 
         .addon-toggle-btn:hover {
             background: #36393f;
@@ -3801,16 +3801,16 @@ const styles = `
             gap: 8px;
         }
 
-        .addon-menu-header::before {
-            content: '';
-            width: 18px;
-            height: 18px;
-            background-image: url('https://imgur.com/a/6gE7Sye');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
-        }
+      .addon-menu-header::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/main/images/ikonka.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
 
         .addon-menu.dragging {
             transition: none !important;
