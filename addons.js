@@ -4077,7 +4077,7 @@ const styles = `
 
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'addon-toggle-btn';
-        toggleBtn.textContent = '⚙️ Dodatki';
+        toggleBtn.textContent = 'Kaczor Manager';
 
         // Make button draggable and get function to check if was dragged
         const wasDragged = makeDraggable(container, toggleBtn);
