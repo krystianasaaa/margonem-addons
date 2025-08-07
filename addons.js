@@ -1,12 +1,3 @@
-// ==UserScript==
-// @name         Kaczor Addons Manager - Dream - aaa
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  manager bo co
-// @author       Kaczka
-// @match        https://dream.margonem.pl/*
-// @grant        none
-// ==/UserScript==
 (function() {
     'use strict';
     function getCookie(name) {
