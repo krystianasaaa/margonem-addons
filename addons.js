@@ -4087,7 +4087,7 @@ const styles = `
 
         const header = document.createElement('div');
         header.className = 'addon-menu-header';
-        header.textContent = 'Manager Dodatków';
+        header.textContent = 'Manager';
 
         // Close button
         const closeBtn = document.createElement('button');
