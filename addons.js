@@ -3732,7 +3732,7 @@ const styles = `
             content: '';
             width: 16px;
             height: 16px;
-            background-image: url('https://media.discordapp.net/attachments/793585855717048343/1402060185220157480/raw.png?ex=6894840d&is=6893328d&hm=419bd627f091951fc1ac2f8a1396bd59700961b93eaf760431f28f57747da87f&=&format=webp&quality=lossless&width=960&height=960');
+            background-image: url('https://imgur.com/a/6gE7Sye');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -3805,7 +3805,7 @@ const styles = `
             content: '';
             width: 18px;
             height: 18px;
-            background-image: url('https://media.discordapp.net/attachments/793585855717048343/1402060185220157480/raw.png?ex=6894840d&is=6893328d&hm=419bd627f091951fc1ac2f8a1396bd59700961b93eaf760431f28f57747da87f&=&format=webp&quality=lossless&width=960&height=960');
+            background-image: url('https://imgur.com/a/6gE7Sye');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
