@@ -28,29 +28,29 @@
         styles.textContent = `
             #dream-summary-box {
                 position: fixed;
-                background: linear-gradient(135deg, #0f3460, #0f4c75);
-                border: 2px solid #3282b8;
-                border-radius: 12px;
-                color: #e8f4fd;
+                background: #1a1a1a;
+                border: 1px solid #333;
+                border-radius: 8px;
+                color: #ffffff;
                 font-family: Arial, sans-serif;
                 font-size: 12px;
-                box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.6);
                 z-index: 10000;
                 min-width: 250px;
-                backdrop-filter: blur(10px);
             }
             
             #dream-summary-box.hidden { display: none !important; }
             
             .dream-summary-header {
-                background: linear-gradient(135deg, #3282b8, #0f4c75);
+                background: #2d2d2d;
                 padding: 8px 12px;
-                border-radius: 10px 10px 0 0;
+                border-radius: 7px 7px 0 0;
                 cursor: move;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 font-weight: bold;
+                border-bottom: 1px solid #444;
             }
             
             .dream-summary-content {
@@ -72,27 +72,37 @@
             }
             
             .titan-count {
-                background: rgba(50,130,184,0.3);
-                padding: 2px 6px;
+                background: #333;
+                padding: 3px 8px;
                 border-radius: 4px;
                 font-size: 10px;
                 white-space: nowrap;
+                cursor: pointer;
+                transition: all 0.2s;
+                border: 1px solid #555;
+            }
+            
+            .titan-count:hover {
+                background: #444;
+                transform: scale(1.05);
+                border-color: #666;
             }
             
             .titan-count.highlight {
-                background: rgba(255,193,7,0.4);
+                background: #4a4a00;
                 font-weight: bold;
-                border: 1px solid #ffc107;
+                border: 1px solid #ffff00;
+                color: #ffff00;
             }
             
             .last-refresh {
-                color: #a8dadc;
+                color: #888;
                 font-size: 9px;
             }
             
             .dream-summary-button {
-                background: #3282b8;
-                border: none;
+                background: #444;
+                border: 1px solid #666;
                 color: white;
                 padding: 4px 8px;
                 border-radius: 4px;
@@ -102,21 +112,21 @@
             }
             
             .dream-summary-button:hover {
-                background: #2968a3;
+                background: #555;
             }
             
             .show-dream-btn {
                 position: fixed;
-                background: linear-gradient(135deg, #3282b8, #0f4c75);
-                border: 2px solid #3282b8;
+                background: #2d2d2d;
+                border: 1px solid #666;
                 color: white;
                 width: 45px;
                 height: 35px;
-                border-radius: 8px;
+                border-radius: 6px;
                 cursor: pointer;
                 font-size: 12px;
                 z-index: 9999;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.6);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -125,8 +135,8 @@
             }
             
             .show-dream-btn:hover {
-                transform: scale(1.1);
-                box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+                background: #444;
+                transform: scale(1.05);
             }
             
             .resizer {
@@ -136,7 +146,70 @@
                 width: 15px;
                 height: 15px;
                 cursor: nw-resize;
-                background: linear-gradient(-45deg, transparent 40%, #3282b8 40%, #3282b8 60%, transparent 60%);
+                background: linear-gradient(-45deg, transparent 40%, #666 40%, #666 60%, transparent 60%);
+            }
+            
+            /* Modal dla listy graczy */
+            .titan-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                z-index: 20000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .titan-modal-content {
+                background: #1a1a1a;
+                border: 1px solid #333;
+                border-radius: 8px;
+                color: white;
+                max-width: 400px;
+                max-height: 500px;
+                overflow-y: auto;
+            }
+            
+            .titan-modal-header {
+                background: #2d2d2d;
+                padding: 12px;
+                border-bottom: 1px solid #444;
+                font-weight: bold;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .titan-modal-body {
+                padding: 10px;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            
+            .player-item {
+                padding: 5px 10px;
+                margin: 2px 0;
+                background: #2a2a2a;
+                border-radius: 4px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .modal-close-btn {
+                background: #666;
+                border: none;
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            
+            .modal-close-btn:hover {
+                background: #777;
             }
         `;
         document.head.appendChild(styles);
@@ -288,7 +361,82 @@
         document.addEventListener('mouseup', () => isDragging = false);
     }
 
-    // === FUNKCJA ZMIANY ROZMIARU ===
+    // === FUNKCJA POKAZYWANIA GRACZY Z TYTANA ===
+    function showTitanPlayers(titanName) {
+        if (!currentPlayersData || !Array.isArray(currentPlayersData)) {
+            return;
+        }
+
+        const playersInTitan = currentPlayersData.filter(p => getTitanName(p.l) === titanName);
+        
+        if (playersInTitan.length === 0) {
+            return;
+        }
+
+        // Sortuj graczy według poziomu (malejąco)
+        playersInTitan.sort((a, b) => b.l - a.l);
+
+        const modal = document.createElement('div');
+        modal.className = 'titan-modal';
+        modal.innerHTML = `
+            <div class="titan-modal-content">
+                <div class="titan-modal-header">
+                    <div>${getTitanEmoji(titanName)} ${titanName} (${playersInTitan.length} graczy)</div>
+                    <button class="modal-close-btn">✕</button>
+                </div>
+                <div class="titan-modal-body">
+                    ${playersInTitan.map(p => `
+                        <div class="player-item">
+                            <span><strong>${p.n}</strong></span>
+                            <span>LvL ${p.l}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Event listenery do zamknięcia
+        modal.querySelector('.modal-close-btn').onclick = () => modal.remove();
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.remove();
+        };
+
+        // Zamknij na ESC
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') {
+                modal.remove();
+                document.removeEventListener('keydown', handleEsc);
+            }
+        };
+        document.addEventListener('keydown', handleEsc);
+    }
+
+    // === FUNKCJA DODAWANIA KLIKANIA DO TYTANÓW ===
+    function addTitanClickListeners(container) {
+        const titanCounts = container.querySelectorAll('.titan-count');
+
+        titanCounts.forEach(titanCount => {
+            const text = titanCount.textContent.trim();
+            
+            // Pomiń elementy z "-"
+            if (text.includes('❌ -:')) return;
+
+            // Wyciągnij nazwę tytana z tekstu
+            const match = text.match(/^[^\s]+\s+(.+?):\s*\d+$/);
+            if (match) {
+                const titanName = match[1].trim();
+                titanCount.setAttribute('data-titan', titanName);
+                
+                titanCount.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showTitanPlayers(titanName);
+                });
+            }
+        });
+    }
     function makeResizable(element) {
         const resizer = element.querySelector('.resizer');
         let isResizing = false, startX, startY, startWidth, startHeight;
@@ -372,7 +520,7 @@
 
         return `
             <div class="summary-row">
-                <div style="font-weight: bold; color: #ffc107;">👥 Gracze online: ${players.length}</div>
+                <div style="font-weight: bold; color: #fff;">👥 Gracze online: ${players.length}</div>
                 <div class="last-refresh">${lastRefreshTime ? `🕐 ${lastRefreshTime.toLocaleTimeString('pl-PL')}` : ''}</div>
             </div>
             <div class="summary-row">
@@ -448,6 +596,8 @@
         const summaryContent = box.querySelector('#summary-content');
         if (summaryContent) {
             summaryContent.innerHTML = generateSummaryHTML(players);
+            // Dodaj możliwość klikania w tytany
+            addTitanClickListeners(summaryContent);
         }
     }
 
