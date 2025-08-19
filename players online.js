@@ -2099,9 +2099,9 @@ if (savedGuilds) {
     }
 }
 
-// AUTOMATYCZNE ŁADOWANIE KLANÓW Z GITHUB PRZY STARCIE
+
 async function autoLoadGuilds() {
-    const githubUrl = 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/guilds/guilds.json;
+    const githubUrl = 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/guilds/guilds.json';
     console.log('🔄 Automatyczne ładowanie klanów z GitHub...');
     
     const result = await loadGuildsFromGitHub(githubUrl);
