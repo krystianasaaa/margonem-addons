@@ -611,7 +611,6 @@
 
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'addon-toggle-btn';
-        toggleBtn.textContent = ' Kaczor Manager';
 
         const wasDragged = makeDraggable(container, toggleBtn);
 
