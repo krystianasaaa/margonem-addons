@@ -237,19 +237,10 @@
     }
 
     function getTitanEmoji(titanName) {
-        const emojiMap = {
-            'Orla/Kic': '🦅',
-            'Kic': '🦅', 
-            'Rene': '🐺',
-            'Arcy': '⚔️',
-            'Zoons/Łowka': '🏹',
-            'Łowka': '🏹',
-            'Przyzy': '🛡️',
-            'Magua': '🔥',
-            'Teza': '⚡',
-            'Barba/Tan': '👹',
-            '-': '❌'
-        };
+const emojiMap = {
+        'Orla/Kic': '🦅/🐰', 'Kic': '🐰', 'Rene': '⛓️', 'Arcy': '🔥', 'Zoons/Łowka': '🗡️/🏹',
+        'Łowka': '🏹', 'Przyzy': '👹', 'Magua': '🐟', 'Teza': '⚡', 'Barba/Tan': '👑'
+    };
         return emojiMap[titanName] || '❓';
     }
 
