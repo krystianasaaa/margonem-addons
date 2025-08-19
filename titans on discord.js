@@ -1,9 +1,15 @@
 (function() {
     'use strict';
+if (window.titanNotifierRunning) {
+    console.log('Titans on Discord już działa - pomijam duplikat');
+    return;
+}
+window.titanNotifierRunning = true;
 
     // Śledzenie wykrytych tytanów
     let lastDetectedTitans = new Set();
 const COOLDOWN_TIME = 5 * 60 * 1000;
+let titanCheckInterval = null;
 
     const styles = `
         #titan-notifier-button {
@@ -412,8 +418,7 @@ const COOLDOWN_TIME = 5 * 60 * 1000;
 
         localStorage.setItem('titanNotifierLog', JSON.stringify(log));
     }
-
-    function updateButtonAppearance() {
+function updateButtonAppearance() {
         const button = document.getElementById('titan-notifier-button');
         if (button) {
             if (isNotifierEnabled()) {
@@ -725,8 +730,7 @@ async function checkTitanRespawns() {
             statusText = 'Dodatek włączony, ale brak webhook URL';
         }
 
-        // Lista najpopularniejszych tytanów do ustawienia ról
-        const popularTitans = [
+               const popularTitans = [
             {name: "Dziewicza Orlica", level: 51},
             {name: "Zabójczy Królik", level: 70},
             {name: "Renegat Baulus", level: 101},
@@ -948,6 +952,14 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
 
     // Inicjalizacja
     function init() {
+    const existingButton = document.getElementById('titan-notifier-button');
+    if (existingButton) {
+        existingButton.remove();
+        console.log('Usunięto duplikat przycisku Titans on Discord');
+    }
+if (titanCheckInterval) {
+    clearInterval(titanCheckInterval);
+}
         // Dodaj style
         const styleSheet = document.createElement('style');
         styleSheet.textContent = styles;
@@ -975,7 +987,7 @@ modal.querySelector('#titan-load-world-roles').onclick = () => {
         updateButtonAppearance();
 
         // Rozpocznij sprawdzanie respawnów co 10 sekund
-        setInterval(checkTitanRespawns, 10000);
+       titanCheckInterval = setInterval(checkTitanRespawns, 10000);
 
         console.log('Dodatek uruchomiony!');
     }
