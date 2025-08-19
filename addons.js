@@ -269,10 +269,9 @@
             transition: none !important;
         }
 
-        .addon-manager.hidden .addon-toggle-btn {
-            opacity: 0.3;
-            pointer-events: none;
-        }
+        .addon-manager.hidden {
+    display: none !important;
+}
 
         .addon-menu {
             position: absolute;
@@ -647,22 +646,23 @@
         return () => hasDragged;
     }
 
-    // Funkcja do ukrywania/pokazywania managera
-    function toggleManagerVisibility() {
-        const manager = document.querySelector('.addon-manager');
-        if (!manager) return;
+function toggleManagerVisibility() {
+    const manager = document.querySelector('.addon-manager');
+    if (!manager) return;
 
-        isHidden = !isHidden;
-        manager.classList.toggle('hidden', isHidden);
-        
+    isHidden = !isHidden;
+    
+    if (isHidden) {
+        manager.style.display = 'none';
         // Zamknij menu jeśli jest otwarte
-        if (isHidden) {
-            const menu = manager.querySelector('.addon-menu');
-            menu.classList.remove('active');
-        }
-        
-        console.log(`Manager dodatków ${isHidden ? 'ukryty' : 'widoczny'}`);
+        const menu = manager.querySelector('.addon-menu');
+        menu.classList.remove('active');
+    } else {
+        manager.style.display = 'block';
     }
+    
+    console.log(`Manager dodatków ${isHidden ? 'ukryty' : 'widoczny'}`);
+}
 
     // System obsługi skrótów klawiszowych
     function setupKeyboardShortcuts() {
