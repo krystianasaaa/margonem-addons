@@ -207,12 +207,52 @@
         }));
     }
 
-    // Funkcja cleanup (musisz ją dostosować do swoich potrzeb)
-    function cleanupAddon(addonId) {
-        console.log(`Czyszczenie dodatku: ${addonId}`);
-        // Tutaj umieść kod do czyszczenia zasobów dodatku
-        // np. usuwanie event listenerów, elementów DOM, itp.
-    }
+function cleanupAddon(addonId) {
+    console.log(`Czyszczenie dodatku: ${addonId}`);
+    // Ukryj wszystkie elementy dodatku
+    hideAddonElements(addonId);
+}
+
+// Nowa funkcja do ukrywania elementów dodatków
+function hideAddonElements(addonId) {
+    // Ukryj elementy na podstawie typowych selektorów dla dodatków
+    const selectors = [
+        `[id*="${addonId}"]`,
+        `[class*="${addonId}"]`,
+        `[data-addon="${addonId}"]`,
+        '.addon-ui',
+        '.addon-panel',
+        '.addon-button',
+        '.addon-icon'
+    ];
+    
+    selectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            element.style.display = 'none';
+        });
+    });
+}
+
+// Nowa funkcja do pokazywania elementów dodatków
+function showAddonElements(addonId) {
+    const selectors = [
+        `[id*="${addonId}"]`,
+        `[class*="${addonId}"]`,
+        `[data-addon="${addonId}"]`,
+        '.addon-ui',
+        '.addon-panel',
+        '.addon-button',
+        '.addon-icon'
+    ];
+    
+    selectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            element.style.display = '';
+        });
+    });
+}
 
     // CSS Styles dla GUI
     const styles = `
@@ -657,8 +697,22 @@ function toggleManagerVisibility() {
         // Zamknij menu jeśli jest otwarte
         const menu = manager.querySelector('.addon-menu');
         menu.classList.remove('active');
+        
+        // DODAJ TO: Ukryj wszystkie elementy włączonych dodatków
+        Object.keys(loadedAddons).forEach(addonId => {
+            if (loadedAddons[addonId].enabled) {
+                hideAddonElements(addonId);
+            }
+        });
     } else {
         manager.style.display = 'block';
+        
+        // DODAJ TO: Pokaż wszystkie elementy włączonych dodatków
+        Object.keys(loadedAddons).forEach(addonId => {
+            if (loadedAddons[addonId].enabled) {
+                showAddonElements(addonId);
+            }
+        });
     }
     
     console.log(`Manager dodatków ${isHidden ? 'ukryty' : 'widoczny'}`);
