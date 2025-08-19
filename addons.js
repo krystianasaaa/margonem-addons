@@ -9,7 +9,6 @@
         return null;
     }
 
-
     const allowedUsers = ['7712777', '6122094', '6210905', '9110806', '3543472', '4965363', '6793254', '4633387', '1661718', '7164363', '5109521', '8370413', '8228619', '7172886', '8357394', '6936569', '874973', '8144729', '1521186', '594120', '8839561', '5906841', '8824864', '2885972', '8776354', '7520102', '9269588', '7316243', '8432475', '5295667', '4664363', '9392055', '530596', '6244754', '8200643']; // <-- Tutaj wklej swoje ID
 
     const userId = getCookie('user_id');
@@ -215,19 +214,10 @@
         // np. usuwanie event listenerów, elementów DOM, itp.
     }
 
-    // Inicjalizacja - załaduj wszystkie dodatki przy starcie
-    loadAllAddons().then(() => {
-        console.log('🚀 Manager dodatków gotowy!');
-        console.log('Dostępne dodatki:', getAddonsList());
-        console.log(`👤 Zalogowany jako użytkownik: ${userId}`);
-    });
-
     // CSS Styles dla GUI
     const styles = `
         .addon-manager {
             position: fixed;
-            top: 10px;
-            right: 10px;
             z-index: 10000;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
@@ -279,15 +269,20 @@
             transition: none !important;
         }
 
+        .addon-manager.hidden .addon-toggle-btn {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
         .addon-menu {
             position: absolute;
             top: 50px;
-            right: 0;
+            left: 0;
             background: #2f3136;
             border: 1px solid #40444b;
             border-radius: 6px;
             padding: 16px;
-            min-width: 280px;
+            min-width: 300px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             display: none;
         }
@@ -475,6 +470,44 @@
             transform: translateY(-1px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
+
+        .shortcut-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #40444b;
+        }
+
+        .shortcut-label {
+            color: #dcddde;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .shortcut-input {
+            background: #40444b;
+            border: 1px solid #4f545c;
+            color: #dcddde;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .shortcut-input:focus {
+            outline: none;
+            border-color: #5865f2;
+            background: #36393f;
+        }
+
+        .shortcut-help {
+            font-size: 10px;
+            color: #72767d;
+            text-align: center;
+            font-style: italic;
+        }
     `;
 
     // Dodaj style do strony
@@ -508,6 +541,35 @@
         const saved = getAddonCookie(`addon_${addonId}_enabled`);
         return saved === 'true';
     }
+
+    // Funkcja do zapisywania pozycji
+    function savePosition(x, y) {
+        setCookie('addon_manager_x', x.toString());
+        setCookie('addon_manager_y', y.toString());
+    }
+
+    // Funkcja do wczytywania pozycji
+    function loadPosition() {
+        const x = getAddonCookie('addon_manager_x');
+        const y = getAddonCookie('addon_manager_y');
+        return {
+            x: x ? parseInt(x) : null,
+            y: y ? parseInt(y) : null
+        };
+    }
+
+    // Funkcja do zapisywania skrótu klawiszowego
+    function saveHideShortcut(shortcut) {
+        setCookie('addon_manager_shortcut', shortcut);
+    }
+
+    // Funkcja do wczytywania skrótu klawiszowego
+    function loadHideShortcut() {
+        return getAddonCookie('addon_manager_shortcut') || 'F1';
+    }
+
+    // Globalna zmienna do przechowywania stanu ukrycia
+    let isHidden = false;
 
     // Make element draggable
     function makeDraggable(element, handle) {
@@ -568,6 +630,10 @@
 
             isDragging = false;
 
+            // Zapisz pozycję po zakończeniu przeciągnięcia
+            const rect = element.getBoundingClientRect();
+            savePosition(rect.left, rect.top);
+
             setTimeout(() => {
                 element.classList.remove('dragging');
                 handle.classList.remove('dragging');
@@ -581,10 +647,61 @@
         return () => hasDragged;
     }
 
+    // Funkcja do ukrywania/pokazywania managera
+    function toggleManagerVisibility() {
+        const manager = document.querySelector('.addon-manager');
+        if (!manager) return;
+
+        isHidden = !isHidden;
+        manager.classList.toggle('hidden', isHidden);
+        
+        // Zamknij menu jeśli jest otwarte
+        if (isHidden) {
+            const menu = manager.querySelector('.addon-menu');
+            menu.classList.remove('active');
+        }
+        
+        console.log(`Manager dodatków ${isHidden ? 'ukryty' : 'widoczny'}`);
+    }
+
+    // System obsługi skrótów klawiszowych
+    function setupKeyboardShortcuts() {
+        let currentShortcut = loadHideShortcut();
+        
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toUpperCase();
+            const shortcut = currentShortcut.toUpperCase();
+            
+            // Sprawdź czy naciśnięty klawisz pasuje do ustawionego skrótu
+            if (key === shortcut) {
+                toggleManagerVisibility();
+            }
+        });
+        
+        return {
+            getCurrentShortcut: () => currentShortcut,
+            setShortcut: (newShortcut) => {
+                currentShortcut = newShortcut;
+                saveHideShortcut(newShortcut);
+            }
+        };
+    }
+
     // Create GUI
     function createGUI() {
         const container = document.createElement('div');
         container.className = 'addon-manager';
+
+        // Wczytaj zapisaną pozycję
+        const savedPosition = loadPosition();
+        if (savedPosition.x !== null && savedPosition.y !== null) {
+            container.style.left = savedPosition.x + 'px';
+            container.style.top = savedPosition.y + 'px';
+        } else {
+            // Domyślna pozycja
+            container.style.top = '10px';
+            container.style.right = '10px';
+        }
 
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'addon-toggle-btn';
@@ -676,6 +793,41 @@
         controls.appendChild(disableAllBtn);
         menu.appendChild(controls);
 
+        // Sekcja skrótów klawiszowych
+        const shortcutSection = document.createElement('div');
+        shortcutSection.className = 'shortcut-section';
+
+        const shortcutLabel = document.createElement('div');
+        shortcutLabel.className = 'shortcut-label';
+        shortcutLabel.textContent = 'Skrót do ukrywania:';
+
+        const shortcutInput = document.createElement('input');
+        shortcutInput.className = 'shortcut-input';
+        shortcutInput.type = 'text';
+        shortcutInput.maxLength = 3;
+        shortcutInput.value = keyboardShortcuts.getCurrentShortcut();
+        shortcutInput.placeholder = 'F1';
+
+        const shortcutHelp = document.createElement('div');
+        shortcutHelp.className = 'shortcut-help';
+        shortcutHelp.textContent = 'Naciśnij klawisz aby ustawić skrót';
+
+        shortcutInput.addEventListener('keydown', (e) => {
+            e.preventDefault();
+            const key = e.key.toUpperCase();
+            if (key.length === 1 || key.startsWith('F') || ['ESCAPE', 'ENTER', 'SPACE', 'TAB'].includes(key)) {
+                shortcutInput.value = key;
+                keyboardShortcuts.setShortcut(key);
+                shortcutInput.blur();
+                console.log(`Skrót klawiszowy zmieniony na: ${key}`);
+            }
+        });
+
+        shortcutSection.appendChild(shortcutLabel);
+        shortcutSection.appendChild(shortcutInput);
+        shortcutSection.appendChild(shortcutHelp);
+        menu.appendChild(shortcutSection);
+
         toggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             setTimeout(() => {
@@ -711,27 +863,57 @@
         });
     }
 
+    // Inicjalizacja systemu skrótów klawiszowych
+    const keyboardShortcuts = setupKeyboardShortcuts();
+
     // Inicjalizacja - załaduj wszystkie dodatki przy starcie
     loadAllAddons().then(() => {
         console.log('🚀 Manager dodatków gotowy!');
-        console.log('Dostępne dodatki:', getAddonsList());
-        console.log(`👤 Zalogowany jako użytkownik: ${userId}`);
+console.log('Dostępne dodatki:', getAddonsList());
         
-        // Utwórz GUI po załadowaniu dodatków
-        setTimeout(() => {
-            createGUI();
-        }, 500);
+        // Stwórz GUI
+        createGUI();
+        
+        // Globalne API do zarządzania dodatkami
+        window.AddonManager = {
+            enable: enableAddon,
+            disable: disableAddon,
+            toggle: toggleAddon,
+            list: getAddonsList,
+            isEnabled: (addonId) => {
+                const addon = loadedAddons[addonId];
+                return addon ? addon.enabled : false;
+            },
+            getAddon: (addonId) => loadedAddons[addonId],
+            refresh: updateGUI,
+            toggleVisibility: toggleManagerVisibility
+        };
+        
+        console.log('🎮 Dostępne komendy w konsoli:');
+        console.log('• AddonManager.enable("addon1") - włącz dodatek');
+        console.log('• AddonManager.disable("addon1") - wyłącz dodatek');
+        console.log('• AddonManager.toggle("addon1") - przełącz dodatek');
+        console.log('• AddonManager.list() - lista wszystkich dodatków');
+        console.log('• AddonManager.toggleVisibility() - ukryj/pokaż manager');
+        console.log(`• Klawisz ${keyboardShortcuts.getCurrentShortcut()} - ukryj/pokaż manager`);
+    }).catch(error => {
+        console.error('❌ Błąd podczas inicjalizacji managera dodatków:', error);
     });
 
-    // Eksportuj funkcje do użycia
-    window.AddonManager = {
-        enable: enableAddon,
-        disable: disableAddon,
-        toggle: toggleAddon,
-        getList: getAddonsList,
-        reload: loadAllAddons,
-        getCurrentUser: () => userId,
-        updateGUI: updateGUI
-    };
+    // Obsługa błędów
+    window.addEventListener('error', (e) => {
+        if (e.filename && e.filename.includes('addon')) {
+            console.error('Błąd w dodatku:', e.error);
+        }
+    });
+
+    // Cleanup przy odświeżeniu strony
+    window.addEventListener('beforeunload', () => {
+        Object.keys(loadedAddons).forEach(addonId => {
+            if (loadedAddons[addonId].enabled) {
+                cleanupAddon(addonId);
+            }
+        });
+    });
 
 })();
