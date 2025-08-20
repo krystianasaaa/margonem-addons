@@ -1,0 +1,78 @@
+# .github/workflows/update-guilds.yml
+name: Update Dream Guilds
+
+on:
+  schedule:
+    # Codziennie o 12:00 UTC (13:00 CET / 14:00 CEST)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Możliwość ręcznego uruchomienia
+
+jobs:
+  update-guilds:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install requests beautifulsoup4 lxml
+        
+    - name: Run scraper
+      run: |
+        echo "🚀 Aktualizuję guilds/guilds.json..."
+        cd guilds
+        python update_guilds.py
+        
+    - name: Check for changes
+      id: changes
+      run: |
+        if git diff --quiet guilds/guilds.json; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "🔄 Brak zmian w guilds.json"
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "✅ guilds.json został zaktualizowany"
+          
+          # Pokaż ile graczy/klanów
+          PLAYERS=$(jq '. | length' guilds/guilds.json)
+          UNIQUE_GUILDS=$(jq -r '. | to_entries | map(.value) | unique | length' guilds/guilds.json)
+          echo "📊 Graczy: $PLAYERS, Klanów: $UNIQUE_GUILDS"
+        fi
+        
+    - name: Commit changes
+      if: steps.changes.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "Dream Guild Bot"
+        
+        TIMESTAMP=$(date '+%Y-%m-%d %H:%M UTC')
+        PLAYERS=$(jq '. | length' guilds/guilds.json)
+        
+        git add guilds/guilds.json
+        git commit -m "🤖 Update guilds.json - $TIMESTAMP
+
+📊 Updated with $PLAYERS players from Dream world"
+        git push
+        
+    - name: Summary
+      run: |
+        echo "# 🏰 Dream Guilds Update" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📅 **Date:** $(date '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ steps.changes.outputs.changed }}" = "true" ]; then
+          PLAYERS=$(jq '. | length' guilds/guilds.json)
+          GUILDS=$(jq -r '. | to_entries | map(.value) | unique | length' guilds/guilds.json)
+          echo "✅ **Status:** Updated successfully" >> $GITHUB_STEP_SUMMARY
+          echo "👥 **Players:** $PLAYERS" >> $GITHUB_STEP_SUMMARY  
+          echo "🏰 **Guilds:** $GUILDS" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "🔄 **Status:** No changes" >> $GITHUB_STEP_SUMMARY
+        fi
