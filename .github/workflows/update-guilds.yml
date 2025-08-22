@@ -126,15 +126,30 @@ jobs:
         
     - name: Install dependencies
       run: |
+        # Python dependencies
         pip install requests beautifulsoup4 lxml
+        
+        # System dependencies  
+        sudo apt-get update
+        sudo apt-get install -y jq
         
     - name: Debug - Check files before
       run: |
-        echo "📂 Struktura katalogów:"
-        find . -name "*.py" -o -name "*.json" | head -20
+        echo "📂 Current directory:"
+        pwd
         echo ""
-        echo "📁 Zawartość katalogu guilds:"
-        ls -la guilds/ || echo "❌ Katalog guilds nie istnieje"
+        echo "📂 Directory structure:"
+        find . -name "*.py" -o -name "*.json" -o -name "*.yml" | head -20
+        echo ""
+        echo "📁 Guilds directory:"
+        if [ -d "guilds" ]; then
+          echo "✅ guilds/ exists"
+          ls -la guilds/
+        else
+          echo "❌ guilds/ directory not found!"
+          echo "Available directories:"
+          ls -la
+        fi
         
     - name: Run scraper
       id: scraper
