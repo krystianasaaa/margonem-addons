@@ -110,16 +110,8 @@ jobs:
         git config --global user.name "Dream Guild Bot"
         
         TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
-        PLAYERS="${{ steps.changes.outputs.players }}"
-        
-        git add guilds/guilds.json
-        
-        COMMIT_MSG="🤖 Update guilds.json - $TIMESTAMP
-
-📊 Updated with $PLAYERS players from Dream world
-🔄 Automated update via GitHub Actions"
-
-        git commit -m "$COMMIT_MSG"
+        PLAYERS_COUNT="${{ steps.changes.outputs.players }}"
+        git commit -m "🤖 Update guilds.json - $TIMESTAMP" -m "📊 Updated with $PLAYERS_COUNT players from Dream world" -m "🔄 Automated update via GitHub Actions"
         
         for i in {1..3}; do
           if git push origin main; then
