@@ -18,10 +18,8 @@ jobs:
     - name: Check for changes
       id: changes
       run: |
-        cd guilds
-        
-        # Sprawdź czy są zmiany w git
-        git add guilds.json
+        # Sprawdź czy są zmiany w git (plik jest już w guilds/)
+        git add guilds/guilds.json
         if git diff --cached --quiet; then
           echo "changed=false" >> $GITHUB_OUTPUT
           echo "🔄 Brak zmian w guilds.json"
@@ -30,9 +28,9 @@ jobs:
           echo "✅ guilds.json został zaktualizowany"
           
           # Pokaż statystyki
-          if [ -f "guilds.json" ]; then
-            PLAYERS=$(jq '. | length' guilds.json 2>/dev/null || echo "0")
-            UNIQUE_GUILDS=$(jq -r '. | to_entries | map(.value) | unique | length' guilds.json 2>/dev/null || echo "0")
+          if [ -f "guilds/guilds.json" ]; then
+            PLAYERS=$(jq '. | length' guilds/guilds.json 2>/dev/null || echo "0")
+            UNIQUE_GUILDS=$(jq -r '. | to_entries | map(.value) | unique | length' guilds/guilds.json 2>/dev/null || echo "0")
             echo "📊 Graczy: $PLAYERS, Klanów: $UNIQUE_GUILDS"
             echo "players=$PLAYERS" >> $GITHUB_OUTPUT
             echo "guilds=$UNIQUE_GUILDS" >> $GITHUB_OUTPUT
@@ -51,8 +49,7 @@ jobs:
         PLAYERS="${{ steps.changes.outputs.players }}"
         
         # Dodaj plik i commituj
-        cd guilds
-        git add guilds.json
+        git add guilds/guilds.json
         
         COMMIT_MSG="🤖 Update guilds.json - $TIMESTAMP
 
