@@ -64,8 +64,7 @@ class DreamGuildsUpdater:
         return (name.lower() not in invalid_names and 
                 not name.isdigit() and 
                 len(name) < 50 and
-                not re.match(r'^[#\-_\s]+
-                , name))
+                not re.match(r'^[#\-_ \s]+$', name))
         
     def validate_player_name(self, name):
         """Walidacja nicku gracza"""
