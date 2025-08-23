@@ -32,7 +32,7 @@ class DreamGuildsUpdater:
         if level == "ERROR":
             self.errors.append(f"{timestamp}: {message}")
 
-    def safe_request(self, url, timeout=30, retries=3):
+    def safe_request(self, url, timeout=20, retries=3):
         """Bezpieczne wykonanie requesta z retry"""
         for attempt in range(retries):
             try:
