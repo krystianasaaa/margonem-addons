@@ -266,7 +266,7 @@ class DreamGuildsUpdater:
 
             # Przerwa między requestami - respektujmy serwer
             if i < len(guilds):
-                time.sleep(5)  # Krótszy delay dla CI
+                time.sleep(10)  # Krótszy delay dla CI
 
         if not player_guild_mapping:
             self.log("❌ Nie udało się pobrać żadnych danych!", "ERROR")
