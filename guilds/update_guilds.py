@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import re
 import sys
+import random
 
 
 class DreamGuildsUpdater:
@@ -19,6 +20,9 @@ class DreamGuildsUpdater:
             'DNT': '1',
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
         })
         self.dream_ladder_url = "https://www.margonem.pl/ladder/guilds,Dream"
         self.base_url = "https://www.margonem.pl"
@@ -32,19 +36,38 @@ class DreamGuildsUpdater:
         if level == "ERROR":
             self.errors.append(f"{timestamp}: {message}")
 
-    def safe_request(self, url, timeout=20, retries=3):
-        """Bezpieczne wykonanie requesta z retry"""
+    def random_delay(self, min_seconds=15, max_seconds=30):
+        """Losowy delay między requestami"""
+        delay = random.uniform(min_seconds, max_seconds)
+        self.log(f"⏳ Czekam {delay:.1f} sekund...")
+        time.sleep(delay)
+
+    def safe_request(self, url, timeout=30, retries=3):
+        """Bezpieczne wykonanie requesta z retry i dłuższymi opóźnieniami"""
         for attempt in range(retries):
             try:
                 self.log(f"Request to {url} (attempt {attempt + 1}/{retries})")
+                
+                # Dodaj losowe opóźnienie przed każdym requestem
+                if attempt > 0:
+                    retry_delay = random.uniform(30, 60)  # 30-60 sekund między retry
+                    self.log(f"⏳ Retry delay: {retry_delay:.1f} sekund...")
+                    time.sleep(retry_delay)
+                
                 response = self.session.get(url, timeout=timeout)
                 response.raise_for_status()
+                
+                # Dodatkowy delay po udanym requeście
+                post_request_delay = random.uniform(3, 8)
+                time.sleep(post_request_delay)
+                
                 return response
+                
             except requests.exceptions.RequestException as e:
                 self.log(f"Request failed (attempt {attempt + 1}): {e}", "ERROR")
                 if attempt < retries - 1:
-                    wait_time = 2 ** attempt  # Exponential backoff
-                    self.log(f"Retrying in {wait_time} seconds...")
+                    wait_time = (2 ** attempt) * random.uniform(10, 20)  # Exponential backoff z randomizacją
+                    self.log(f"Retrying in {wait_time:.1f} seconds...")
                     time.sleep(wait_time)
                 else:
                     raise
@@ -233,6 +256,7 @@ class DreamGuildsUpdater:
     def update_guilds_json(self):
         """Główna funkcja - aktualizuje guilds.json"""
         self.log("🚀 Rozpoczynam aktualizację guilds.json")
+        self.log("⏳ UWAGA: Proces będzie bardzo wolny (15-30s między requestami)")
 
         # Wczytaj istniejące dane
         existing_data = self.load_existing_data()
@@ -249,6 +273,9 @@ class DreamGuildsUpdater:
         successful_guilds = 0
         total_members = 0
 
+        # Wymieszaj listę klanów, żeby kolejność była losowa
+        random.shuffle(guilds)
+
         for i, guild in enumerate(guilds, 1):
             self.log(f"\n[{i:2d}/{len(guilds)}] {guild['name']}")
 
@@ -264,9 +291,9 @@ class DreamGuildsUpdater:
             else:
                 self.log(f"⚠️  Brak członków dla {guild['name']}")
 
-            # Przerwa między requestami - respektujmy serwer
+            # Długa przerwa między klanami - respektujmy serwer
             if i < len(guilds):
-                time.sleep(10)  # Krótszy delay dla CI
+                self.random_delay(25, 45)  # 25-45 sekund między klanami
 
         if not player_guild_mapping:
             self.log("❌ Nie udało się pobrać żadnych danych!", "ERROR")
