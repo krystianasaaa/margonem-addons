@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    // Domyślne ustawienia
+    
     const defaultSettings = {
         key1: 'Digit1',
         key2: 'Digit2',
