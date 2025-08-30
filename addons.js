@@ -44,12 +44,12 @@
     addon5: {
         name: 'Inventory Search',
         enabled: false,
-        url: 'https://twoj-url-do-dodatku-1.js'
+        url: 'https://raw.githubusercontent.com/krystegggggggg/margonem-addons/refs/heads/patch-1/inventory%20search.js'
     },
     addon6: {
         name: 'Better Selling',
         enabled: false,
-        url: 'https://twoj-url-do-dodatku-2.js'
+        url: 'https://raw.githubusercontent.com/krystegggggggg/margonem-addons/refs/heads/patch-1/better%20selling.js'
     }
 };
 
