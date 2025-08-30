@@ -19,28 +19,39 @@
     }
 
      // Konfiguracja dodatków
-    const addonConfig = {
-        addon1: {
-            name: 'Players Online',
-            enabled: false,
-            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online.js'
-        },
-        addon2: {
-            name: 'Players Online - Alarm',
-            enabled: false,
-            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online%20alarm.js'
-        },
-        addon3: {
-            name: 'Titans on Discord',
-            enabled: false,
-            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/titans%20on%20discord.js'
-        },
-        addon4: {
-            name: 'Heroes on Discord',
-            enabled: false,
-            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/heroes%20on%20discord.js'
-        }
-    };
+   const addonConfig = {
+    addon1: {
+        name: 'Players Online',
+        enabled: false,
+        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online.js'
+    },
+    addon2: {
+        name: 'Players Online - Alarm',
+        enabled: false,
+        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online%20alarm.js'
+    },
+    addon3: {
+        name: 'Titans on Discord',
+        enabled: false,
+        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/titans%20on%20discord.js'
+    },
+    addon4: {
+        name: 'Heroes on Discord',
+        enabled: false,
+        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/heroes%20on%20discord.js'
+    },
+    
+    addon5: {
+        name: 'Inventory Search',
+        enabled: false,
+        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/inventory%20search.js'
+    },
+    addon6: {
+        name: 'Better Selling',
+        enabled: false,
+        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/better%20sellings.js'
+    }
+};
 
     // Obiekt do przechowywania załadowanych dodatków
     const loadedAddons = {};
