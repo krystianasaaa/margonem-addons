@@ -47,7 +47,7 @@
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/inventory%20search.js'
     },
     addon6: {
-        name: 'Better Selling',
+        name: 'Shop Hotkey',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/better%20sellings.js'
     }
