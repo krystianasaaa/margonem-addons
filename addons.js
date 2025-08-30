@@ -85,18 +85,32 @@
                 enabled: false,
                 code: addonCode,
                 addonFunction: null,
-                init: function() {
-                    console.log(`${config.name} włączony`);
-                    try {
-                        // Wykonaj kod dodatku w bezpiecznym kontekście
-                        this.addonFunction = new Function(
-                            'addonId', 
-                            'console', 
-                            'document', 
-                            'window',
-                            'cleanupAddon',
-                            this.code
-                        );
+init: function() {
+    console.log(`${config.name} włączony`);
+    try {
+        // Dodaj polyfill dla funkcji GM_
+        window.GM_getValue = window.GM_getValue || function(key, defaultValue) {
+            const stored = localStorage.getItem('gm_' + key);
+            return stored !== null ? JSON.parse(stored) : defaultValue;
+        };
+
+        window.GM_setValue = window.GM_setValue || function(key, value) {
+            localStorage.setItem('gm_' + key, JSON.stringify(value));
+        };
+
+        window.GM_deleteValue = window.GM_deleteValue || function(key) {
+            localStorage.removeItem('gm_' + key);
+        };
+
+        // Wykonaj kod dodatku w bezpiecznym kontekście
+        this.addonFunction = new Function(
+            'addonId', 
+            'console', 
+            'document', 
+            'window',
+            'cleanupAddon',
+            this.code
+        );
                         
                         // Uruchom dodatek
                         this.addonFunction(addonId, console, document, window, cleanupAddon);
