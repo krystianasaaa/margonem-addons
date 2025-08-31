@@ -741,14 +741,7 @@ async function checkTitanRespawns() {
             {name: "Maddok Magua", level: 231},
             {name: "Tezcatlipoca", level: 258},
             {name: "Barbatos Smoczy Strażnik", level: 285},
-            {name: "Tanroth", level: 300},
-            {name: "Kolga", level: 50},
-            {name: "Duva", level: 90},
-            {name: "Blodughaddy", level: 130},
-            {name: "Bara", level: 170},
-            {name: "Unn", level: 210},
-            {name: "Himinglava", level: 250},
-            {name: "Hronn", level: 290}
+            {name: "Tanroth", level: 300}
         ];
 
         // Generuj ustawienia ról dla popularnych tytanów
