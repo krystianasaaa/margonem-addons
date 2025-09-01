@@ -245,8 +245,8 @@ init: function() {
         // np. usuwanie event listenerów, elementów DOM, itp.
     }
 
-    // CSS Styles dla GUI
     const styles = `
+        /* CSS dla Manager Dodatków - ciemny styl inspirowany obrazkiem */
         .addon-manager {
             position: fixed;
             z-index: 10000;
@@ -254,48 +254,49 @@ init: function() {
         }
 
         .addon-toggle-btn {
-            background: #2f3136;
+            background: linear-gradient(135deg, #1e2124 0%, #2f3136 100%);
             border: 1px solid #40444b;
             color: #dcddde;
             padding: 8px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: move;
             font-size: 13px;
             font-weight: 500;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
             user-select: none;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            min-width: 32px;
-            width: 32px;
-            height: 32px;
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
         }
 
         .addon-toggle-btn::before {
             content: '';
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             flex-shrink: 0;
+            filter: brightness(1.2);
         }
 
         .addon-toggle-btn:hover {
-            background: #36393f;
-            border-color: #4f545c;
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, #36393f 0%, #42464d 100%);
+            border-color: #5865f2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.5);
         }
 
         .addon-toggle-btn:active {
             transform: translateY(0);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
         .addon-toggle-btn.dragging {
@@ -305,58 +306,63 @@ init: function() {
 
         .addon-menu {
             position: absolute;
-            top: 50px;
+            top: 55px;
             left: 0;
-            background: #2f3136;
+            background: linear-gradient(180deg, #1e2124 0%, #2f3136 100%);
             border: 1px solid #40444b;
-            border-radius: 6px;
-            padding: 16px;
-            min-width: 300px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            padding: 0;
+            min-width: 400px;
+            max-width: 500px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6);
             display: none;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
         }
 
         .addon-menu.active {
             display: block;
-            animation: slideIn 0.2s ease;
+            animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(-8px);
+                transform: translateY(-20px) scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
         .addon-menu-header {
             color: #ffffff;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            text-align: left;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            padding: 16px 20px;
+            background: linear-gradient(90deg, #5865f2 0%, #7289da 100%);
             border-bottom: 1px solid #40444b;
-            padding-bottom: 8px;
             cursor: move;
             user-select: none;
             position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
         .addon-menu-header::before {
             content: '';
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             flex-shrink: 0;
+            filter: brightness(1.5);
         }
 
         .addon-menu.dragging {
@@ -365,37 +371,61 @@ init: function() {
 
         .addon-close-btn {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #36393f;
-            border: 1px solid #40444b;
-            color: #dcddde;
-            width: 24px;
-            height: 24px;
+            top: 12px;
+            right: 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ffffff;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 16px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             line-height: 1;
+            backdrop-filter: blur(10px);
         }
 
         .addon-close-btn:hover {
             background: #ed4245;
             border-color: #ed4245;
             color: white;
+            transform: scale(1.1);
+        }
+
+        .addon-content {
+            padding: 16px 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .addon-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .addon-content::-webkit-scrollbar-track {
+            background: #2f3136;
+        }
+
+        .addon-content::-webkit-scrollbar-thumb {
+            background: #5865f2;
+            border-radius: 3px;
         }
 
         .addon-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #40444b;
-            transition: all 0.2s ease;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.3s ease;
+            margin: 0 -12px;
+            padding: 14px 12px;
+            border-radius: 6px;
         }
 
         .addon-item:last-child {
@@ -403,31 +433,64 @@ init: function() {
         }
 
         .addon-item:hover {
-            background: rgba(255,255,255,0.04);
-            margin: 0 -8px;
-            padding: 10px 8px;
-            border-radius: 4px;
+            background: linear-gradient(90deg, rgba(88, 101, 242, 0.1) 0%, rgba(114, 137, 218, 0.1) 100%);
+            border-color: rgba(88, 101, 242, 0.3);
+            transform: translateX(2px);
+        }
+
+        .addon-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .addon-name {
-            color: #dcddde;
-            font-size: 14px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .addon-status {
+            font-size: 12px;
             font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            width: fit-content;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .addon-status.enabled {
+            background: linear-gradient(90deg, #3ba55d 0%, #57f287 100%);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(59, 165, 93, 0.3);
+        }
+
+        .addon-status.disabled {
+            background: linear-gradient(90deg, #ed4245 0%, #f38ba8 100%);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(237, 66, 69, 0.3);
         }
 
         .addon-switch {
             position: relative;
-            width: 44px;
-            height: 22px;
-            background: #4f545c;
-            border-radius: 11px;
+            width: 52px;
+            height: 28px;
+            background: linear-gradient(135deg, #4f545c 0%, #36393f 100%);
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 2px solid transparent;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
         }
 
         .addon-switch.active {
-            background: #3ba55d;
+            background: linear-gradient(135deg, #3ba55d 0%, #57f287 100%);
+            border-color: #57f287;
+            box-shadow: 0 4px 12px rgba(59, 165, 93, 0.4);
         }
 
         .addon-switch::after {
@@ -435,69 +498,124 @@ init: function() {
             position: absolute;
             top: 2px;
             left: 2px;
-            width: 18px;
-            height: 18px;
-            background: white;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             border-radius: 50%;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
 
         .addon-switch.active::after {
-            left: 24px;
+            left: 26px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .addon-status {
-            font-size: 11px;
-            color: #72767d;
-            margin-top: 2px;
+        .addon-switch:hover {
+            transform: scale(1.05);
         }
 
         .addon-controls {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #40444b;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
             display: flex;
-            gap: 8px;
+            gap: 12px;
         }
 
         .control-btn {
             flex: 1;
-            padding: 6px 10px;
-            border: 1px solid #40444b;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border: 2px solid transparent;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            color: #dcddde;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
         }
 
         .enable-all-btn {
-            background: #3ba55d;
-            border-color: #3ba55d;
-            color: white;
+            background: linear-gradient(135deg, #3ba55d 0%, #57f287 100%);
+            border-color: #57f287;
+            box-shadow: 0 4px 12px rgba(59, 165, 93, 0.3);
         }
 
         .disable-all-btn {
-            background: #ed4245;
-            border-color: #ed4245;
-            color: white;
+            background: linear-gradient(135deg, #ed4245 0%, #f38ba8 100%);
+            border-color: #f38ba8;
+            box-shadow: 0 4px 12px rgba(237, 66, 69, 0.3);
         }
 
         .enable-all-btn:hover {
-            background: #2d7d32;
-            border-color: #2d7d32;
+            background: linear-gradient(135deg, #2d7d32 0%, #3ba55d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 165, 93, 0.4);
         }
 
         .disable-all-btn:hover {
-            background: #c62828;
-            border-color: #c62828;
+            background: linear-gradient(135deg, #c62828 0%, #ed4245 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(237, 66, 69, 0.4);
         }
 
-        .control-btn:hover {
-            transform: translateY(-1px);
+        .control-btn:active {
+            transform: translateY(0);
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .addon-menu::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #5865f2, transparent);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .addon-item.loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @media (max-width: 480px) {
+            .addon-menu {
+                min-width: 320px;
+                max-width: 90vw;
+            }
+            
+            .addon-controls {
+                flex-direction: column;
+            }
+            
+            .control-btn {
+                font-size: 12px;
+                padding: 10px 12px;
+            }
         }
     `;
 
