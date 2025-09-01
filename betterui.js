@@ -27,11 +27,26 @@
         'Przywraca': 'Turka',
         'punktów życia podczas walki': '',
         'Odporność': 'Odpy',
-        'Moc ciosu krytycznego': 'Moc CK',
         'Moc ciosu krytycznego fizycznego': 'SKF',
         'Moc ciosu krytycznego magicznego': 'SKM',
         'Podczas obrony szansa na cios krytyczny przeciwnika jest mniejsza o ': 'Obniżka Kryta o ',
         'punktów procentowych': '',
+        'Obrażenia': 'DMG',
+        'fizyczne dystansowe': 'FIZ',
+        'trucizny': 'truty',
+        'Spowalnia cel o': 'Slow o',
+        'punktów pancerza podczas ciosu': 'panca',
+        'Ogłuszający cios': 'UGA BUGA MACZUGA',
+        '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75%, 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
+        'Przywracanie Energii': 'Przywro Energi',
+        'Absorbuje': 'Absa',
+        'obrażeń fizycznych': 'DMG FIZ',
+        'obrażeń magicznych': 'DMG MAG',
+        'Zmniejsza o': 'Slow o',
+        'szybkość ataku celu': 'SA',
+        'Niszczenie odporności magicznych o': 'Niszczara odpów o',
+        'podczas ciosu': 'przy hicie',
+        
 
 
 
@@ -221,7 +236,7 @@
         });
     }
 
-    // Inicjalizacja na poziomie document-start
+
     function init() {
 
 
