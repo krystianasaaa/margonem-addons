@@ -47,6 +47,13 @@
         'Niszczenie odporności magicznych o': 'Niszczara odpów o',
         'podczas ciosu': 'przy hicie',
         'Wewnętrzny spokój': 'umka dla cweli',
+       'Kłapoouchy': 'cwel',
+       'Jendrula': 'cwel',
+       'Ritz': 'cwel',
+       'Jedrrek Turbo Orka': 'cwel',
+       'Młotkiem w orlice': 'cwel',
+       'Jendruś': 'cwel',
+      'Wiidmo': 'cwel',
         
 
 
