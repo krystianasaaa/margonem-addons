@@ -303,8 +303,9 @@ init: function() {
     border: 1px solid #1a1a1a;
     border-radius: 4px;
     padding: 0;
-    min-width: 400px;
-    max-width: 500px;
+    min-width: 600px;
+    max-width: 700px;
+    width: 650px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
     display: none;
     overflow: hidden;
@@ -370,9 +371,12 @@ init: function() {
 
 .addon-content {
     padding: 12px 16px;
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
     background: #2a2a2a;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
 }
 
 .addon-content::-webkit-scrollbar {
@@ -401,8 +405,10 @@ init: function() {
     padding: 10px 8px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
     transition: all 0.2s ease;
-    margin: 0 -8px;
+    margin: 0 4px;
     border-radius: 2px;
+    min-height: 50px;
+    width: calc(100% - 8px);
 }
 
 .addon-item:last-child {
@@ -573,6 +579,11 @@ init: function() {
     .addon-menu {
         min-width: 300px;
         max-width: 90vw;
+        width: 90vw;
+    }
+    
+    .addon-content {
+        grid-template-columns: 1fr;
     }
     
     .addon-controls {
