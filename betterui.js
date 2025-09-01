@@ -200,7 +200,9 @@
             }
         }
 
-        // Szukanie rzadkości na podstawie data-item-type
+        // ROZSZERZONE WYKRYWANIE RZADKOŚCI
+
+        // 1. Najpierw sprawdź data-item-type (jeśli istnieje)
         const itemTypePatterns = [
             { pattern: /data-item-type="t-leg"/i, rarity: 'legendarny' },
             { pattern: /data-item-type="t-her"/i, rarity: 'heroiczny' },
@@ -216,20 +218,59 @@
             }
         }
 
-        // Fallback - szukanie rzadkości w tekście (jeśli nie ma data-item-type)
+        // 2. Sprawdź CSS klasy
         if (itemInfo.rarity === 'zwykły') {
-            const rarityPatterns = [
-                /(Zwykłe|Zwykły)/i,
-                /(Unikatowe|Unikatowy)/i,
-                /(Heroiczne|Heroiczny)/i,
-                /(Ulepszonych|Ulepszony)/i,
-                /(Legendarne|Legendarny)/i
+            const cssClassPatterns = [
+                { pattern: /class="[^"]*legendary[^"]*"/i, rarity: 'legendarny' },
+                { pattern: /class="[^"]*heroic[^"]*"/i, rarity: 'heroiczny' },
+                { pattern: /class="[^"]*unique[^"]*"/i, rarity: 'unikatowy' },
+                { pattern: /class="[^"]*upgraded[^"]*"/i, rarity: 'ulepszony' },
+                { pattern: /class="[^"]*normal[^"]*"/i, rarity: 'zwykły' }
             ];
 
-            for (const pattern of rarityPatterns) {
-                const rarityMatch = tooltipContent.match(pattern);
-                if (rarityMatch) {
-                    itemInfo.rarity = rarityMatch[1].toLowerCase();
+            for (const item of cssClassPatterns) {
+                if (item.pattern.test(tooltipContent)) {
+                    itemInfo.rarity = item.rarity;
+                    break;
+                }
+            }
+        }
+
+        // 3. Sprawdź kolorowanie tekstu (style="color:")
+        if (itemInfo.rarity === 'zwykły') {
+            const colorPatterns = [
+                { pattern: /style="[^"]*color:\s*#?ff6600[^"]*"/i, rarity: 'legendarny' }, // pomarańczowy
+                { pattern: /style="[^"]*color:\s*#?9900ff[^"]*"/i, rarity: 'heroiczny' }, // fioletowy
+                { pattern: /style="[^"]*color:\s*#?0099ff[^"]*"/i, rarity: 'unikatowy' }, // niebieski
+                { pattern: /style="[^"]*color:\s*#?00ff00[^"]*"/i, rarity: 'ulepszony' }, // zielony
+            ];
+
+            for (const item of colorPatterns) {
+                if (item.pattern.test(tooltipContent)) {
+                    itemInfo.rarity = item.rarity;
+                    break;
+                }
+            }
+        }
+
+        // 4. Sprawdź tekst rzadkości w tooltip (jako ostateczny fallback)
+        if (itemInfo.rarity === 'zwykły') {
+            const textRarityPatterns = [
+                { pattern: /\bLegendarny\b/i, rarity: 'legendarny' },
+                { pattern: /\bLegendarne\b/i, rarity: 'legendarny' },
+                { pattern: /\bHeroiczny\b/i, rarity: 'heroiczny' },
+                { pattern: /\bHeroiczne\b/i, rarity: 'heroiczny' },
+                { pattern: /\bUnikatowy\b/i, rarity: 'unikatowy' },
+                { pattern: /\bUnikatowe\b/i, rarity: 'unikatowy' },
+                { pattern: /\bUlepszony\b/i, rarity: 'ulepszony' },
+                { pattern: /\bUlepszonych\b/i, rarity: 'ulepszony' },
+                { pattern: /\bZwykły\b/i, rarity: 'zwykły' },
+                { pattern: /\bZwykłe\b/i, rarity: 'zwykły' }
+            ];
+
+            for (const item of textRarityPatterns) {
+                if (item.pattern.test(tooltipContent)) {
+                    itemInfo.rarity = item.rarity;
                     break;
                 }
             }
@@ -356,6 +397,9 @@
 
         let upgradeInfo = '<div style="border-top: 1px solid #666; margin-top: 10px; padding-top: 5px;">';
         upgradeInfo += '<div style="color: #FFD700; font-weight: bold; margin-bottom: 5px; text-align: center;">Koszt ulepszeń:</div>';
+
+        // DODAJ INFORMACJĘ O RZADKOŚCI DLA DEBUGOWANIA (tymczasowo)
+        upgradeInfo += `<div style="color: #888; font-size: 10px; text-align: center; margin-bottom: 3px;">Rzadkość: ${itemInfo.rarity}</div>`;
 
         // Dodaj koszty dla każdego poziomu
         for (let level in costs) {
