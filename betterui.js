@@ -46,6 +46,7 @@
         'szybkość ataku celu': 'SA',
         'Niszczenie odporności magicznych o': 'Niszczara odpów o',
         'podczas ciosu': 'przy hicie',
+        'Wewnętrzny spokój': 'umka dla cweli',
         
 
 
