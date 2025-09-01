@@ -290,11 +290,6 @@ init: function() {
     border-color: #333;
 }
 
-.addon-toggle-btn:active {
-    background: linear-gradient(to bottom, #2d2d2d 0%, #1a1a1a 100%);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-}
-
 .addon-menu {
     position: absolute;
     top: 50px;
@@ -303,9 +298,7 @@ init: function() {
     border: 1px solid #1a1a1a;
     border-radius: 4px;
     padding: 0;
-    min-width: 600px;
-    max-width: 700px;
-    width: 650px;
+    width: 600px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
     display: none;
     overflow: hidden;
@@ -370,13 +363,13 @@ init: function() {
 }
 
 .addon-content {
-    padding: 12px 16px;
-    max-height: 500px;
+    padding: 8px;
+    max-height: 400px;
     overflow-y: auto;
     background: #2a2a2a;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0;
+    gap: 4px;
 }
 
 .addon-content::-webkit-scrollbar {
@@ -394,52 +387,49 @@ init: function() {
     border: 1px solid #222;
 }
 
-.addon-content::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #666 0%, #444 100%);
-}
-
+/* Kompaktowy styl elementu dodatku jak w Margonem */
 .addon-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 6px 8px;
+    background: linear-gradient(to bottom, #444 0%, #333 100%);
+    border: 1px solid #222;
+    border-radius: 3px;
     transition: all 0.2s ease;
-    margin: 0 4px;
-    border-radius: 2px;
-    min-height: 50px;
-    width: calc(100% - 8px);
-}
-
-.addon-item:last-child {
-    border-bottom: none;
+    min-height: 32px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 .addon-item:hover {
-    background: rgba(255,255,255,0.03);
-    border-color: rgba(255,255,255,0.1);
+    background: linear-gradient(to bottom, #555 0%, #444 100%);
+    border-color: #333;
 }
 
 .addon-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 1px;
+    min-width: 0;
 }
 
 .addon-name {
     color: #ffffff;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: normal;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .addon-status {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: normal;
     color: #888;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 }
 
 .addon-status.enabled {
@@ -450,78 +440,69 @@ init: function() {
     color: #888;
 }
 
-/* Przełącznik w stylu Margonem */
+/* Mały przełącznik obok nazwy */
 .addon-switch {
     position: relative;
-    width: 50px;
-    height: 24px;
+    width: 36px;
+    height: 18px;
     background: linear-gradient(to bottom, #333 0%, #1a1a1a 100%);
     border: 1px solid #111;
-    border-radius: 12px;
+    border-radius: 9px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+    margin-left: 8px;
 }
 
 .addon-switch.active {
     background: linear-gradient(to bottom, #4CAF50 0%, #388E3C 100%);
     border-color: #2E7D32;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 0 8px rgba(76, 175, 80, 0.3);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 0 4px rgba(76, 175, 80, 0.3);
 }
 
 .addon-switch::after {
     content: '';
     position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 18px;
-    height: 18px;
+    top: 1px;
+    left: 1px;
+    width: 14px;
+    height: 14px;
     background: linear-gradient(to bottom, #f0f0f0 0%, #d0d0d0 100%);
     border: 1px solid #999;
     border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .addon-switch.active::after {
-    left: 28px;
+    left: 19px;
     background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%);
     border-color: #ccc;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-.addon-switch:hover {
-    transform: none;
-}
-
-.addon-switch:hover::after {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.6);
 }
 
 .addon-controls {
-    margin-top: 12px;
-    padding-top: 12px;
+    margin: 0;
+    padding: 8px;
     border-top: 1px solid rgba(255,255,255,0.1);
     display: flex;
-    gap: 8px;
+    gap: 4px;
     background: #252525;
-    margin: 0 -16px;
-    padding: 12px 16px 12px 16px;
+    grid-column: 1 / -1;
 }
 
 .control-btn {
     flex: 1;
-    padding: 8px 12px;
+    padding: 6px 12px;
     border: 1px solid #333;
     border-radius: 3px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: normal;
     transition: all 0.2s ease;
     color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 0.3px;
-    position: relative;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.3);
     text-shadow: 0 1px 1px rgba(0,0,0,0.8);
 }
@@ -538,12 +519,10 @@ init: function() {
 
 .enable-all-btn:hover {
     background: linear-gradient(to bottom, #5CBF60 0%, #48A148 100%);
-    border-color: #358E38;
 }
 
 .disable-all-btn:hover {
     background: linear-gradient(to bottom, #f55346 0%, #e33f3f 100%);
-    border-color: #d63838;
 }
 
 .control-btn:active {
@@ -551,35 +530,10 @@ init: function() {
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
-/* Usunięcie animacji i efektów, które nie pasują do stylu Margonem */
-.addon-menu::before {
-    display: none;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.addon-menu.active {
-    animation: slideIn 0.2s ease;
-}
-
-.addon-item.loading {
-    opacity: 0.6;
-}
-
-@media (max-width: 480px) {
+@media (max-width: 680px) {
     .addon-menu {
-        min-width: 300px;
-        max-width: 90vw;
-        width: 90vw;
+        width: 95vw;
+        max-width: 500px;
     }
     
     .addon-content {
@@ -588,12 +542,7 @@ init: function() {
     
     .addon-controls {
         flex-direction: column;
-        gap: 6px;
-    }
-    
-    .control-btn {
-        font-size: 10px;
-        padding: 6px 8px;
+        gap: 4px;
     }
 }
     `;
