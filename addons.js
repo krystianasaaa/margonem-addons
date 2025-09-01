@@ -246,377 +246,345 @@ init: function() {
     }
 
     const styles = `
-        /* CSS dla Manager Dodatków - ciemny styl inspirowany obrazkiem */
-        .addon-manager {
-            position: fixed;
-            z-index: 10000;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
+.addon-manager {
+    position: fixed;
+    z-index: 10000;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
 
-        .addon-toggle-btn {
-            background: linear-gradient(135deg, #1e2124 0%, #2f3136 100%);
-            border: 1px solid #40444b;
-            color: #dcddde;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: move;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transition: all 0.3s ease;
-            user-select: none;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            min-width: 40px;
-            width: 40px;
-            height: 40px;
-        }
+.addon-toggle-btn {
+    background: linear-gradient(to bottom, #4a4a4a 0%, #2d2d2d 100%);
+    border: 1px solid #1a1a1a;
+    color: #ffffff;
+    padding: 8px;
+    border-radius: 3px;
+    cursor: move;
+    font-size: 11px;
+    font-weight: normal;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 1px 3px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
+    user-select: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+}
 
-        .addon-toggle-btn::before {
-            content: '';
-            width: 24px;
-            height: 24px;
-            background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
-            filter: brightness(1.2);
-        }
+.addon-toggle-btn::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
 
-        .addon-toggle-btn:hover {
-            background: linear-gradient(135deg, #36393f 0%, #42464d 100%);
-            border-color: #5865f2;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.5);
-        }
+.addon-toggle-btn:hover {
+    background: linear-gradient(to bottom, #5a5a5a 0%, #3d3d3d 100%);
+    border-color: #333;
+}
 
-        .addon-toggle-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        }
+.addon-toggle-btn:active {
+    background: linear-gradient(to bottom, #2d2d2d 0%, #1a1a1a 100%);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
 
-        .addon-toggle-btn.dragging {
-            transform: none !important;
-            transition: none !important;
-        }
+.addon-menu {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    background: linear-gradient(to bottom, #3a3a3a 0%, #2a2a2a 100%);
+    border: 1px solid #1a1a1a;
+    border-radius: 4px;
+    padding: 0;
+    min-width: 400px;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+    display: none;
+    overflow: hidden;
+}
 
-        .addon-menu {
-            position: absolute;
-            top: 55px;
-            left: 0;
-            background: linear-gradient(180deg, #1e2124 0%, #2f3136 100%);
-            border: 1px solid #40444b;
-            border-radius: 8px;
-            padding: 0;
-            min-width: 400px;
-            max-width: 500px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.6);
-            display: none;
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-        }
+.addon-menu.active {
+    display: block;
+}
 
-        .addon-menu.active {
-            display: block;
-            animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
+.addon-menu-header {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+    padding: 12px 16px;
+    background: linear-gradient(to bottom, #4a4a4a 0%, #3a3a3a 100%);
+    border-bottom: 1px solid #1a1a1a;
+    cursor: move;
+    user-select: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
+.addon-menu-header::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
 
-        .addon-menu-header {
-            color: #ffffff;
-            font-size: 18px;
-            font-weight: 700;
-            margin: 0;
-            padding: 16px 20px;
-            background: linear-gradient(90deg, #5865f2 0%, #7289da 100%);
-            border-bottom: 1px solid #40444b;
-            cursor: move;
-            user-select: none;
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
+.addon-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: linear-gradient(to bottom, #666 0%, #444 100%);
+    border: 1px solid #222;
+    color: #ffffff;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    line-height: 1;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
 
-        .addon-menu-header::before {
-            content: '';
-            width: 20px;
-            height: 20px;
-            background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
-            filter: brightness(1.5);
-        }
+.addon-close-btn:hover {
+    background: linear-gradient(to bottom, #cc4444 0%, #aa2222 100%);
+    border-color: #992222;
+}
 
-        .addon-menu.dragging {
-            transition: none !important;
-        }
+.addon-content {
+    padding: 12px 16px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: #2a2a2a;
+}
 
-        .addon-close-btn {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #ffffff;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            line-height: 1;
-            backdrop-filter: blur(10px);
-        }
+.addon-content::-webkit-scrollbar {
+    width: 12px;
+}
 
-        .addon-close-btn:hover {
-            background: #ed4245;
-            border-color: #ed4245;
-            color: white;
-            transform: scale(1.1);
-        }
+.addon-content::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 6px;
+}
 
-        .addon-content {
-            padding: 16px 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
+.addon-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #555 0%, #333 100%);
+    border-radius: 6px;
+    border: 1px solid #222;
+}
 
-        .addon-content::-webkit-scrollbar {
-            width: 6px;
-        }
+.addon-content::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #666 0%, #444 100%);
+}
 
-        .addon-content::-webkit-scrollbar-track {
-            background: #2f3136;
-        }
+.addon-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.2s ease;
+    margin: 0 -8px;
+    border-radius: 2px;
+}
 
-        .addon-content::-webkit-scrollbar-thumb {
-            background: #5865f2;
-            border-radius: 3px;
-        }
+.addon-item:last-child {
+    border-bottom: none;
+}
 
-        .addon-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.3s ease;
-            margin: 0 -12px;
-            padding: 14px 12px;
-            border-radius: 6px;
-        }
+.addon-item:hover {
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.1);
+}
 
-        .addon-item:last-child {
-            border-bottom: none;
-        }
+.addon-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
 
-        .addon-item:hover {
-            background: linear-gradient(90deg, rgba(88, 101, 242, 0.1) 0%, rgba(114, 137, 218, 0.1) 100%);
-            border-color: rgba(88, 101, 242, 0.3);
-            transform: translateX(2px);
-        }
+.addon-name {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: normal;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+}
 
-        .addon-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+.addon-status {
+    font-size: 10px;
+    font-weight: normal;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        .addon-name {
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
+.addon-status.enabled {
+    color: #4CAF50;
+}
 
-        .addon-status {
-            font-size: 12px;
-            font-weight: 500;
-            padding: 2px 8px;
-            border-radius: 12px;
-            display: inline-block;
-            width: fit-content;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.addon-status.disabled {
+    color: #888;
+}
 
-        .addon-status.enabled {
-            background: linear-gradient(90deg, #3ba55d 0%, #57f287 100%);
-            color: #ffffff;
-            box-shadow: 0 2px 6px rgba(59, 165, 93, 0.3);
-        }
+/* Przełącznik w stylu Margonem */
+.addon-switch {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background: linear-gradient(to bottom, #333 0%, #1a1a1a 100%);
+    border: 1px solid #111;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
 
-        .addon-status.disabled {
-            background: linear-gradient(90deg, #ed4245 0%, #f38ba8 100%);
-            color: #ffffff;
-            box-shadow: 0 2px 6px rgba(237, 66, 69, 0.3);
-        }
+.addon-switch.active {
+    background: linear-gradient(to bottom, #4CAF50 0%, #388E3C 100%);
+    border-color: #2E7D32;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 0 8px rgba(76, 175, 80, 0.3);
+}
 
-        .addon-switch {
-            position: relative;
-            width: 52px;
-            height: 28px;
-            background: linear-gradient(135deg, #4f545c 0%, #36393f 100%);
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            border: 2px solid transparent;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
-        }
+.addon-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(to bottom, #f0f0f0 0%, #d0d0d0 100%);
+    border: 1px solid #999;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
 
-        .addon-switch.active {
-            background: linear-gradient(135deg, #3ba55d 0%, #57f287 100%);
-            border-color: #57f287;
-            box-shadow: 0 4px 12px rgba(59, 165, 93, 0.4);
-        }
+.addon-switch.active::after {
+    left: 28px;
+    background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%);
+    border-color: #ccc;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
 
-        .addon-switch::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 50%;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        }
+.addon-switch:hover {
+    transform: none;
+}
 
-        .addon-switch.active::after {
-            left: 26px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
+.addon-switch:hover::after {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
 
-        .addon-switch:hover {
-            transform: scale(1.05);
-        }
+.addon-controls {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    gap: 8px;
+    background: #252525;
+    margin: 0 -16px;
+    padding: 12px 16px 12px 16px;
+}
 
-        .addon-controls {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            gap: 12px;
-        }
+.control-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #333;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: normal;
+    transition: all 0.2s ease;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    position: relative;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.3);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.8);
+}
 
-        .control-btn {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
-        }
+.enable-all-btn {
+    background: linear-gradient(to bottom, #4CAF50 0%, #388E3C 100%);
+    border-color: #2E7D32;
+}
 
-        .control-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.6s ease;
-        }
+.disable-all-btn {
+    background: linear-gradient(to bottom, #f44336 0%, #d32f2f 100%);
+    border-color: #c62828;
+}
 
-        .control-btn:hover::before {
-            left: 100%;
-        }
+.enable-all-btn:hover {
+    background: linear-gradient(to bottom, #5CBF60 0%, #48A148 100%);
+    border-color: #358E38;
+}
 
-        .enable-all-btn {
-            background: linear-gradient(135deg, #3ba55d 0%, #57f287 100%);
-            border-color: #57f287;
-            box-shadow: 0 4px 12px rgba(59, 165, 93, 0.3);
-        }
+.disable-all-btn:hover {
+    background: linear-gradient(to bottom, #f55346 0%, #e33f3f 100%);
+    border-color: #d63838;
+}
 
-        .disable-all-btn {
-            background: linear-gradient(135deg, #ed4245 0%, #f38ba8 100%);
-            border-color: #f38ba8;
-            box-shadow: 0 4px 12px rgba(237, 66, 69, 0.3);
-        }
+.control-btn:active {
+    background: linear-gradient(to bottom, #333 0%, #1a1a1a 100%);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
 
-        .enable-all-btn:hover {
-            background: linear-gradient(135deg, #2d7d32 0%, #3ba55d 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 165, 93, 0.4);
-        }
+/* Usunięcie animacji i efektów, które nie pasują do stylu Margonem */
+.addon-menu::before {
+    display: none;
+}
 
-        .disable-all-btn:hover {
-            background: linear-gradient(135deg, #c62828 0%, #ed4245 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(237, 66, 69, 0.4);
-        }
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        .control-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        }
+.addon-menu.active {
+    animation: slideIn 0.2s ease;
+}
 
-        .addon-menu::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #5865f2, transparent);
-        }
+.addon-item.loading {
+    opacity: 0.6;
+}
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .addon-item.loading {
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @media (max-width: 480px) {
-            .addon-menu {
-                min-width: 320px;
-                max-width: 90vw;
-            }
-            
-            .addon-controls {
-                flex-direction: column;
-            }
-            
-            .control-btn {
-                font-size: 12px;
-                padding: 10px 12px;
-            }
-        }
+@media (max-width: 480px) {
+    .addon-menu {
+        min-width: 300px;
+        max-width: 90vw;
+    }
+    
+    .addon-controls {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .control-btn {
+        font-size: 10px;
+        padding: 6px 8px;
+    }
+}
     `;
 
     // Dodaj style do strony
