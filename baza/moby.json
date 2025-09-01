@@ -1,1 +1,529 @@
-tu bedzie baza
+{
+  "expowiska": [
+    {
+      "nazwa": "SK",
+      "mapy": ["Nawiedzone Komnaty - przedsionek", "Sala Dowódcy Orków", "Nawiedzone Komnaty - zachód", "Nawiedzone Komnaty - wschód", "Sala Rady Orków", "Sala Królewska", "Komnaty Czarnej Gwardii - zachód", "Komnaty Czarnej Gwardii - wschód"],
+      "moby": ["Pradawny Mistrz Miecza" , "Szara Strzała" , ]
+    },
+    {
+      "nazwa": "Wioski startowe - Ithan",
+      "mapy": ["Ithan", "Wioski startowe"],
+      "moby": ["Króliki", "Pająki", "Żaby"]
+    },
+    {
+      "nazwa": "Dolina Yss",
+      "mapy": ["Dolina Yss"],
+      "moby": ["Szerszenie", "Młode Żuki", "Świerszcze", "Lis", "Dzik", "Wilk", "Niedźwiedź", "Wilk II"]
+    },
+    {
+      "nazwa": "Górska Grota",
+      "mapy": ["Górska Grota"],
+      "moby": ["Gaunt", "Skarabeusz", "Galareta", "Gaunt II", "Skorpion"]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    },
+    {
+      "nazwa": "",
+      "mapy": [""],
+      "moby": [""]
+    }
+  ]
+}
