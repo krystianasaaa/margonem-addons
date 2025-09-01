@@ -63,6 +63,24 @@
         'Przeszywająca skuteczność': 'Przeszywajka'
     };
 
+    // Lista wszystkich typów przedmiotów, które mogą być ulepszone
+    const itemTypes = [
+        'Pierścienie', 'Naszyjniki', 'Hełmy', 'Rękawice', 'Zbroje',
+        'Dystansowe', 'Strzały', 'Buty', 'Jednoręczne', 'Półtoraręczne',
+        'Dwuręczne', 'Orby magiczne', 'Tarcze', 'Pomocnicze'
+    ];
+
+    // Funkcja do sprawdzania czy tooltip zawiera przedmiot, który można ulepszyć
+    function isUpgradeableItem(tooltipContent) {
+        // Sprawdź czy tooltip zawiera typ przedmiotu, który można ulepszyć
+        const typeMatch = tooltipContent.match(/Typ:\s*([^<\n]+)/i);
+        if (typeMatch) {
+            const itemType = typeMatch[1].trim();
+            return itemTypes.some(type => itemType.includes(type));
+        }
+        return false;
+    }
+
     // Funkcja do obliczania kosztów ulepszenia
     function calculateUpgradeCosts(itemLevel, currentUpgrade = 0, itemCount = 1, rarity = 'zwykły') {
         const lvl = itemLevel;
@@ -308,6 +326,11 @@
 
     // Funkcja do dodawania informacji o ulepszeniu do tooltipa
     function addUpgradeInfo(tooltipContent) {
+        // Sprawdź czy kalkulator już został dodany
+        if (tooltipContent.includes('Koszt ulepszeń:')) {
+            return tooltipContent;
+        }
+
         const itemInfo = parseItemInfo(tooltipContent);
 
         // Sprawdź czy tooltip zawiera informacje o przedmiocie
@@ -338,10 +361,10 @@
         for (let level in costs) {
             const cost = costs[level];
             upgradeInfo += `<div style="color: #CCCCCC; font-size: 11px; margin-bottom: 3px;">`;
-            upgradeInfo += `+${level}: <span style="color: #87CEEB;">${cost.upgrade.toLocaleString()}</span> pkt. ulepszenia`;
+            upgradeInfo += `+${level}: <span style="color: #87CEEB;">${cost.upgrade.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span> pkt. ulepszenia`;
 
             if (cost.gold > 0) {
-                upgradeInfo += `, <span style="color: #FFD700;">${cost.gold.toLocaleString()}</span> złota`;
+                upgradeInfo += `, <span style="color: #FFD700;">${cost.gold.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span> złota`;
             }
 
             if (cost.essence > 0) {
@@ -354,12 +377,12 @@
         // Dodaj podsumowanie (tylko jeśli jest więcej niż jeden poziom do ulepszenia)
         if (Object.keys(costs).length > 1) {
             upgradeInfo += '<div style="border-top: 1px solid #444; margin-top: 5px; padding-top: 5px;">';
-            upgradeInfo += '<div style="color: #FFD700; font-size: 11px; font-weight: bold; text-align: center;">SUMA:</div>';
+            upgradeInfo += '<div style="color: #FFD700; font-size: 11px; font-weight: bold; text-align: center;">SUMA OD +0 DO +5:</div>';
             upgradeInfo += '<div style="color: #CCCCCC; font-size: 11px; text-align: center;">';
-            upgradeInfo += `<span style="color: #87CEEB;">${totals.upgrade.toLocaleString()}</span> pkt. ulepszenia`;
+            upgradeInfo += `<span style="color: #87CEEB;">${totals.upgrade.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span> pkt. ulepszenia`;
 
             if (totals.gold > 0) {
-                upgradeInfo += `, <span style="color: #FFD700;">${totals.gold.toLocaleString()}</span> złota`;
+                upgradeInfo += `, <span style="color: #FFD700;">${totals.gold.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span> złota`;
             }
 
             if (totals.essence > 0) {
@@ -389,7 +412,7 @@
         }
 
         // Następnie dodaj informacje o ulepszeniu dla wszystkich przedmiotów
-        if (result.includes('item-tip') || result.includes('Poziom:')) {
+        if ((result.includes('item-tip') || result.includes('Poziom:')) && isUpgradeableItem(result)) {
             result = addUpgradeInfo(result);
         }
 
