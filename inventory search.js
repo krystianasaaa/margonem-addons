@@ -662,24 +662,24 @@ foundItems.forEach(item => {
 
     let messageContent = `
         <div style="margin-bottom: 12px; text-align: center;">
-            <span style="color: #3282b8; font-weight: bold;">Znaleziono: ${foundItems.length} przedmiot(ów)</span><br>
-            <span style="color: #e8f4fd; font-size: 11px;">Szukano: "${searchTerm || 'wszystkie przedmioty'}"</span>
+<span style="color: #cccccc; font-weight: bold;">Znaleziono: ${foundItems.length} przedmiot(ów)</span><br>
+<span style="color: #ffffff; font-size: 11px;">Szukano: "${searchTerm || 'wszystkie przedmioty'}"</span>
         </div>
     `;
 
 
     if (Object.keys(itemsByBag).length > 0) {
         messageContent += '<div style="border-top: 1px solid #0f4c75; padding-top: 10px;">';
-        messageContent += '<strong style="color: #3282b8;">📦 Przedmioty w torbach:</strong><br>';
+        messageContent += '<strong style="color: #cccccc;">📦 Przedmioty w torbach:</strong><br>';
 
 Object.entries(itemsByBag).forEach(([bagKey, items]) => {
     const [bagNumber, bagName] = bagKey.split('|');
     const formattedItems = formatItemsWithCount(items);
 
     messageContent += `
-        <div style="margin: 6px 0; padding: 8px; background: rgba(15,76,117,0.2); border-radius: 6px; border-left: 3px solid #3282b8;">
-            <span style="color: #3282b8; font-weight: bold;">${bagName}</span><br>
-            ${formattedItems.map(item => `<span style="color: #e8f4fd; font-size: 11px;">• ${item}</span>`).join('<br>')}
+<div style="margin: 6px 0; padding: 8px; background: rgba(68,68,68,0.3); border-radius: 6px; border-left: 3px solid #777777;">
+    <span style="color: #cccccc; font-weight: bold;">${bagName}</span><br>
+    ${formattedItems.map(item => `<span style="color: #ffffff; font-size: 11px;">• ${item}</span>`).join('<br>')}
         </div>
     `;
 });
@@ -689,7 +689,7 @@ Object.entries(itemsByBag).forEach(([bagKey, items]) => {
 
 if (itemsInMainInventory.length > 0) {
     messageContent += '<div style="border-top: 1px solid #0f4c75; padding-top: 10px; margin-top: 10px;">';
-    messageContent += '<strong style="color: #3282b8;">W torbach:</strong><br>';
+    messageContent += '<strong style="color: #cccccc;">W torbach:</strong><br>';
 
     const formattedMainItems = formatItemsWithCount(itemsInMainInventory);
     messageContent += `
@@ -712,7 +712,7 @@ if (itemsInMainInventory.length > 0) {
     messageContent += `
         <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #0f4c75; text-align: center;">
             <button id="clearSearchFromMessage" style="
-                background: linear-gradient(135deg, #0f4c75, #3282b8);
+                background: linear-gradient(135deg, #333333, #555555);
                 color: white;
                 border: none;
                 padding: 6px 12px;
