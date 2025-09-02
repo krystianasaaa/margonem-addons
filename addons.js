@@ -261,40 +261,66 @@ const styles = `
 }
 
 .addon-toggle-btn {
-    background: linear-gradient(to bottom, #4a4a4a 0%, #2d2d2d 100%);
-    border: 1px solid #1a1a1a;
-    color: #ffffff;
-    padding: 8px;
-    border-radius: 3px;
-    cursor: move;
-    font-size: 11px;
-    font-weight: normal;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 1px 3px rgba(0,0,0,0.5);
-    transition: all 0.2s ease;
-    user-select: none;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    width: 40px;
-    height: 40px;
-}
-
-.addon-toggle-btn::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    flex-shrink: 0;
+    width: 44px !important;
+    height: 44px !important;
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
+    border: 2px solid #333 !important;
+    border-radius: 4px !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 2px 4px rgba(0,0,0,0.5) !important;
+    position: relative !important;
+    cursor: move !important;
+    transition: all 0.2s ease !important;
+    padding: 0 !important;
+    overflow: hidden !important;
 }
 
 .addon-toggle-btn:hover {
-    background: linear-gradient(to bottom, #5a5a5a 0%, #3d3d3d 100%);
-    border-color: #333;
+    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%) !important;
+    border-color: #444 !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        inset 0 -1px 0 rgba(0,0,0,0.4),
+        0 3px 6px rgba(0,0,0,0.6) !important;
+}
+
+.addon-toggle-btn:active {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
+    box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.05) !important;
+    transform: translateY(1px) !important;
+}
+
+.addon-toggle-btn::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 28px !important;
+    height: 28px !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="14" y="3" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="14" y="14" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="3" y="14" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/></svg>') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    opacity: 0.9 !important;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)) !important;
+}
+
+.addon-toggle-btn:hover::before {
+    opacity: 1 !important;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7)) !important;
+}
+
+.addon-menu.active ~ .addon-toggle-btn {
+    border-color: #4CAF50 !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.2),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 0 8px rgba(76, 175, 80, 0.3) !important;
 }
 
 .addon-menu {
@@ -336,7 +362,7 @@ const styles = `
     content: '';
     width: 16px;
     height: 16px;
-    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="14" y="3" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="14" y="14" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="3" y="14" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/></svg>');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -395,7 +421,6 @@ const styles = `
     border: 1px solid #222;
 }
 
-/* Kompaktowy styl elementu dodatku jak w Margonom */
 .addon-item {
     display: flex;
     justify-content: space-between;
@@ -495,7 +520,6 @@ const styles = `
     transform: translateX(-50%) translateY(-2px);
 }
 
-/* Strzałka tooltipa */
 .addon-tooltip::after {
     content: '';
     position: absolute;
@@ -506,7 +530,6 @@ const styles = `
     border-top-color: #1a1a1a;
 }
 
-/* Strzałka gdy tooltip jest nad ikoną */
 .addon-tooltip.tooltip-above::after {
     top: auto;
     bottom: 100%;
@@ -530,7 +553,6 @@ const styles = `
     color: #888;
 }
 
-/* Mały przełącznik obok nazwy */
 .addon-switch {
     position: relative;
     width: 36px;
@@ -620,13 +642,11 @@ const styles = `
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
-/* Kolumny dla dodatków */
 .addon-column {
     display: flex;
     flex-direction: column;
 }
 
-/* Style dla powiadomienia o odświeżeniu - ZMIENIONE NA GÓRĘ */
 .refresh-notification {
     position: fixed;
     top: 20px;
