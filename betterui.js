@@ -1,8 +1,92 @@
 (function() {
     'use strict';
 
+    // Konfiguracja - co ma być włączone
+    let config = {
+        bonusyLegendarne: true,
+        statystykiPrzedmiotow: true,
+        interfejs: true
+    };
+
+   function saveConfig() {
+        try {
+            // Tworzymy unikalny klucz dla tej domeny
+            const storageKey = 'betterUI_config_' + window.location.hostname;
+
+            // Używamy prostego sposobu zapisywania w pamięci przeglądarki
+            const script = document.createElement('script');
+            script.id = 'better-ui-storage';
+            script.type = 'application/json';
+            script.textContent = JSON.stringify(config);
+
+            // Usuń poprzedni skrypt jeśli istnieje
+            const oldScript = document.getElementById('better-ui-storage');
+            if (oldScript) {
+                oldScript.remove();
+            }
+
+            // Dodaj nowy skrypt do head (będzie trwały podczas sesji)
+            document.head.appendChild(script);
+
+            // Dodatkowo spróbuj zapisać w sessionStorage jeśli dostępne
+            if (typeof sessionStorage !== 'undefined') {
+                sessionStorage.setItem(storageKey, JSON.stringify(config));
+            }
+        } catch (e) {
+            console.log('Better UI: Nie można zapisać konfiguracji');
+        }
+    }
+
+    // Próba odczytu konfiguracji z pamięci (jeśli istnieje)
+    function loadConfig() {
+        try {
+            const storageKey = 'betterUI_config_' + window.location.hostname;
+            let savedConfig = {};
+
+            // Najpierw sprawdź sessionStorage
+            if (typeof sessionStorage !== 'undefined') {
+                const sessionData = sessionStorage.getItem(storageKey);
+                if (sessionData) {
+                    savedConfig = JSON.parse(sessionData);
+                }
+            }
+
+            // Jeśli nie ma w sessionStorage, sprawdź skrypt w DOM
+            if (Object.keys(savedConfig).length === 0) {
+                const storageScript = document.getElementById('better-ui-storage');
+                if (storageScript && storageScript.textContent) {
+                    savedConfig = JSON.parse(storageScript.textContent);
+                }
+            }
+
+            // Zastosuj zapisaną konfigurację
+            if (Object.keys(savedConfig).length > 0) {
+                config = { ...config, ...savedConfig };
+            }
+        } catch (e) {
+            console.log('Better UI: Nie można wczytać konfiguracji, używam domyślnej');
+        }
+    }
+
+    // Wywołaj wczytywanie konfiguracji na początku
+    loadConfig();
     const bonusNames = {
-        // Bonusy standardowe
+        // Bonusy legendarne
+        ...(config.bonusyLegendarne ? {
+       'Cios bardzo krytyczny': '💀 POTĘŻNE PIERDOLNIĘCIE 💀',
+        'Dotyk anioła': 'Dotyczek',
+        'Klątwa': 'Klątewka',
+        'Oślepienie': 'Oślepa',
+        'Ostatni ratunek': 'OR',
+        'Krytyczna osłona': 'KO',
+        'Fasada opieki': 'Fasada',
+        'Płomienne oczyszczenie': 'Płomienne',
+        'Krwawa udręka': 'Krwawa',
+        'Przeszywająca skuteczność': 'Przeszywajka'
+        } : {}),
+
+        // Statystyki przedmiotów
+        ...(config.statystykiPrzedmiotow ? {
         'Cios krytyczny': 'Kryt',
         'Przebicie': 'Przebitka',
         'Głęboka rana': 'GR',
@@ -38,7 +122,6 @@
         'punktów pancerza podczas ciosu': 'panca',
         'Ogłuszający cios': 'UGA BUGA MACZUGA',
         '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75% DODATKOWO: 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
-        'Turkanie energii': 'Przywro energii',
         'Absorbuje': 'Absa',
         'obrażeń fizycznych': 'DMG FIZ',
         'obrażeń magicznych': 'DMG MAG',
@@ -46,25 +129,286 @@
         'szybkość ataku celu': 'SA',
         'Niszczenie odporności magicznych o': 'Niszczara odpów o',
         'podczas ciosu': 'przy hicie',
+        'szans na kontratak po ciosie krytycznym': 'na kontre'
+        } : {}),
+
+        // Interfejs
+        ...(config.interfejs ? {
+            'Punkty Honoru': 'PH',
+        'Teleportuje gracza na mapę': 'Tepa na',
         'Wewnętrzny spokój': 'umka dla cweli',
         'Smocze Runy': 'SR',
-        'Punkty Honoru': 'PH',
-        'Teleportuje gracza na mapę': 'Tepa na',
-        'szans na kontratak po ciosie krytycznym': 'na kontre',
-
-        // Bonusy legendarne
-        'Cios bardzo krytyczny': '💀 POTĘŻNE PIERDOLNIĘCIE 💀',
-        'Dotyk anioła': 'Dotyczek',
-        'Klątwa': 'Klątewka',
-        'Oślepienie': 'Oślepa',
-        'Ostatni ratunek': 'OR',
-        'Krytyczna osłona': 'KO',
-        'Fasada opieki': 'Fasada',
-        'Płomienne oczyszczenie': 'Płomienne',
-        'Krwawa udręka': 'Krwawa',
-        'Przeszywająca skuteczność': 'Przeszywajka'
+        'Turkanie energii': 'Przywro energii',
+        'Przywracanie energii': 'Przywro energii',
+        } : {})
     };
 
+// Znajdź tę funkcję w swoim kodzie i zastąp ją:
+
+function createGUI() {
+    const gui = document.createElement('div');
+    gui.id = 'better-ui-gui';
+    gui.style.cssText = `
+        position: fixed;
+       bottom: 585px;
+        right: 430px;
+        width: 28px;
+        height: 28px;
+        background: rgba(40, 40, 40, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        cursor: pointer;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 500;
+        font-size: 12px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+    `;
+
+    gui.addEventListener('mouseenter', () => {
+        gui.style.background = 'rgba(50, 50, 50, 0.95)';
+    });
+
+    gui.addEventListener('mouseleave', () => {
+        gui.style.background = 'rgba(40, 40, 40, 0.95)';
+    });
+
+    gui.textContent = 'UI';
+
+    const panel = document.createElement('div');
+    panel.id = 'better-ui-panel';
+    panel.style.cssText = `
+        position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+        width: 280px;
+        background: rgba(30, 30, 30, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 20px;
+        z-index: 9999;
+        display: none;
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    `;
+
+    panel.innerHTML = `
+        <div style="color: #fff; font-weight: 500; margin-bottom: 20px; text-align: left; font-size: 16px; display: flex; align-items: center;">
+            <span style="width: 8px; height: 8px; background: #4CAF50; border-radius: 50%; margin-right: 10px;"></span>
+            Better UI Settings
+        </div>
+
+        <div style="space-y: 15px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <span style="color: #e0e0e0; font-weight: 400; font-size: 13px;">
+                    Bonusy Legendarne
+                    <span id="bonusy-refresh" class="refresh-notice" style="display: none; color: #ff9800; font-size: 11px;"> (Wymagane odświeżenie gry)</span>
+                </span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="bonusy-legendarne" ${config.bonusyLegendarne ? 'checked' : ''}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <span style="color: #e0e0e0; font-weight: 400; font-size: 13px;">
+                    Statystyki Przedmiotów
+                    <span id="statystyki-refresh" class="refresh-notice" style="display: none; color: #ff9800; font-size: 11px;"> (Wymagane odświeżenie gry)</span>
+                </span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="statystyki-przedmiotow" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <span style="color: #e0e0e0; font-weight: 400; font-size: 13px;">
+                    Interfejs
+                    <span id="interfejs-refresh" class="refresh-notice" style="display: none; color: #ff9800; font-size: 11px;"> (Wymagane odświeżenie gry)</span>
+                </span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button id="apply-ui" class="action-btn apply-btn" style="flex: 1;">
+                Zamknij
+            </button>
+            <button id="reload-ui" class="action-btn reload-btn" style="flex: 1;">
+                Odśwież grę
+            </button>
+        </div>
+    `;
+
+    // Dodaj style CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2);
+            transition: 0.3s;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .toggle-switch .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background: #fff;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .slider {
+            background: #2196F3;
+            border-color: #2196F3;
+        }
+
+        .toggle-switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .action-btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .apply-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .apply-btn:hover {
+            background: #da190b;
+        }
+
+        .reload-btn {
+            background: #ff9800;
+            color: white;
+        }
+
+        .reload-btn:hover {
+            background: #f57c00;
+        }
+
+        .refresh-notice {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    document.body.appendChild(gui);
+    document.body.appendChild(panel);
+
+    // Obsługa kliknięcia w ikonkę
+    gui.addEventListener('click', () => {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Funkcja do pokazywania notyfikacji o odświeżeniu
+    function showRefreshNotice(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.style.display = 'inline';
+        }
+    }
+
+    // Obsługa checkboxów
+    panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
+        const previousValue = config.bonusyLegendarne;
+        config.bonusyLegendarne = e.target.checked;
+        saveConfig();
+
+        // Pokaż notyfikację jeśli wartość się zmieniła
+        if (previousValue !== e.target.checked) {
+            showRefreshNotice('bonusy-refresh');
+        }
+    });
+
+    panel.querySelector('#statystyki-przedmiotow').addEventListener('change', (e) => {
+        const previousValue = config.statystykiPrzedmiotow;
+        config.statystykiPrzedmiotow = e.target.checked;
+        saveConfig();
+
+        // Pokaż notyfikację jeśli wartość się zmieniła
+        if (previousValue !== e.target.checked) {
+            showRefreshNotice('statystyki-refresh');
+        }
+    });
+
+    panel.querySelector('#interfejs').addEventListener('change', (e) => {
+        const previousValue = config.interfejs;
+        config.interfejs = e.target.checked;
+        saveConfig();
+
+        // Pokaż notyfikację jeśli wartość się zmieniła
+        if (previousValue !== e.target.checked) {
+            showRefreshNotice('interfejs-refresh');
+        }
+    });
+
+    // Obsługa przycisków
+    panel.querySelector('#apply-ui').addEventListener('click', () => {
+        panel.style.display = 'none';
+    });
+
+    panel.querySelector('#reload-ui').addEventListener('click', () => {
+        location.reload();
+    });
+
+    // Zamykanie panelu po kliknięciu poza nim
+    document.addEventListener('click', (e) => {
+        if (!gui.contains(e.target) && !panel.contains(e.target)) {
+            panel.style.display = 'none';
+        }
+    });
+}
     // Lista wszystkich typów przedmiotów, które mogą być ulepszone
     const itemTypes = [
         'Pierścienie', 'Naszyjniki', 'Hełmy', 'Rękawice', 'Zbroje',
@@ -620,8 +964,11 @@
         setupEngineHooks();
         hookMargonemFunctions();
         setTimeout(setupBackupObserver, 1000);
-    }
 
+        // Stwórz GUI po załadowaniu strony
+        setTimeout(createGUI, 2000);
+    }
+loadConfig();
     init();
 
 })();
