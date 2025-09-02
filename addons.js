@@ -21,41 +21,47 @@
 const addonConfig = {
     addon1: {
         name: 'Players Online',
+        description: 'Wyświetla liczbę graczy online na serwerze w czasie rzeczywistym.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online.js'
     },
     addon2: {
         name: 'Players Online - Alarm',
+        description: 'Powiadamia dźwiękiem gdy liczba graczy online przekroczy określony próg.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online%20alarm.js'
     },
     addon3: {
         name: 'Titans on Discord',
+        description: 'Wysyła powiadomienia na Discord o pojawieniu się tytanów na mapie.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/titans%20on%20discord.js'
     },
     addon4: {
         name: 'Heroes on Discord',
+        description: 'Wysyła powiadomienia na Discord o pojawieniu się bohaterów na mapie.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/heroes%20on%20discord.js'
     },
     addon5: {
         name: 'Inventory Search',
+        description: 'Dodaje funkcję wyszukiwania przedmiotów w ekwipunku.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/inventory%20search.js'
     },
     addon6: {
         name: 'Shop Hotkey',
+        description: 'Dodaje skróty klawiszowe do szybkiego sprzedawania przedmiotów.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/better%20sellings.js'
     },
     addon7: {
         name: 'Better UI',
+        description: 'Ulepsza interfejs użytkownika gry o dodatkowe funkcje i lepszy wygląd.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/betterui.js'
     }
 };
-
 // Obiekt do przechowywania załadowanych dodatków
 const loadedAddons = {};
 
@@ -417,6 +423,13 @@ const styles = `
     min-width: 0;
 }
 
+.addon-name-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
 .addon-name {
     color: #ffffff;
     font-size: 12px;
@@ -425,6 +438,71 @@ const styles = `
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.addon-help-icon {
+    width: 14px;
+    height: 14px;
+    background: linear-gradient(to bottom, #666 0%, #444 100%);
+    border: 1px solid #333;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 9px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.addon-help-icon:hover {
+    background: linear-gradient(to bottom, #777 0%, #555 100%);
+    border-color: #444;
+    transform: scale(1.1);
+}
+
+.addon-tooltip {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, #1a1a1a 0%, #0a0a0a 100%);
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 8px 10px;
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.3;
+    white-space: normal;
+    max-width: 200px;
+    z-index: 10001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    pointer-events: none;
+    word-wrap: break-word;
+}
+
+.addon-help-icon:hover .addon-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-2px);
+}
+
+/* Strzałka tooltipa */
+.addon-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #1a1a1a;
 }
 
 .addon-status {
@@ -539,6 +617,7 @@ const styles = `
     flex-direction: column;
 }
 
+/* Style dla powiadomienia o odświeżeniu - ZMIENIONE NA GÓRĘ */
 .refresh-notification {
     position: fixed;
     top: 20px;
@@ -868,45 +947,64 @@ function createGUI() {
     const addonEntries = Object.entries(loadedAddons);
     
     addonEntries.forEach(([addonId, addon], index) => {
-        const item = document.createElement('div');
-        item.className = 'addon-item';
+    const item = document.createElement('div');
+    item.className = 'addon-item';
 
-        const info = document.createElement('div');
-        info.className = 'addon-info';
-        
-        const name = document.createElement('div');
-        name.className = 'addon-name';
-        name.textContent = addon.name;
+    const info = document.createElement('div');
+    info.className = 'addon-info';
+    
+    // Kontener dla nazwy i ikony pomocy
+    const nameContainer = document.createElement('div');
+    nameContainer.className = 'addon-name-container';
+    
+    const name = document.createElement('div');
+    name.className = 'addon-name';
+    name.textContent = addon.name;
 
-        const status = document.createElement('div');
-        status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
-        status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
+    // Ikona znaku zapytania z tooltipem
+    const helpIcon = document.createElement('div');
+    helpIcon.className = 'addon-help-icon';
+    helpIcon.textContent = '?';
+    
+    // Tooltip z opisem
+    const tooltip = document.createElement('div');
+    tooltip.className = 'addon-tooltip';
+    tooltip.textContent = addonConfig[addonId].description || 'Brak opisu dla tego dodatku.';
+    
+    helpIcon.appendChild(tooltip);
+    
+    nameContainer.appendChild(name);
+    nameContainer.appendChild(helpIcon);
 
-        info.appendChild(name);
-        info.appendChild(status);
+    const status = document.createElement('div');
+    status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
+    status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
 
-        const switchElement = document.createElement('div');
-        switchElement.className = `addon-switch ${addon.enabled ? 'active' : ''}`;
+    info.appendChild(nameContainer); // Zmienione z name na nameContainer
+    info.appendChild(status);
 
-        switchElement.addEventListener('click', async () => {
-            const success = await toggleAddon(addonId);
-            if (success) {
-                switchElement.classList.toggle('active', addon.enabled);
-                status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
-                status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
-            }
-        });
+    const switchElement = document.createElement('div');
+    switchElement.className = `addon-switch ${addon.enabled ? 'active' : ''}`;
 
-        item.appendChild(info);
-        item.appendChild(switchElement);
-        
-        // Dodaj do odpowiedniej kolumny (naprzemiennie)
-        if (index % 2 === 0) {
-            leftColumn.appendChild(item);
-        } else {
-            rightColumn.appendChild(item);
+    switchElement.addEventListener('click', async () => {
+        const success = await toggleAddon(addonId);
+        if (success) {
+            switchElement.classList.toggle('active', addon.enabled);
+            status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
+            status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
         }
     });
+
+    item.appendChild(info);
+    item.appendChild(switchElement);
+    
+    // Dodaj do odpowiedniej kolumny (naprzemiennie)
+    if (index % 2 === 0) {
+        leftColumn.appendChild(item);
+    } else {
+        rightColumn.appendChild(item);
+    }
+});
 
     content.appendChild(leftColumn);
     content.appendChild(rightColumn);
