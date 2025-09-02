@@ -21,25 +21,25 @@
 const addonConfig = {
     addon1: {
         name: 'Players Online',
-        description: 'Wyświetla liczbę graczy online na serwerze w czasie rzeczywistym.',
+        description: 'Wyświetla liczbę graczy online na serwerze, z podziałem na tytanów.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online.js'
     },
     addon2: {
         name: 'Players Online - Alarm',
-        description: 'Powiadamia dźwiękiem gdy liczba graczy online przekroczy określony próg.',
+        description: 'Wysyła wiadmość na discorda gdy liczba graczy online przekroczy określony próg.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online%20alarm.js'
     },
     addon3: {
         name: 'Titans on Discord',
-        description: 'Wysyła powiadomienia na Discord o pojawieniu się tytanów na mapie.',
+        description: 'Wysyła powiadomienie na discorda gdy tytan zrespi.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/titans%20on%20discord.js'
     },
     addon4: {
         name: 'Heroes on Discord',
-        description: 'Wysyła powiadomienia na Discord o pojawieniu się bohaterów na mapie.',
+        description: 'Wysyła powiadomienie na discorda gdy znajdziesz herosa.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/heroes%20on%20discord.js'
     },
@@ -57,7 +57,7 @@ const addonConfig = {
     },
     addon7: {
         name: 'Better UI',
-        description: 'Ulepsza interfejs użytkownika gry o dodatkowe funkcje i lepszy wygląd.',
+        description: 'Zmienia nazwy statystyk, bonusów legendarnych oraz dodaje kalkulator ulepszania do tipów.',
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/betterui.js'
     }
