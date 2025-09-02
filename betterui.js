@@ -3,7 +3,7 @@
 
     const bonusNames = {
         // Bonusy standardowe
-        'Cios krytyczny': 'Krytyk',
+        'Cios krytyczny': 'Kryt',
         'Przebicie': 'Przebitka',
         'Głęboka rana': 'GR',
         'Unik': 'Unik',
@@ -37,8 +37,8 @@
         'Spowalnia cel o': 'Slow o',
         'punktów pancerza podczas ciosu': 'panca',
         'Ogłuszający cios': 'UGA BUGA MACZUGA',
-        '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75%, 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
-        'Przywracanie Energii': 'Przywro Energi',
+        '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75% DODATKOWO: 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
+        'Turkanie energii': 'Przywro energii',
         'Absorbuje': 'Absa',
         'obrażeń fizycznych': 'DMG FIZ',
         'obrażeń magicznych': 'DMG MAG',
@@ -49,6 +49,8 @@
         'Wewnętrzny spokój': 'umka dla cweli',
         'Smocze Runy': 'SR',
         'Punkty Honoru': 'PH',
+        'Teleportuje gracza na mapę': 'Tepa na',
+        'szans na kontratak po ciosie krytycznym': 'na kontre',
 
         // Bonusy legendarne
         'Cios bardzo krytyczny': '💀 POTĘŻNE PIERDOLNIĘCIE 💀',
