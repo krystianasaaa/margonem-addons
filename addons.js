@@ -18,7 +18,7 @@
         return;
     }
 
-  const addonConfig = {
+const addonConfig = {
     addon1: {
         name: 'Players Online',
         enabled: false,
@@ -204,6 +204,10 @@ function disableAddon(addonId) {
         addon.enabled = false;
         saveAddonState(addonId, false); // Zapisz stan
         console.log(`✅ Wyłączono: ${addon.name}`);
+        
+        // Pokaż powiadomienie o konieczności odświeżenia strony
+        showRefreshNotification(`Dodatek "${addon.name}" został wyłączony. Odśwież stronę aby zastosować zmiany.`);
+        
         return true;
     } catch (error) {
         console.error(`Błąd podczas wyłączania ${addon.name}:`, error);
@@ -535,6 +539,88 @@ const styles = `
     flex-direction: column;
 }
 
+/* Style dla powiadomienia o odświeżeniu */
+.refresh-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(to bottom, #444 0%, #333 100%);
+    border: 2px solid #ff6b35;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 400px;
+    z-index: 20000;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.refresh-notification h3 {
+    margin: 0 0 10px 0;
+    color: #ff6b35;
+    font-size: 16px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.refresh-notification p {
+    margin: 0 0 20px 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #ddd;
+}
+
+.refresh-notification-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.refresh-btn, .dismiss-btn {
+    padding: 8px 16px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.refresh-btn {
+    background: linear-gradient(to bottom, #ff6b35 0%, #e55a2b 100%);
+    color: #ffffff;
+    border-color: #d44820;
+}
+
+.refresh-btn:hover {
+    background: linear-gradient(to bottom, #ff7b45 0%, #f56a3b 100%);
+}
+
+.dismiss-btn {
+    background: linear-gradient(to bottom, #666 0%, #444 100%);
+    color: #ffffff;
+    border-color: #333;
+}
+
+.dismiss-btn:hover {
+    background: linear-gradient(to bottom, #777 0%, #555 100%);
+}
+
 @media (max-width: 680px) {
     .addon-menu {
         width: 95vw;
@@ -548,6 +634,15 @@ const styles = `
     .addon-controls {
         flex-direction: column;
         gap: 4px;
+    }
+    
+    .refresh-notification {
+        max-width: 90vw;
+        padding: 15px;
+    }
+    
+    .refresh-notification-buttons {
+        flex-direction: column;
     }
 }
 `;
@@ -598,6 +693,48 @@ function loadPosition() {
         x: x ? parseInt(x) : null,
         y: y ? parseInt(y) : null
     };
+}
+
+// Funkcja do pokazywania powiadomienia o odświeżeniu
+function showRefreshNotification(message) {
+    // Sprawdź czy powiadomienie już istnieje
+    const existing = document.querySelector('.refresh-notification');
+    if (existing) {
+        existing.remove();
+    }
+
+    const notification = document.createElement('div');
+    notification.className = 'refresh-notification';
+
+    notification.innerHTML = `
+        <h3>⚠️ Wymagane odświeżenie</h3>
+        <p>${message}</p>
+        <div class="refresh-notification-buttons">
+            <button class="refresh-btn">Odśwież teraz</button>
+            <button class="dismiss-btn">Później</button>
+        </div>
+    `;
+
+    // Dodaj event listenery do przycisków
+    const refreshBtn = notification.querySelector('.refresh-btn');
+    const dismissBtn = notification.querySelector('.dismiss-btn');
+
+    refreshBtn.addEventListener('click', () => {
+        window.location.reload();
+    });
+
+    dismissBtn.addEventListener('click', () => {
+        notification.remove();
+    });
+
+    // Automatyczne usunięcie po 10 sekundach
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 10000);
+
+    document.body.appendChild(notification);
 }
 
 // Make element draggable
