@@ -253,7 +253,6 @@ function cleanupAddon(addonId) {
 }
 
 const styles = `
-const styles = `
 .addon-manager {
     position: fixed;
     z-index: 10000;
