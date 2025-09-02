@@ -1,3 +1,14 @@
+// ==UserScript==
+// @name         New Userscript
+// @namespace    http://tampermonkey.net/
+// @version      2025-09-02
+// @description  try to take over the world!
+// @author       You
+// @match        http://*/*
+// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @grant        none
+// ==/UserScript==
+
 (function() {
     'use strict';
     function getCookie(name) {
@@ -362,7 +373,7 @@ const styles = `
     content: '';
     width: 16px;
     height: 16px;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="14" y="3" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="14" y="14" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="3" y="14" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/></svg>');
+    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
