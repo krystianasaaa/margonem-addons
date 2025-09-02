@@ -466,24 +466,25 @@ const styles = `
 }
 
 .addon-tooltip {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: fixed;
+    bottom: auto;
+    top: auto;
+    left: auto;
+    right: auto;
     background: linear-gradient(to bottom, #1a1a1a 0%, #0a0a0a 100%);
     border: 1px solid #444;
     border-radius: 4px;
-    padding: 8px 10px;
+    padding: 10px 12px;
     color: #fff;
-    font-size: 11px;
-    line-height: 1.3;
+    font-size: 12px;
+    line-height: 1.4;
     white-space: normal;
-    max-width: 200px;
-    z-index: 10001;
+    width: 280px;
+    z-index: 20001;
     opacity: 0;
     visibility: hidden;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.9);
     pointer-events: none;
     word-wrap: break-word;
 }
@@ -501,8 +502,16 @@ const styles = `
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    border: 4px solid transparent;
+    border: 5px solid transparent;
     border-top-color: #1a1a1a;
+}
+
+/* Strzałka gdy tooltip jest nad ikoną */
+.addon-tooltip.tooltip-above::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: #1a1a1a;
 }
 
 .addon-status {
@@ -891,6 +900,39 @@ function makeDraggable(element, handle) {
 
     return () => hasDragged;
 }
+function positionTooltip(helpIcon, tooltip) {
+    const iconRect = helpIcon.getBoundingClientRect();
+    const tooltipWidth = 280;
+    const tooltipHeight = tooltip.offsetHeight || 60; // przybliżona wysokość
+    
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Oblicz pozycję
+    let left = iconRect.left + iconRect.width / 2 - tooltipWidth / 2;
+    let top = iconRect.bottom + 8; // 8px poniżej ikony
+    
+    // Sprawdź czy tooltip nie wychodzi poza prawą krawędź
+    if (left + tooltipWidth > viewportWidth - 10) {
+        left = viewportWidth - tooltipWidth - 10;
+    }
+    
+    // Sprawdź czy tooltip nie wychodzi poza lewą krawędź
+    if (left < 10) {
+        left = 10;
+    }
+    
+    // Sprawdź czy tooltip nie wychodzi poza dolną krawędź
+    if (top + tooltipHeight > viewportHeight - 10) {
+        top = iconRect.top - tooltipHeight - 8; // Pokaż nad ikoną
+        tooltip.classList.add('tooltip-above');
+    } else {
+        tooltip.classList.remove('tooltip-above');
+    }
+    
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+}
 
 // Create GUI - ZMIENIONA FUNKCJA
 function createGUI() {
@@ -961,20 +1003,35 @@ function createGUI() {
     name.className = 'addon-name';
     name.textContent = addon.name;
 
-    // Ikona znaku zapytania z tooltipem
-    const helpIcon = document.createElement('div');
-    helpIcon.className = 'addon-help-icon';
-    helpIcon.textContent = '?';
-    
-    // Tooltip z opisem
-    const tooltip = document.createElement('div');
-    tooltip.className = 'addon-tooltip';
-    tooltip.textContent = addonConfig[addonId].description || 'Brak opisu dla tego dodatku.';
-    
-    helpIcon.appendChild(tooltip);
-    
-    nameContainer.appendChild(name);
-    nameContainer.appendChild(helpIcon);
+const helpIcon = document.createElement('div');
+helpIcon.className = 'addon-help-icon';
+helpIcon.textContent = '?';
+
+// Tooltip z opisem
+const tooltip = document.createElement('div');
+tooltip.className = 'addon-tooltip';
+tooltip.textContent = addonConfig[addonId].description || 'Brak opisu dla tego dodatku.';
+
+// Event listenery dla pokazywania/ukrywania tooltipa
+helpIcon.addEventListener('mouseenter', () => {
+    document.body.appendChild(tooltip); // Dodaj tooltip do body
+    positionTooltip(helpIcon, tooltip);
+    tooltip.style.opacity = '1';
+    tooltip.style.visibility = 'visible';
+});
+
+helpIcon.addEventListener('mouseleave', () => {
+    tooltip.style.opacity = '0';
+    tooltip.style.visibility = 'hidden';
+    setTimeout(() => {
+        if (tooltip.parentNode) {
+            tooltip.parentNode.removeChild(tooltip);
+        }
+    }, 200);
+});
+
+nameContainer.appendChild(name);
+nameContainer.appendChild(helpIcon);
 
     const status = document.createElement('div');
     status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
