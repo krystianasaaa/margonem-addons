@@ -937,53 +937,6 @@ function makeDraggable(element, handle, isMenu = false) {
     return () => hasDragged;
 }
 
-    function handleMouseMove(e) {
-        if (!isDragging) return;
-
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
-
-        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-            hasDragged = true;
-            element.classList.add('dragging');
-            handle.classList.add('dragging');
-        }
-
-        let newX = initialX + deltaX;
-        let newY = initialY + deltaY;
-
-        const rect = element.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        newX = Math.max(0, Math.min(newX, viewportWidth - rect.width));
-        newY = Math.max(0, Math.min(newY, viewportHeight - rect.height));
-
-        element.style.left = newX + 'px';
-        element.style.top = newY + 'px';
-    }
-
-    function handleMouseUp() {
-        if (!isDragging) return;
-
-        isDragging = false;
-
-        // Zapisz pozycję po zakończeniu przeciągnięcia
-        const rect = element.getBoundingClientRect();
-        savePosition(rect.left, rect.top);
-
-        setTimeout(() => {
-            element.classList.remove('dragging');
-            handle.classList.remove('dragging');
-            hasDragged = false;
-        }, 100);
-
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => hasDragged;
-}
 function positionTooltip(helpIcon, tooltip) {
     const iconRect = helpIcon.getBoundingClientRect();
     const tooltipWidth = 280;
