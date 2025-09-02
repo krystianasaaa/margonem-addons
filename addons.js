@@ -18,8 +18,7 @@
         return;
     }
 
-     // Konfiguracja dodatków
-   const addonConfig = {
+  const addonConfig = {
     addon1: {
         name: 'Players Online',
         enabled: false,
@@ -40,7 +39,6 @@
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/heroes%20on%20discord.js'
     },
-    
     addon5: {
         name: 'Inventory Search',
         enabled: false,
@@ -51,7 +49,6 @@
         enabled: false,
         url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/better%20sellings.js'
     },
-
     addon7: {
         name: 'Better UI',
         enabled: false,
@@ -59,193 +56,193 @@
     }
 };
 
-    // Obiekt do przechowywania załadowanych dodatków
-    const loadedAddons = {};
+// Obiekt do przechowywania załadowanych dodatków
+const loadedAddons = {};
 
-    // Funkcja do ładowania kodu dodatku z GitHub
-    async function loadAddonCode(url) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const code = await response.text();
-            return code;
-        } catch (error) {
-            console.error('Błąd podczas ładowania dodatku:', error);
-            throw error;
-        }
-    }
-
-    // Funkcja do tworzenia dodatku
-    async function createAddon(addonId, config) {
-        try {
-            console.log(`Ładowanie dodatku: ${config.name}...`);
-            
-            // Załaduj kod z GitHub
-            const addonCode = await loadAddonCode(config.url);
-            
-            // Stwórz obiekt dodatku
-            const addon = {
-                name: config.name,
-                enabled: false,
-                code: addonCode,
-                addonFunction: null,
-init: function() {
-    console.log(`${config.name} włączony`);
+// Funkcja do ładowania kodu dodatku z GitHub
+async function loadAddonCode(url) {
     try {
-        // Dodaj polyfill dla funkcji GM_
-        window.GM_getValue = window.GM_getValue || function(key, defaultValue) {
-            const stored = localStorage.getItem('gm_' + key);
-            return stored !== null ? JSON.parse(stored) : defaultValue;
-        };
-
-        window.GM_setValue = window.GM_setValue || function(key, value) {
-            localStorage.setItem('gm_' + key, JSON.stringify(value));
-        };
-
-        window.GM_deleteValue = window.GM_deleteValue || function(key) {
-            localStorage.removeItem('gm_' + key);
-        };
-
-        // Wykonaj kod dodatku w bezpiecznym kontekście
-        this.addonFunction = new Function(
-            'addonId', 
-            'console', 
-            'document', 
-            'window',
-            'cleanupAddon',
-            this.code
-        );
-                        
-                        // Uruchom dodatek
-                        this.addonFunction(addonId, console, document, window, cleanupAddon);
-                    } catch (error) {
-                        console.error(`Błąd podczas inicjalizacji ${config.name}:`, error);
-                        throw error;
-                    }
-                },
-                destroy: function() {
-                    cleanupAddon(addonId);
-                }
-            };
-            
-            return addon;
-        } catch (error) {
-            console.error(`Błąd podczas tworzenia dodatku ${config.name}:`, error);
-            return null;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const code = await response.text();
+        return code;
+    } catch (error) {
+        console.error('Błąd podczas ładowania dodatku:', error);
+        throw error;
     }
+}
 
-    // Funkcja do ładowania wszystkich dodatków
-    async function loadAllAddons() {
-        for (const [addonId, config] of Object.entries(addonConfig)) {
-            const addon = await createAddon(addonId, config);
-            if (addon) {
-                loadedAddons[addonId] = addon;
-                console.log(`✅ Załadowano: ${config.name}`);
-                
-                // Sprawdź zapisany stan i włącz dodatek jeśli był włączony
-                const wasEnabled = loadAddonState(addonId);
-                if (wasEnabled) {
-                    try {
-                        await addon.init();
-                        addon.enabled = true;
-                        console.log(`🔄 Przywrócono stan: ${config.name} - włączony`);
-                    } catch (error) {
-                        console.error(`Błąd podczas przywracania ${config.name}:`, error);
-                        addon.enabled = false;
-                        saveAddonState(addonId, false);
-                    }
+// Funkcja do tworzenia dodatku
+async function createAddon(addonId, config) {
+    try {
+        console.log(`Ładowanie dodatku: ${config.name}...`);
+        
+        // Załaduj kod z GitHub
+        const addonCode = await loadAddonCode(config.url);
+        
+        // Stwórz obiekt dodatku
+        const addon = {
+            name: config.name,
+            enabled: false,
+            code: addonCode,
+            addonFunction: null,
+            init: function() {
+                console.log(`${config.name} włączony`);
+                try {
+                    // Dodaj polyfill dla funkcji GM_
+                    window.GM_getValue = window.GM_getValue || function(key, defaultValue) {
+                        const stored = localStorage.getItem('gm_' + key);
+                        return stored !== null ? JSON.parse(stored) : defaultValue;
+                    };
+
+                    window.GM_setValue = window.GM_setValue || function(key, value) {
+                        localStorage.setItem('gm_' + key, JSON.stringify(value));
+                    };
+
+                    window.GM_deleteValue = window.GM_deleteValue || function(key) {
+                        localStorage.removeItem('gm_' + key);
+                    };
+
+                    // Wykonaj kod dodatku w bezpiecznym kontekście
+                    this.addonFunction = new Function(
+                        'addonId', 
+                        'console', 
+                        'document', 
+                        'window',
+                        'cleanupAddon',
+                        this.code
+                    );
+                                    
+                    // Uruchom dodatek
+                    this.addonFunction(addonId, console, document, window, cleanupAddon);
+                } catch (error) {
+                    console.error(`Błąd podczas inicjalizacji ${config.name}:`, error);
+                    throw error;
                 }
-            } else {
-                console.log(`❌ Nie udało się załadować: ${config.name}`);
+            },
+            destroy: function() {
+                cleanupAddon(addonId);
             }
-        }
+        };
+        
+        return addon;
+    } catch (error) {
+        console.error(`Błąd podczas tworzenia dodatku ${config.name}:`, error);
+        return null;
     }
+}
 
-    // Funkcja do włączania dodatku
-    async function enableAddon(addonId) {
-        const addon = loadedAddons[addonId];
-        if (!addon) {
-            console.error(`Dodatek ${addonId} nie został załadowany`);
-            return false;
-        }
-        
-        if (addon.enabled) {
-            console.log(`Dodatek ${addon.name} jest już włączony`);
-            return true;
-        }
-        
-        try {
-            await addon.init();
-            addon.enabled = true;
-            saveAddonState(addonId, true); // Zapisz stan
-            console.log(`✅ Włączono: ${addon.name}`);
-            return true;
-        } catch (error) {
-            console.error(`Błąd podczas włączania ${addon.name}:`, error);
-            return false;
-        }
-    }
-
-    // Funkcja do wyłączania dodatku
-    function disableAddon(addonId) {
-        const addon = loadedAddons[addonId];
-        if (!addon) {
-            console.error(`Dodatek ${addonId} nie został załadowany`);
-            return false;
-        }
-        
-        if (!addon.enabled) {
-            console.log(`Dodatek ${addon.name} jest już wyłączony`);
-            return true;
-        }
-        
-        try {
-            addon.destroy();
-            addon.enabled = false;
-            saveAddonState(addonId, false); // Zapisz stan
-            console.log(`✅ Wyłączono: ${addon.name}`);
-            return true;
-        } catch (error) {
-            console.error(`Błąd podczas wyłączania ${addon.name}:`, error);
-            return false;
-        }
-    }
-
-    // Funkcja do przełączania stanu dodatku
-    async function toggleAddon(addonId) {
-        const addon = loadedAddons[addonId];
-        if (!addon) {
-            console.error(`Dodatek ${addonId} nie został załadowany`);
-            return false;
-        }
-        
-        if (addon.enabled) {
-            return disableAddon(addonId);
+// Funkcja do ładowania wszystkich dodatków
+async function loadAllAddons() {
+    for (const [addonId, config] of Object.entries(addonConfig)) {
+        const addon = await createAddon(addonId, config);
+        if (addon) {
+            loadedAddons[addonId] = addon;
+            console.log(`✅ Załadowano: ${config.name}`);
+            
+            // Sprawdź zapisany stan i włącz dodatek jeśli był włączony
+            const wasEnabled = loadAddonState(addonId);
+            if (wasEnabled) {
+                try {
+                    await addon.init();
+                    addon.enabled = true;
+                    console.log(`🔄 Przywrócono stan: ${config.name} - włączony`);
+                } catch (error) {
+                    console.error(`Błąd podczas przywracania ${config.name}:`, error);
+                    addon.enabled = false;
+                    saveAddonState(addonId, false);
+                }
+            }
         } else {
-            return await enableAddon(addonId);
+            console.log(`❌ Nie udało się załadować: ${config.name}`);
         }
     }
+}
 
-    // Funkcja do pobierania listy dodatków
-    function getAddonsList() {
-        return Object.entries(loadedAddons).map(([id, addon]) => ({
-            id,
-            name: addon.name,
-            enabled: addon.enabled
-        }));
+// Funkcja do włączania dodatku
+async function enableAddon(addonId) {
+    const addon = loadedAddons[addonId];
+    if (!addon) {
+        console.error(`Dodatek ${addonId} nie został załadowany`);
+        return false;
     }
-
-    // Funkcja cleanup (musisz ją dostosować do swoich potrzeb)
-    function cleanupAddon(addonId) {
-        console.log(`Czyszczenie dodatku: ${addonId}`);
-        // Tutaj umieść kod do czyszczenia zasobów dodatku
-        // np. usuwanie event listenerów, elementów DOM, itp.
+    
+    if (addon.enabled) {
+        console.log(`Dodatek ${addon.name} jest już włączony`);
+        return true;
     }
+    
+    try {
+        await addon.init();
+        addon.enabled = true;
+        saveAddonState(addonId, true); // Zapisz stan
+        console.log(`✅ Włączono: ${addon.name}`);
+        return true;
+    } catch (error) {
+        console.error(`Błąd podczas włączania ${addon.name}:`, error);
+        return false;
+    }
+}
 
-    const styles = `
+// Funkcja do wyłączania dodatku
+function disableAddon(addonId) {
+    const addon = loadedAddons[addonId];
+    if (!addon) {
+        console.error(`Dodatek ${addonId} nie został załadowany`);
+        return false;
+    }
+    
+    if (!addon.enabled) {
+        console.log(`Dodatek ${addon.name} jest już wyłączony`);
+        return true;
+    }
+    
+    try {
+        addon.destroy();
+        addon.enabled = false;
+        saveAddonState(addonId, false); // Zapisz stan
+        console.log(`✅ Wyłączono: ${addon.name}`);
+        return true;
+    } catch (error) {
+        console.error(`Błąd podczas wyłączania ${addon.name}:`, error);
+        return false;
+    }
+}
+
+// Funkcja do przełączania stanu dodatku
+async function toggleAddon(addonId) {
+    const addon = loadedAddons[addonId];
+    if (!addon) {
+        console.error(`Dodatek ${addonId} nie został załadowany`);
+        return false;
+    }
+    
+    if (addon.enabled) {
+        return disableAddon(addonId);
+    } else {
+        return await enableAddon(addonId);
+    }
+}
+
+// Funkcja do pobierania listy dodatków
+function getAddonsList() {
+    return Object.entries(loadedAddons).map(([id, addon]) => ({
+        id,
+        name: addon.name,
+        enabled: addon.enabled
+    }));
+}
+
+// Funkcja cleanup (musisz ją dostosować do swoich potrzeb)
+function cleanupAddon(addonId) {
+    console.log(`Czyszczenie dodatku: ${addonId}`);
+    // Tutaj umieść kod do czyszczenia zasobów dodatku
+    // np. usuwanie event listenerów, elementów DOM, itp.
+}
+
+const styles = `
 .addon-manager {
     position: fixed;
     z-index: 10000;
@@ -370,6 +367,7 @@ init: function() {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
+    align-items: start;
 }
 
 .addon-content::-webkit-scrollbar {
@@ -387,7 +385,7 @@ init: function() {
     border: 1px solid #222;
 }
 
-/* Kompaktowy styl elementu dodatku jak w Margonem */
+/* Kompaktowy styl elementu dodatku jak w Margonom */
 .addon-item {
     display: flex;
     justify-content: space-between;
@@ -399,6 +397,7 @@ init: function() {
     transition: all 0.2s ease;
     min-height: 32px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    margin-bottom: 4px;
 }
 
 .addon-item:hover {
@@ -530,6 +529,12 @@ init: function() {
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
+/* Kolumny dla dodatków */
+.addon-column {
+    display: flex;
+    flex-direction: column;
+}
+
 @media (max-width: 680px) {
     .addon-menu {
         width: 95vw;
@@ -545,280 +550,314 @@ init: function() {
         gap: 4px;
     }
 }
-    `;
+`;
 
-    // Dodaj style do strony
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = styles;
-    document.head.appendChild(styleSheet);
+// Dodaj style do strony
+const styleSheet = document.createElement('style');
+styleSheet.textContent = styles;
+document.head.appendChild(styleSheet);
 
-    // System zapisywania stanu w cookies (alternatywa dla localStorage)
-    function setCookie(name, value, days = 30) {
-        const expires = new Date();
-        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+// System zapisywania stanu w cookies (alternatywa dla localStorage)
+function setCookie(name, value, days = 30) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+}
+
+function getAddonCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
     }
+    return null;
+}
 
-    function getAddonCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) {
-            return parts.pop().split(';').shift();
+// Funkcja do zapisywania stanu dodatku
+function saveAddonState(addonId, enabled) {
+    setCookie(`addon_${addonId}_enabled`, enabled.toString());
+}
+
+// Funkcja do wczytywania stanu dodatku
+function loadAddonState(addonId) {
+    const saved = getAddonCookie(`addon_${addonId}_enabled`);
+    return saved === 'true';
+}
+
+// Funkcja do zapisywania pozycji
+function savePosition(x, y) {
+    setCookie('addon_manager_x', x.toString());
+    setCookie('addon_manager_y', y.toString());
+}
+
+// Funkcja do wczytywania pozycji
+function loadPosition() {
+    const x = getAddonCookie('addon_manager_x');
+    const y = getAddonCookie('addon_manager_y');
+    return {
+        x: x ? parseInt(x) : null,
+        y: y ? parseInt(y) : null
+    };
+}
+
+// Make element draggable
+function makeDraggable(element, handle) {
+    let isDragging = false;
+    let hasDragged = false;
+    let startX, startY, initialX, initialY;
+
+    handle.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        hasDragged = false;
+
+        startX = e.clientX;
+        startY = e.clientY;
+
+        const rect = element.getBoundingClientRect();
+        initialX = rect.left;
+        initialY = rect.top;
+
+        element.style.position = 'fixed';
+        element.style.left = initialX + 'px';
+        element.style.top = initialY + 'px';
+        element.style.right = 'auto';
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        e.preventDefault();
+    });
+
+    function handleMouseMove(e) {
+        if (!isDragging) return;
+
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+            hasDragged = true;
+            element.classList.add('dragging');
+            handle.classList.add('dragging');
         }
-        return null;
+
+        let newX = initialX + deltaX;
+        let newY = initialY + deltaY;
+
+        const rect = element.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        newX = Math.max(0, Math.min(newX, viewportWidth - rect.width));
+        newY = Math.max(0, Math.min(newY, viewportHeight - rect.height));
+
+        element.style.left = newX + 'px';
+        element.style.top = newY + 'px';
     }
 
-    // Funkcja do zapisywania stanu dodatku
-    function saveAddonState(addonId, enabled) {
-        setCookie(`addon_${addonId}_enabled`, enabled.toString());
-    }
+    function handleMouseUp() {
+        if (!isDragging) return;
 
-    // Funkcja do wczytywania stanu dodatku
-    function loadAddonState(addonId) {
-        const saved = getAddonCookie(`addon_${addonId}_enabled`);
-        return saved === 'true';
-    }
+        isDragging = false;
 
-    // Funkcja do zapisywania pozycji
-    function savePosition(x, y) {
-        setCookie('addon_manager_x', x.toString());
-        setCookie('addon_manager_y', y.toString());
-    }
+        // Zapisz pozycję po zakończeniu przeciągnięcia
+        const rect = element.getBoundingClientRect();
+        savePosition(rect.left, rect.top);
 
-    // Funkcja do wczytywania pozycji
-    function loadPosition() {
-        const x = getAddonCookie('addon_manager_x');
-        const y = getAddonCookie('addon_manager_y');
-        return {
-            x: x ? parseInt(x) : null,
-            y: y ? parseInt(y) : null
-        };
-    }
-    // Make element draggable
-    function makeDraggable(element, handle) {
-        let isDragging = false;
-        let hasDragged = false;
-        let startX, startY, initialX, initialY;
-
-        handle.addEventListener('mousedown', (e) => {
-            isDragging = true;
+        setTimeout(() => {
+            element.classList.remove('dragging');
+            handle.classList.remove('dragging');
             hasDragged = false;
+        }, 100);
 
-            startX = e.clientX;
-            startY = e.clientY;
-
-            const rect = element.getBoundingClientRect();
-            initialX = rect.left;
-            initialY = rect.top;
-
-            element.style.position = 'fixed';
-            element.style.left = initialX + 'px';
-            element.style.top = initialY + 'px';
-            element.style.right = 'auto';
-
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-
-            e.preventDefault();
-        });
-
-        function handleMouseMove(e) {
-            if (!isDragging) return;
-
-            const deltaX = e.clientX - startX;
-            const deltaY = e.clientY - startY;
-
-            if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-                hasDragged = true;
-                element.classList.add('dragging');
-                handle.classList.add('dragging');
-            }
-
-            let newX = initialX + deltaX;
-            let newY = initialY + deltaY;
-
-            const rect = element.getBoundingClientRect();
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-
-            newX = Math.max(0, Math.min(newX, viewportWidth - rect.width));
-            newY = Math.max(0, Math.min(newY, viewportHeight - rect.height));
-
-            element.style.left = newX + 'px';
-            element.style.top = newY + 'px';
-        }
-
-        function handleMouseUp() {
-            if (!isDragging) return;
-
-            isDragging = false;
-
-            // Zapisz pozycję po zakończeniu przeciągnięcia
-            const rect = element.getBoundingClientRect();
-            savePosition(rect.left, rect.top);
-
-            setTimeout(() => {
-                element.classList.remove('dragging');
-                handle.classList.remove('dragging');
-                hasDragged = false;
-            }, 100);
-
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        }
-
-        return () => hasDragged;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
     }
 
-    // Create GUI
-    function createGUI() {
-        const container = document.createElement('div');
-        container.className = 'addon-manager';
+    return () => hasDragged;
+}
 
-        // Wczytaj zapisaną pozycję
-        const savedPosition = loadPosition();
-        if (savedPosition.x !== null && savedPosition.y !== null) {
-            container.style.left = savedPosition.x + 'px';
-            container.style.top = savedPosition.y + 'px';
-        } else {
-            // Domyślna pozycja
-            container.style.top = '10px';
-            container.style.right = '10px';
-        }
+// Create GUI - ZMIENIONA FUNKCJA
+function createGUI() {
+    const container = document.createElement('div');
+    container.className = 'addon-manager';
 
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'addon-toggle-btn';
-
-        const wasDragged = makeDraggable(container, toggleBtn);
-
-        const menu = document.createElement('div');
-        menu.className = 'addon-menu';
-
-        const header = document.createElement('div');
-        header.className = 'addon-menu-header';
-        header.textContent = 'Manager Dodatków';
-
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'addon-close-btn';
-        closeBtn.innerHTML = '×';
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            menu.classList.remove('active');
-        });
-
-        header.appendChild(closeBtn);
-        makeDraggable(menu, header);
-        menu.appendChild(header);
-
-        // Create addon items
-        Object.entries(loadedAddons).forEach(([addonId, addon]) => {
-            const item = document.createElement('div');
-            item.className = 'addon-item';
-
-            const info = document.createElement('div');
-            const name = document.createElement('div');
-            name.className = 'addon-name';
-            name.textContent = addon.name;
-
-            const status = document.createElement('div');
-            status.className = 'addon-status';
-            status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
-
-            info.appendChild(name);
-            info.appendChild(status);
-
-            const switchElement = document.createElement('div');
-            switchElement.className = `addon-switch ${addon.enabled ? 'active' : ''}`;
-
-            switchElement.addEventListener('click', async () => {
-                const success = await toggleAddon(addonId);
-                if (success) {
-                    switchElement.classList.toggle('active', addon.enabled);
-                    status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
-                }
-            });
-
-            item.appendChild(info);
-            item.appendChild(switchElement);
-            menu.appendChild(item);
-        });
-
-        // Control buttons
-        const controls = document.createElement('div');
-        controls.className = 'addon-controls';
-
-        const enableAllBtn = document.createElement('button');
-        enableAllBtn.className = 'control-btn enable-all-btn';
-        enableAllBtn.textContent = 'Włącz wszystkie';
-        enableAllBtn.addEventListener('click', async () => {
-            for (const addonId of Object.keys(loadedAddons)) {
-                if (!loadedAddons[addonId].enabled) {
-                    await enableAddon(addonId);
-                }
-            }
-            updateGUI();
-        });
-
-        const disableAllBtn = document.createElement('button');
-        disableAllBtn.className = 'control-btn disable-all-btn';
-        disableAllBtn.textContent = 'Wyłącz wszystkie';
-        disableAllBtn.addEventListener('click', () => {
-            Object.keys(loadedAddons).forEach(addonId => {
-                if (loadedAddons[addonId].enabled) {
-                    disableAddon(addonId);
-                }
-            });
-            updateGUI();
-        });
-
-        controls.appendChild(enableAllBtn);
-        controls.appendChild(disableAllBtn);
-        menu.appendChild(controls);
-
-
-        toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            setTimeout(() => {
-                if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
-                    menu.classList.toggle('active');
-                }
-            }, 10);
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!container.contains(e.target)) {
-                menu.classList.remove('active');
-            }
-        });
-
-        container.appendChild(toggleBtn);
-        container.appendChild(menu);
-        document.body.appendChild(container);
+    // Wczytaj zapisaną pozycję
+    const savedPosition = loadPosition();
+    if (savedPosition.x !== null && savedPosition.y !== null) {
+        container.style.left = savedPosition.x + 'px';
+        container.style.top = savedPosition.y + 'px';
+    } else {
+        // Domyślna pozycja
+        container.style.top = '10px';
+        container.style.right = '10px';
     }
 
-    // Update GUI
-    function updateGUI() {
-        const switches = document.querySelectorAll('.addon-switch');
-        const statuses = document.querySelectorAll('.addon-status');
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'addon-toggle-btn';
 
-        Object.entries(loadedAddons).forEach(([addonId, addon], index) => {
-            if (switches[index]) {
-                switches[index].classList.toggle('active', addon.enabled);
-            }
-            if (statuses[index]) {
-                statuses[index].textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
-            }
-        });
-    }
+    const wasDragged = makeDraggable(container, toggleBtn);
 
+    const menu = document.createElement('div');
+    menu.className = 'addon-menu';
 
-    // Inicjalizacja - załaduj wszystkie dodatki przy starcie
-    loadAllAddons().then(() => {
-        console.log('🚀 Manager dodatków gotowy!');
-        console.log('Dostępne dodatki:', getAddonsList());
+    const header = document.createElement('div');
+    header.className = 'addon-menu-header';
+    header.textContent = 'Manager Dodatków';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'addon-close-btn';
+    closeBtn.innerHTML = '×';
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.remove('active');
+    });
+
+    header.appendChild(closeBtn);
+    makeDraggable(menu, header);
+    menu.appendChild(header);
+
+    // Kontener dla dodatków z dwiema kolumnami
+    const content = document.createElement('div');
+    content.className = 'addon-content';
+
+    // Tworzenie dwóch kolumn
+    const leftColumn = document.createElement('div');
+    leftColumn.className = 'addon-column';
+    
+    const rightColumn = document.createElement('div');
+    rightColumn.className = 'addon-column';
+
+    // Podziel dodatki na dwie kolumny
+    const addonEntries = Object.entries(loadedAddons);
+    
+    addonEntries.forEach(([addonId, addon], index) => {
+        const item = document.createElement('div');
+        item.className = 'addon-item';
+
+        const info = document.createElement('div');
+        info.className = 'addon-info';
         
-        // Stwórz GUI
-        createGUI();
+        const name = document.createElement('div');
+        name.className = 'addon-name';
+        name.textContent = addon.name;
+
+        const status = document.createElement('div');
+        status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
+        status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
+
+        info.appendChild(name);
+        info.appendChild(status);
+
+        const switchElement = document.createElement('div');
+        switchElement.className = `addon-switch ${addon.enabled ? 'active' : ''}`;
+
+        switchElement.addEventListener('click', async () => {
+            const success = await toggleAddon(addonId);
+            if (success) {
+                switchElement.classList.toggle('active', addon.enabled);
+                status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
+                status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
+            }
+        });
+
+        item.appendChild(info);
+        item.appendChild(switchElement);
+        
+        // Dodaj do odpowiedniej kolumny (naprzemiennie)
+        if (index % 2 === 0) {
+            leftColumn.appendChild(item);
+        } else {
+            rightColumn.appendChild(item);
+        }
+    });
+
+    content.appendChild(leftColumn);
+    content.appendChild(rightColumn);
+
+    // Control buttons
+    const controls = document.createElement('div');
+    controls.className = 'addon-controls';
+
+    const enableAllBtn = document.createElement('button');
+    enableAllBtn.className = 'control-btn enable-all-btn';
+    enableAllBtn.textContent = 'Włącz wszystkie';
+    enableAllBtn.addEventListener('click', async () => {
+        for (const addonId of Object.keys(loadedAddons)) {
+            if (!loadedAddons[addonId].enabled) {
+                await enableAddon(addonId);
+            }
+        }
+        updateGUI();
+    });
+
+    const disableAllBtn = document.createElement('button');
+    disableAllBtn.className = 'control-btn disable-all-btn';
+    disableAllBtn.textContent = 'Wyłącz wszystkie';
+    disableAllBtn.addEventListener('click', () => {
+        Object.keys(loadedAddons).forEach(addonId => {
+            if (loadedAddons[addonId].enabled) {
+                disableAddon(addonId);
+            }
+        });
+        updateGUI();
+    });
+
+    controls.appendChild(enableAllBtn);
+    controls.appendChild(disableAllBtn);
+
+    menu.appendChild(content);
+    menu.appendChild(controls);
+
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setTimeout(() => {
+            if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
+                menu.classList.toggle('active');
+            }
+        }, 10);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!container.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    container.appendChild(toggleBtn);
+    container.appendChild(menu);
+    document.body.appendChild(container);
+}
+
+// Update GUI - ZMIENIONA FUNKCJA
+function updateGUI() {
+    // Usuń istniejące menu i stwórz nowe z aktualnym stanem
+    const existingManager = document.querySelector('.addon-manager');
+    if (existingManager) {
+        const position = {
+            left: existingManager.style.left,
+            top: existingManager.style.top
+        };
+        existingManager.remove();
+        
+        // Ponownie stwórz GUI z zachowaniem pozycji
+        setTimeout(() => {
+            createGUI();
+            const newManager = document.querySelector('.addon-manager');
+            if (newManager && position.left && position.top) {
+                newManager.style.left = position.left;
+                newManager.style.top = position.top;
+            }
+        }, 50);
+    }
+}
+
+// Inicjalizacja - załaduj wszystkie dodatki przy starcie
+loadAllAddons().then(() => {
+    console.log('🚀 Manager dodatków gotowy!');
+    console.log('Dostępne dodatki:', getAddonsList());
+    
+    // Stwórz GUI
+    createGUI();
         
         // Globalne API do zarządzania dodatkami
         window.AddonManager = {
