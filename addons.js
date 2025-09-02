@@ -801,19 +801,6 @@ function loadPosition() {
         y: y ? parseInt(y) : null
     };
 }
-function saveMenuPosition(x, y) {
-    setCookie('addon_menu_x', x.toString());
-    setCookie('addon_menu_y', y.toString());
-}
-
-function loadMenuPosition() {
-    const x = getAddonCookie('addon_menu_x');
-    const y = getAddonCookie('addon_menu_y');
-    return {
-        x: x ? parseInt(x) : null,
-        y: y ? parseInt(y) : null
-    };
-}
 
 function showRefreshNotification(message) {
     // Sprawdź czy powiadomienie już istnieje
@@ -858,7 +845,8 @@ function showRefreshNotification(message) {
     document.body.appendChild(notification);
 }
 
-function makeDraggable(element, handle, isMenu = false) {
+// Make element draggable
+function makeDraggable(element, handle) {
     let isDragging = false;
     let hasDragged = false;
     let startX, startY, initialX, initialY;
@@ -883,7 +871,6 @@ function makeDraggable(element, handle, isMenu = false) {
         document.addEventListener('mouseup', handleMouseUp);
 
         e.preventDefault();
-        e.stopPropagation();
     });
 
     function handleMouseMove(e) {
@@ -917,12 +904,9 @@ function makeDraggable(element, handle, isMenu = false) {
 
         isDragging = false;
 
+        // Zapisz pozycję po zakończeniu przeciągnięcia
         const rect = element.getBoundingClientRect();
-        if (isMenu) {
-            saveMenuPosition(rect.left, rect.top);
-        } else {
-            savePosition(rect.left, rect.top);
-        }
+        savePosition(rect.left, rect.top);
 
         setTimeout(() => {
             element.classList.remove('dragging');
@@ -936,7 +920,6 @@ function makeDraggable(element, handle, isMenu = false) {
 
     return () => hasDragged;
 }
-
 function positionTooltip(helpIcon, tooltip) {
     const iconRect = helpIcon.getBoundingClientRect();
     const tooltipWidth = 280;
@@ -990,7 +973,7 @@ function createGUI() {
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'addon-toggle-btn';
 
-    const wasDragged = makeDraggable(container, toggleBtn, false);
+    const wasDragged = makeDraggable(container, toggleBtn);
 
     const menu = document.createElement('div');
     menu.className = 'addon-menu';
@@ -1007,12 +990,9 @@ function createGUI() {
         menu.classList.remove('active');
     });
 
-header.appendChild(closeBtn);
-makeDraggable(menu, header, true);
-menu.appendChild(header);
-
-// Wczytaj zapisaną pozycję dla menu
-const savedMenuPosition = loadMenuPosition();
+    header.appendChild(closeBtn);
+    makeDraggable(menu, header);
+    menu.appendChild(header);
 
     // Kontener dla dodatków z dwiema kolumnami
     const content = document.createElement('div');
@@ -1140,29 +1120,14 @@ nameContainer.appendChild(helpIcon);
     menu.appendChild(content);
     menu.appendChild(controls);
 
-toggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    setTimeout(() => {
-        if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
-            const isOpening = !menu.classList.contains('active');
-            
-            if (isOpening) {
-                if (savedMenuPosition.x !== null && savedMenuPosition.y !== null) {
-                    menu.style.position = 'fixed';
-                    menu.style.left = savedMenuPosition.x + 'px';
-                    menu.style.top = savedMenuPosition.y + 'px';
-                } else {
-                    const containerRect = container.getBoundingClientRect();
-                    menu.style.position = 'fixed';
-                    menu.style.left = containerRect.left + 'px';
-                    menu.style.top = (containerRect.bottom + 6) + 'px';
-                }
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setTimeout(() => {
+            if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
+                menu.classList.toggle('active');
             }
-            
-            menu.classList.toggle('active');
-        }
-    }, 10);
-});
+        }, 10);
+    });
 
     document.addEventListener('click', (e) => {
         if (!container.contains(e.target)) {
@@ -1170,9 +1135,9 @@ toggleBtn.addEventListener('click', (e) => {
         }
     });
 
-container.appendChild(toggleBtn);
-document.body.appendChild(menu);
-document.body.appendChild(container);
+    container.appendChild(toggleBtn);
+    container.appendChild(menu);
+    document.body.appendChild(container);
 }
 
 // Update GUI - ZMIENIONA FUNKCJA
