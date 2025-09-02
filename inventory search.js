@@ -29,13 +29,13 @@
 
         searchWindow = document.createElement('div');
         searchWindow.id = 'bagSearchWindow';
-        searchWindow.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 2px solid #0f4c75;
+searchWindow.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    border: 2px solid #444444;
             border-radius: 12px;
             padding: 0;
             z-index: 10000;
@@ -50,14 +50,14 @@
 
         const header = document.createElement('div');
         header.className = 'drag-header';
-        header.style.cssText = `
-            background: linear-gradient(135deg, #0f4c75, #3282b8);
-            color: white;
-            padding: 12px 15px;
-            border-radius: 10px 10px 0 0;
-            cursor: move;
-            user-select: none;
-            border-bottom: 1px solid #0f4c75;
+header.style.cssText = `
+    background: linear-gradient(135deg, #333333, #555555);
+    color: white;
+    padding: 12px 15px;
+    border-radius: 10px 10px 0 0;
+    cursor: move;
+    user-select: none;
+    border-bottom: 1px solid #444444;
         `;
 
         const title = document.createElement('h3');
@@ -104,7 +104,7 @@
         searchButton.textContent = 'Szukaj';
         searchButton.style.cssText = `
             padding: 8px 16px;
-            background: linear-gradient(135deg, #0f4c75, #3282b8);
+            background: linear-gradient(135deg, #333333, #555555);
             color: white;
             border: none;
             border-radius: 6px;
@@ -609,7 +609,7 @@ foundItems.forEach(item => {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
         color: #e8f4fd;
         border-radius: 12px;
         border: 2px solid #0f4c75;
