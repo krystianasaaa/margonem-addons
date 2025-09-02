@@ -887,10 +887,10 @@ const style = document.createElement('style');
 style.textContent = `
     #bagSearchWindow {
         position: fixed;
-        background: linear-gradient(135deg, #1a1a2e, #16213e);
-        border: 2px solid #0f4c75;
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        border: 2px solid #444444;
         border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.8);
         z-index: 10000;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         backdrop-filter: blur(10px);
@@ -899,13 +899,13 @@ style.textContent = `
     }
 
     #bagSearchWindow .drag-header {
-        background: linear-gradient(135deg, #0f4c75, #3282b8);
+        background: linear-gradient(135deg, #333333, #555555);
         color: white;
         padding: 12px 15px;
         border-radius: 10px 10px 0 0;
         cursor: move;
         user-select: none;
-        border-bottom: 1px solid #0f4c75;
+        border-bottom: 1px solid #444444;
     }
 
     #bagSearchWindow h3 {
@@ -918,16 +918,16 @@ style.textContent = `
 
     #bagSearchWindow div:not(.drag-header) {
         padding: 15px;
-        background: rgba(0,0,0,0.2);
+        background: rgba(0,0,0,0.4);
     }
 
     #bagSearchWindow input {
         width: 100%;
         padding: 8px;
-        background: rgba(50,130,184,0.2);
-        border: 1px solid #0f4c75;
+        background: rgba(68,68,68,0.3);
+        border: 1px solid #555555;
         border-radius: 6px;
-        color: #e8f4fd;
+        color: #ffffff;
         font-size: 14px;
         box-sizing: border-box;
         margin-bottom: 10px;
@@ -936,17 +936,17 @@ style.textContent = `
 
     #bagSearchWindow input:focus {
         outline: none;
-        border-color: #3282b8;
-        box-shadow: 0 0 10px rgba(50,130,184,0.3);
+        border-color: #777777;
+        box-shadow: 0 0 10px rgba(119,119,119,0.3);
     }
 
     #bagSearchWindow input::placeholder {
-        color: rgba(232,244,253,0.6);
+        color: rgba(255,255,255,0.6);
     }
 
     #bagSearchWindow button {
         padding: 8px 16px;
-        background: linear-gradient(135deg, #0f4c75, #3282b8);
+        background: linear-gradient(135deg, #333333, #555555);
         color: white;
         border: none;
         border-radius: 6px;
@@ -954,63 +954,96 @@ style.textContent = `
         font-size: 14px;
         font-weight: bold;
         transition: all 0.2s;
-        box-shadow: 0 2px 8px rgba(15,76,117,0.3);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
 
     #bagSearchWindow button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(15,76,117,0.4);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+        background: linear-gradient(135deg, #555555, #777777);
     }
 
     #bagSearchWindow .drag-header:hover {
-        background: linear-gradient(135deg, #3282b8, #0f4c75);
+        background: linear-gradient(135deg, #555555, #333333);
     }
 
     #searchResultMessage {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        color: #ffffff;
+        border-radius: 12px;
+        border: 2px solid #444444;
+        z-index: 9999;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.8);
         backdrop-filter: blur(10px);
+        min-width: 350px;
+        max-width: 400px;
+        max-height: 500px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    #searchResultMessage .result-drag-header {
+        background: linear-gradient(135deg, #333333, #555555);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 10px 10px 0 0;
+        cursor: move;
+        user-select: none;
+        border-bottom: 1px solid #444444;
+        flex-shrink: 0;
     }
 
     #searchResultMessage .result-drag-header:hover {
-        background: linear-gradient(135deg, #3282b8, #0f4c75);
+        background: linear-gradient(135deg, #555555, #333333);
     }
 
     #customContextMenu {
         user-select: none;
-        background: linear-gradient(135deg, #1a1a2e, #16213e);
-        border: 2px solid #0f4c75;
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        border: 2px solid #444444;
         border-radius: 8px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.8);
         backdrop-filter: blur(10px);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     #customContextMenu div {
-        color: #e8f4fd;
-        border-bottom: 1px solid rgba(15,76,117,0.3);
+        color: #ffffff;
+        border-bottom: 1px solid rgba(68,68,68,0.3);
         transition: all 0.2s;
         font-size: 12px;
+        padding: 8px 12px;
     }
 
     #customContextMenu div:hover {
-        background: rgba(50,130,184,0.2);
+        background: rgba(85,85,85,0.3);
         transform: translateX(2px);
     }
 
     @keyframes bagPulse {
         0% {
-            box-shadow: 0 0 15px #3282b8;
+            box-shadow: 0 0 15px #777777;
         }
         50% {
-            box-shadow: 0 0 25px #3282b8, 0 0 35px rgba(50,130,184,0.5);
+            box-shadow: 0 0 25px #777777, 0 0 35px rgba(119,119,119,0.5);
         }
         100% {
-            box-shadow: 0 0 15px #3282b8;
+            box-shadow: 0 0 15px #777777;
         }
     }
 
     .search-highlighted-bag {
         position: relative;
-        animation: bagPulse 2s infinite;
+        animation: bagPulse 2s infinite !important;
+        border: 2px solid #FFD700 !important;
+        box-shadow: 0 0 15px #FFD700 !important;
     }
 
     .search-highlighted-bag::after {
@@ -1018,7 +1051,7 @@ style.textContent = `
         position: absolute;
         top: -5px;
         right: -5px;
-        background: #3282b8;
+        background: #555555;
         color: white;
         border-radius: 50%;
         width: 16px;
@@ -1027,7 +1060,7 @@ style.textContent = `
         align-items: center;
         justify-content: center;
         font-size: 10px;
-        box-shadow: 0 2px 8px rgba(50,130,184,0.4);
+        box-shadow: 0 2px 8px rgba(85,85,85,0.4);
     }
 
     /* Scrollbar styling */
@@ -1036,29 +1069,31 @@ style.textContent = `
     }
 
     #searchResultMessage div::-webkit-scrollbar-track {
-        background: rgba(0,0,0,0.3);
+        background: rgba(0,0,0,0.5);
         border-radius: 4px;
     }
 
     #searchResultMessage div::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #0f4c75, #3282b8);
+        background: linear-gradient(135deg, #333333, #555555);
         border-radius: 4px;
     }
 
     #searchResultMessage div::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #3282b8, #0f4c75);
+        background: linear-gradient(135deg, #555555, #333333);
     }
-#searchResultMessage .item-name {
-    transition: color 0.2s ease;
-    border-radius: 3px;
-    padding: 1px 2px;
-}
 
-#searchResultMessage .item-name:hover {
-    color: #ff4444 !important;
-    background: rgba(255, 68, 68, 0.1);
-    text-shadow: 0 0 8px rgba(255, 68, 68, 0.6);
-}
+    #searchResultMessage .item-name {
+        transition: color 0.2s ease;
+        border-radius: 3px;
+        padding: 1px 2px;
+    }
+
+    #searchResultMessage .item-name:hover {
+        color: #ff6666 !important;
+        background: rgba(255, 102, 102, 0.1);
+        text-shadow: 0 0 8px rgba(255, 102, 102, 0.6);
+        cursor: pointer;
+    }
 
     @keyframes fadeIn {
         from {
@@ -1074,12 +1109,35 @@ style.textContent = `
     #bagSearchWindow, #searchResultMessage {
         animation: fadeIn 0.3s ease-out;
     }
-.search-highlighted-bag {
-    position: relative;
-    animation: bagPulse 2s infinite !important;
-    border: 2px solid #FFD700 !important;
-    box-shadow: 0 0 15px #FFD700 !important;
-}
+
+    /* Dodatkowe style dla lepszej integracji z ciemnym motywem */
+    #searchResultMessage div[style*="background: rgba(15,76,117,0.2)"] {
+        background: rgba(68,68,68,0.3) !important;
+        border-left: 3px solid #777777 !important;
+    }
+
+    #searchResultMessage span[style*="color: #3282b8"] {
+        color: #cccccc !important;
+    }
+
+    #searchResultMessage button {
+        background: linear-gradient(135deg, #333333, #555555) !important;
+        color: white !important;
+        border: none !important;
+        padding: 6px 12px !important;
+        border-radius: 6px !important;
+        cursor: pointer !important;
+        font-size: 11px !important;
+        font-weight: bold !important;
+        transition: all 0.2s !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+    }
+
+    #searchResultMessage button:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
+        background: linear-gradient(135deg, #555555, #777777) !important;
+    }
 `;
 document.head.appendChild(style);
 
