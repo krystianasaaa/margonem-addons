@@ -753,60 +753,56 @@
     }
 function integrateWithAddonManager() {
     const checkForManager = setInterval(() => {
-        // Szukaj managera dodatków
-        const managerElements = document.querySelectorAll('[class*="addon"], [id*="addon"], [class*="manager"]');
-
-        for (const element of managerElements) {
-            const text = element.textContent || element.innerText || '';
-            if (text.includes('Better UI') && !document.getElementById('better-ui-integrated-settings')) {
-                // Znaleziono Better UI w managerze - dodaj ustawienia
-                addSettingsToManager(element);
+        // Szukaj dokładnie Better UI w liście dodatków
+        const addonRows = document.querySelectorAll('div');
+        
+        for (const row of addonRows) {
+            const text = row.textContent || '';
+            // Sprawdź czy to dokładnie wiersz z Better UI
+            if (text.includes('Better UI') && text.includes('WŁĄCZONY') && !document.getElementById('better-ui-integrated-settings')) {
+                addSettingsToManager(row);
                 clearInterval(checkForManager);
                 return;
             }
         }
-    }, 1000);
+    }, 500);
 
-    setTimeout(() => clearInterval(checkForManager), 30000);
+    setTimeout(() => clearInterval(checkForManager), 15000);
 }
 
 function addSettingsToManager(betterUIElement) {
-    // Znajdź kontener rodzica
-    const parentContainer = betterUIElement.closest('[class*="addon-item"], [class*="addon-container"], .addon, div');
-    if (!parentContainer) return;
-
     // Stwórz panel ustawień
     const settingsPanel = document.createElement('div');
     settingsPanel.id = 'better-ui-integrated-settings';
     settingsPanel.style.cssText = `
-        margin-top: 10px;
-        padding: 10px;
-        background: rgba(0,0,0,0.3);
-        border-radius: 5px;
+        margin-top: 8px;
+        padding: 8px;
+        background: rgba(0,0,0,0.4);
+        border-radius: 4px;
         border: 1px solid rgba(255,255,255,0.1);
     `;
 
     settingsPanel.innerHTML = `
-        <div style="color: #fff; font-size: 12px; margin-bottom: 8px; font-weight: bold;">Ustawienia:</div>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <span style="color: #ccc; font-size: 11px;">Bonusy Legendarne</span>
+        <div style="color: #fff; font-size: 11px; margin-bottom: 6px; font-weight: bold;">Ustawienia:</div>
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <span style="color: #ccc; font-size: 10px;">Bonusy Legendarne</span>
             <label class="toggle-switch-mini">
                 <input type="checkbox" id="bonusy-legendarne-mini" ${config.bonusyLegendarne ? 'checked' : ''}>
                 <span class="slider-mini"></span>
             </label>
         </div>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <span style="color: #ccc; font-size: 11px;">Statystyki Przedmiotów</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <span style="color: #ccc; font-size: 10px;">Statystyki Przedmiotów</span>
             <label class="toggle-switch-mini">
                 <input type="checkbox" id="statystyki-przedmiotow-mini" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
                 <span class="slider-mini"></span>
             </label>
         </div>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-            <span style="color: #ccc; font-size: 11px;">Interfejs</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <span style="color: #ccc; font-size: 10px;">Interfejs</span>
             <label class="toggle-switch-mini">
                 <input type="checkbox" id="interfejs-mini" ${config.interfejs ? 'checked' : ''}>
                 <span class="slider-mini"></span>
@@ -814,13 +810,13 @@ function addSettingsToManager(betterUIElement) {
         </div>
 
         <button id="reload-game-mini" style="
-            width: 100%;
-            padding: 6px;
-            background: #ff9800;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            font-size: 11px;
+            width: 100%; 
+            padding: 4px; 
+            background: #ff9800; 
+            color: white; 
+            border: none; 
+            border-radius: 3px; 
+            font-size: 10px; 
             cursor: pointer;
             font-weight: bold;
         ">Odśwież grę</button>
@@ -834,8 +830,8 @@ function addSettingsToManager(betterUIElement) {
             .toggle-switch-mini {
                 position: relative;
                 display: inline-block;
-                width: 32px;
-                height: 18px;
+                width: 28px;
+                height: 16px;
             }
 
             .toggle-switch-mini input {
@@ -853,15 +849,15 @@ function addSettingsToManager(betterUIElement) {
                 bottom: 0;
                 background: rgba(255, 255, 255, 0.2);
                 transition: 0.3s;
-                border-radius: 18px;
+                border-radius: 16px;
                 border: 1px solid rgba(255, 255, 255, 0.3);
             }
 
             .toggle-switch-mini .slider-mini:before {
                 position: absolute;
                 content: "";
-                height: 14px;
-                width: 14px;
+                height: 12px;
+                width: 12px;
                 left: 1px;
                 bottom: 1px;
                 background: #fff;
@@ -875,7 +871,7 @@ function addSettingsToManager(betterUIElement) {
             }
 
             .toggle-switch-mini input:checked + .slider-mini:before {
-                transform: translateX(14px);
+                transform: translateX(12px);
             }
         `;
         document.head.appendChild(style);
@@ -902,7 +898,7 @@ function addSettingsToManager(betterUIElement) {
     });
 
     // Dodaj panel do kontenera Better UI
-    parentContainer.appendChild(settingsPanel);
+    betterUIElement.appendChild(settingsPanel);
 }
 
     function init() {
