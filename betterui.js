@@ -143,64 +143,7 @@
         } : {})
     };
 
-    // Funkcja do pokazywania notyfikacji o odświeżeniu
-    function showRefreshNotice(elementId) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.style.display = 'inline';
-        }
-    }
 
-    // Obsługa checkboxów
-    panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
-        const previousValue = config.bonusyLegendarne;
-        config.bonusyLegendarne = e.target.checked;
-        saveConfig();
-
-        // Pokaż notyfikację jeśli wartość się zmieniła
-        if (previousValue !== e.target.checked) {
-            showRefreshNotice('bonusy-refresh');
-        }
-    });
-
-    panel.querySelector('#statystyki-przedmiotow').addEventListener('change', (e) => {
-        const previousValue = config.statystykiPrzedmiotow;
-        config.statystykiPrzedmiotow = e.target.checked;
-        saveConfig();
-
-        // Pokaż notyfikację jeśli wartość się zmieniła
-        if (previousValue !== e.target.checked) {
-            showRefreshNotice('statystyki-refresh');
-        }
-    });
-
-    panel.querySelector('#interfejs').addEventListener('change', (e) => {
-        const previousValue = config.interfejs;
-        config.interfejs = e.target.checked;
-        saveConfig();
-
-        // Pokaż notyfikację jeśli wartość się zmieniła
-        if (previousValue !== e.target.checked) {
-            showRefreshNotice('interfejs-refresh');
-        }
-    });
-
-    // Obsługa przycisków
-    panel.querySelector('#apply-ui').addEventListener('click', () => {
-        panel.style.display = 'none';
-    });
-
-    panel.querySelector('#reload-ui').addEventListener('click', () => {
-        location.reload();
-    });
-
-    // Zamykanie panelu po kliknięciu poza nim
-    document.addEventListener('click', (e) => {
-        if (!gui.contains(e.target) && !panel.contains(e.target)) {
-            panel.style.display = 'none';
-        }
-    });
-}
     // Lista wszystkich typów przedmiotów, które mogą być ulepszone
     const itemTypes = [
         'Pierścienie', 'Naszyjniki', 'Hełmy', 'Rękawice', 'Zbroje',
