@@ -1,14 +1,3 @@
-// ==UserScript==
-// @name         New Userscript
-// @namespace    http://tampermonkey.net/
-// @version      2025-09-02
-// @description  try to take over the world!
-// @author       You
-// @match        http://*/*
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        none
-// ==/UserScript==
-
 (function() {
     'use strict';
     function getCookie(name) {
@@ -812,6 +801,19 @@ function loadPosition() {
         y: y ? parseInt(y) : null
     };
 }
+function saveMenuPosition(x, y) {
+    setCookie('addon_menu_x', x.toString());
+    setCookie('addon_menu_y', y.toString());
+}
+
+function loadMenuPosition() {
+    const x = getAddonCookie('addon_menu_x');
+    const y = getAddonCookie('addon_menu_y');
+    return {
+        x: x ? parseInt(x) : null,
+        y: y ? parseInt(y) : null
+    };
+}
 
 function showRefreshNotification(message) {
     // Sprawdź czy powiadomienie już istnieje
@@ -856,8 +858,7 @@ function showRefreshNotification(message) {
     document.body.appendChild(notification);
 }
 
-// Make element draggable
-function makeDraggable(element, handle) {
+function makeDraggable(element, handle, isMenu = false) {
     let isDragging = false;
     let hasDragged = false;
     let startX, startY, initialX, initialY;
@@ -882,7 +883,59 @@ function makeDraggable(element, handle) {
         document.addEventListener('mouseup', handleMouseUp);
 
         e.preventDefault();
+        e.stopPropagation();
     });
+
+    function handleMouseMove(e) {
+        if (!isDragging) return;
+
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+            hasDragged = true;
+            element.classList.add('dragging');
+            handle.classList.add('dragging');
+        }
+
+        let newX = initialX + deltaX;
+        let newY = initialY + deltaY;
+
+        const rect = element.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        newX = Math.max(0, Math.min(newX, viewportWidth - rect.width));
+        newY = Math.max(0, Math.min(newY, viewportHeight - rect.height));
+
+        element.style.left = newX + 'px';
+        element.style.top = newY + 'px';
+    }
+
+    function handleMouseUp() {
+        if (!isDragging) return;
+
+        isDragging = false;
+
+        const rect = element.getBoundingClientRect();
+        if (isMenu) {
+            saveMenuPosition(rect.left, rect.top);
+        } else {
+            savePosition(rect.left, rect.top);
+        }
+
+        setTimeout(() => {
+            element.classList.remove('dragging');
+            handle.classList.remove('dragging');
+            hasDragged = false;
+        }, 100);
+
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => hasDragged;
+}
 
     function handleMouseMove(e) {
         if (!isDragging) return;
@@ -984,7 +1037,7 @@ function createGUI() {
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'addon-toggle-btn';
 
-    const wasDragged = makeDraggable(container, toggleBtn);
+    const wasDragged = makeDraggable(container, toggleBtn, false);
 
     const menu = document.createElement('div');
     menu.className = 'addon-menu';
@@ -1001,9 +1054,12 @@ function createGUI() {
         menu.classList.remove('active');
     });
 
-    header.appendChild(closeBtn);
-    makeDraggable(menu, header);
-    menu.appendChild(header);
+header.appendChild(closeBtn);
+makeDraggable(menu, header, true);
+menu.appendChild(header);
+
+// Wczytaj zapisaną pozycję dla menu
+const savedMenuPosition = loadMenuPosition();
 
     // Kontener dla dodatków z dwiema kolumnami
     const content = document.createElement('div');
@@ -1131,14 +1187,29 @@ nameContainer.appendChild(helpIcon);
     menu.appendChild(content);
     menu.appendChild(controls);
 
-    toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        setTimeout(() => {
-            if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
-                menu.classList.toggle('active');
+toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setTimeout(() => {
+        if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
+            const isOpening = !menu.classList.contains('active');
+            
+            if (isOpening) {
+                if (savedMenuPosition.x !== null && savedMenuPosition.y !== null) {
+                    menu.style.position = 'fixed';
+                    menu.style.left = savedMenuPosition.x + 'px';
+                    menu.style.top = savedMenuPosition.y + 'px';
+                } else {
+                    const containerRect = container.getBoundingClientRect();
+                    menu.style.position = 'fixed';
+                    menu.style.left = containerRect.left + 'px';
+                    menu.style.top = (containerRect.bottom + 6) + 'px';
+                }
             }
-        }, 10);
-    });
+            
+            menu.classList.toggle('active');
+        }
+    }, 10);
+});
 
     document.addEventListener('click', (e) => {
         if (!container.contains(e.target)) {
@@ -1146,9 +1217,9 @@ nameContainer.appendChild(helpIcon);
         }
     });
 
-    container.appendChild(toggleBtn);
-    container.appendChild(menu);
-    document.body.appendChild(container);
+container.appendChild(toggleBtn);
+document.body.appendChild(menu);
+document.body.appendChild(container);
 }
 
 // Update GUI - ZMIENIONA FUNKCJA
