@@ -253,6 +253,7 @@ function cleanupAddon(addonId) {
 }
 
 const styles = `
+const styles = `
 .addon-manager {
     position: fixed;
     z-index: 10000;
@@ -302,7 +303,7 @@ const styles = `
     transform: translate(-50%, -50%) !important;
     width: 28px !important;
     height: 28px !important;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="14" y="3" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="14" y="14" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/><rect x="3" y="14" width="7" height="7" stroke="%23ffffff" stroke-width="2" rx="1"/></svg>') !important;
+    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png') !important;
     background-size: contain !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
