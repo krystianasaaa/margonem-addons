@@ -539,12 +539,11 @@ const styles = `
     flex-direction: column;
 }
 
-/* Style dla powiadomienia o odświeżeniu */
 .refresh-notification {
     position: fixed;
-    top: 50%;
+    top: 20px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     background: linear-gradient(to bottom, #444 0%, #333 100%);
     border: 2px solid #ff6b35;
     border-radius: 8px;
@@ -555,17 +554,17 @@ const styles = `
     color: #ffffff;
     font-family: Arial, sans-serif;
     text-align: center;
-    animation: slideIn 0.3s ease-out;
+    animation: slideInFromTop 0.3s ease-out;
 }
 
-@keyframes slideIn {
+@keyframes slideInFromTop {
     from {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
+        transform: translateX(-50%) translateY(-20px);
     }
     to {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: translateX(-50%) translateY(0);
     }
 }
 
