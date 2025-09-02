@@ -694,7 +694,6 @@ function loadPosition() {
     };
 }
 
-// Funkcja do pokazywania powiadomienia o odświeżeniu
 function showRefreshNotification(message) {
     // Sprawdź czy powiadomienie już istnieje
     const existing = document.querySelector('.refresh-notification');
@@ -718,11 +717,13 @@ function showRefreshNotification(message) {
     const refreshBtn = notification.querySelector('.refresh-btn');
     const dismissBtn = notification.querySelector('.dismiss-btn');
 
-    refreshBtn.addEventListener('click', () => {
+    refreshBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Zatrzymaj propagację eventu
         window.location.reload();
     });
 
-    dismissBtn.addEventListener('click', () => {
+    dismissBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Zatrzymaj propagację eventu - TO JEST KLUCZ!
         notification.remove();
     });
 
