@@ -1031,7 +1031,6 @@
             const info = document.createElement('div');
             info.id = `addon-${addon.config.id}`;
             info.className = 'addon-info';
-            console.log(addon)
 
             // Kontener dla nazwy i ikony pomocy
             const nameContainer = document.createElement('div');
