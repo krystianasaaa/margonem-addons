@@ -662,31 +662,23 @@ function updateBonusNames() {
         });
     }
 function integrateWithAddonManager() {
-    
     const checkForManager = setInterval(() => {
-        // Szukaj konkretnie elementu Better UI
-        const addonNames = document.querySelectorAll('.addon-name');
-        
-        for (const nameElement of addonNames) {
-            const text = nameElement.textContent || '';
-            
-            if (text.includes('Better UI') && !document.getElementById('better-ui-settings-btn')) {
-                
-                // Znajdź kontener z przyciskami (tam gdzie jest znak zapytania)
-                const container = nameElement.closest('.addon-name-container');
-                if (container) {
-                    addSettingsButton(container);
-                    clearInterval(checkForManager);
-                    return;
-                }
-            }
+        const addonContainer = document.getElementById('addon-better_ui');
+        if (addonContainer.getElementById('better-ui-settings-btn')) {
+            clearInterval(checkForManager);
+            return;
         }
+
+        let addonNameContainer = addonContainer.querySelector('.addon-name-container');
+        addSettingsButton(addonNameContainer);
+        clearInterval(checkForManager);
     }, 500);
 
     setTimeout(() => {
         clearInterval(checkForManager);
     }, 20000);
 }
+
 
 function addSettingsButton(container) {
     // Znajdź znak zapytania
