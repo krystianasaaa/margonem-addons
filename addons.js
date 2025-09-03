@@ -107,6 +107,7 @@
                 name: config.name,
                 enabled: false,
                 code: addonCode,
+                config: config,
                 addonFunction: null,
                 init: function() {
                     console.log(`${config.name} włączony`);
@@ -1028,7 +1029,7 @@
             item.className = 'addon-item';
 
             const info = document.createElement('div');
-            info.id = `addon-${addon.id}`;
+            info.id = `addon-${addon.config.id}`;
             info.className = 'addon-info';
             console.log(addon)
 
