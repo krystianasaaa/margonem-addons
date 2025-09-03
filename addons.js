@@ -17,6 +17,7 @@
         console.log('✅ Dozwoleni użytkownicy:', allowedUsers);
         return;
     }
+let refreshRequired = false;
 
     const addonConfig = {
         addon1: {
@@ -219,8 +220,7 @@
             saveAddonState(addonId, false); // Zapisz stan
             console.log(`✅ Wyłączono: ${addon.name}`);
 
-            // Pokaż powiadomienie o konieczności odświeżenia strony
-            showRefreshNotification(`Dodatek "${addon.name}" został wyłączony. Odśwież stronę aby zastosować zmiany.`);
+           setRefreshRequired();
 
             return true;
         } catch (error) {
@@ -810,48 +810,30 @@
         };
     }
 
-    function showRefreshNotification(message) {
-        // Sprawdź czy powiadomienie już istnieje
-        const existing = document.querySelector('.refresh-notification');
-        if (existing) {
-            existing.remove();
-        }
+function setRefreshRequired() {
+    refreshRequired = true;
+    updateHeaderRefreshInfo();
+}
 
-        const notification = document.createElement('div');
-        notification.className = 'refresh-notification';
-
-        notification.innerHTML = `
-        <h3>⚠️ Wymagane odświeżenie</h3>
-        <p>${message}</p>
-        <div class="refresh-notification-buttons">
-            <button class="refresh-btn">Odśwież teraz</button>
-            <button class="dismiss-btn">Później</button>
-        </div>
-    `;
-
-        // Dodaj event listenery do przycisków
-        const refreshBtn = notification.querySelector('.refresh-btn');
-        const dismissBtn = notification.querySelector('.dismiss-btn');
-
-        refreshBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Zatrzymaj propagację eventu
-            window.location.reload();
-        });
-
-        dismissBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Zatrzymaj propagację eventu - TO JEST KLUCZ!
-            notification.remove();
-        });
-
-        // Automatyczne usunięcie po 10 sekundach
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.remove();
-            }
-        }, 10000);
-
-        document.body.appendChild(notification);
+function updateHeaderRefreshInfo() {
+    const header = document.querySelector('.addon-menu-header');
+    if (!header) return;
+    
+    let refreshInfo = header.querySelector('.refresh-info');
+    
+    if (!refreshRequired) {
+        refreshInfo?.remove();
+        return;
     }
+    
+    if (refreshInfo) return;
+    
+    refreshInfo = document.createElement('span');
+    refreshInfo.className = 'refresh-info';
+    refreshInfo.innerHTML = ' <span style="color: #666; font-size: 12px;">●</span>';
+    refreshInfo.title = 'Niektóre zmiany wymagają odświeżenia strony';
+    header.appendChild(refreshInfo);
+}
 
 // Make element draggable
     function makeDraggable(element, handle) {
@@ -997,10 +979,10 @@
             e.stopPropagation();
             menu.classList.remove('active');
         });
-
-        header.appendChild(closeBtn);
-        makeDraggable(menu, header);
-        menu.appendChild(header);
+header.appendChild(closeBtn);
+updateHeaderRefreshInfo(); 
+makeDraggable(menu, header);
+menu.appendChild(header);
 
         // Kontener dla dodatków z dwiema kolumnami
         const content = document.createElement('div');
