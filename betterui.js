@@ -8,6 +8,7 @@
         interfejs: true
     };
     loadConfig();
+let bonusNames = {};
 
 function saveConfig() {
     try {
