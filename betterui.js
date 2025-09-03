@@ -26,12 +26,11 @@ function loadConfig() {
             console.log('Better UI: Konfiguracja wczytana');
         }
     } catch (e) {
-        console.log('Better UI: Używam domyślnej konfiguracji');
     }
 }
 function updateBonusNames() {
     bonusNames = {};
-    
+
     // Bonusy legendarne
     if (config.bonusyLegendarne) {
         Object.assign(bonusNames, {
@@ -664,10 +663,10 @@ function updateBonusNames() {
 function integrateWithAddonManager() {
     const checkForManager = setInterval(() => {
         const addonContainer = document.getElementById('addon-better_ui');
-        if (!addonContainer) return; 
-        console.log(addonContainer)
-        
-        if (addonContainer.getElementById('better-ui-settings-btn')) {
+        if (!addonContainer) return;
+
+
+        if (addonContainer.querySelector('#better-ui-settings-btn')) {
             clearInterval(checkForManager);
             return;
         }
@@ -687,7 +686,7 @@ function addSettingsButton(container) {
     // Znajdź znak zapytania
     const helpIcon = container.querySelector('.addon-help-icon');
     if (!helpIcon) return;
-    
+
     // Dodaj przycisk dokładnie obok
     const settingsBtn = document.createElement('span');
     settingsBtn.id = 'better-ui-settings-btn';
@@ -701,16 +700,16 @@ function addSettingsButton(container) {
         transition: opacity 0.2s;
         display: inline-block;
     `;
-    
+
     settingsBtn.onmouseover = () => settingsBtn.style.opacity = '1';
     settingsBtn.onmouseout = () => settingsBtn.style.opacity = '0.7';
-    
+
     // Wstaw dokładnie po znaku zapytania
     helpIcon.insertAdjacentElement('afterend', settingsBtn);
-    
+
     // Stwórz panel od razu
     createSettingsPanel();
-    
+
 settingsBtn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -735,12 +734,12 @@ function createSettingsPanel() {
         font-family: Arial, sans-serif;
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     `;
-    
+
     panel.innerHTML = `
         <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444;">
             Better UI - Settings
         </div>
-        
+
         <div style="margin-bottom: 15px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
                 <span style="color: #ccc; font-size: 12px;">Bonusy Legendarne</span>
@@ -749,7 +748,7 @@ function createSettingsPanel() {
                     <span class="slider"></span>
                 </label>
             </div>
-            
+
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
                 <span style="color: #ccc; font-size: 12px;">Statystyki Przedmiotów</span>
                 <label class="toggle-switch">
@@ -757,7 +756,7 @@ function createSettingsPanel() {
                     <span class="slider"></span>
                 </label>
             </div>
-            
+
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
                 <span style="color: #ccc; font-size: 12px;">Interfejs</span>
                 <label class="toggle-switch">
@@ -766,7 +765,7 @@ function createSettingsPanel() {
                 </label>
             </div>
         </div>
-        
+
         <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
             <button id="close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
                 Zamknij
@@ -776,7 +775,7 @@ function createSettingsPanel() {
             </button>
         </div>
     `;
-    
+
     // Dodaj style przełączników jak w managerze
     if (!document.getElementById('better-ui-toggle-styles')) {
         const style = document.createElement('style');
@@ -831,9 +830,9 @@ function createSettingsPanel() {
         `;
         document.head.appendChild(style);
     }
-    
+
     document.body.appendChild(panel);
-    
+
 panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
     e.stopPropagation();
     config.bonusyLegendarne = e.target.checked;
@@ -854,7 +853,7 @@ panel.querySelector('#interfejs').addEventListener('change', (e) => {
     updateBonusNames();
     saveConfig();
 });
-    
+
 panel.querySelector('#close-settings').addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -881,11 +880,11 @@ const initInterval = setInterval(() => {
 }, 250);
 function init() {
     loadConfig();
-    updateBonusNames(); 
+    updateBonusNames();
     setupEngineHooks();
     hookMargonemFunctions();
     integrateWithAddonManager();
-    setupBackupObserver();   
+    setupBackupObserver();
 }
     init();
 
