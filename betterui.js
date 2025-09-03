@@ -903,7 +903,7 @@ function toggleSettingsPanel() {
         setTimeout(setupBackupObserver, 1000);
 
         // Stwórz GUI po załadowaniu strony
-setTimeout(integrateWithAddonManager, 3000);
+setTimeout(integrateWithAddonManager, 500);
     }
 loadConfig();
     init();
