@@ -695,7 +695,6 @@
         });
     }
 function integrateWithAddonManager() {
-    console.log('Better UI: Szukam managera dodatków...');
     
     const checkForManager = setInterval(() => {
         // Szukaj konkretnie elementu Better UI
@@ -705,7 +704,6 @@ function integrateWithAddonManager() {
             const text = nameElement.textContent || '';
             
             if (text.includes('Better UI') && !document.getElementById('better-ui-settings-btn')) {
-                console.log('Better UI: Znaleziono Better UI element');
                 
                 // Znajdź kontener z przyciskami (tam gdzie jest znak zapytania)
                 const container = nameElement.closest('.addon-name-container');
@@ -719,7 +717,6 @@ function integrateWithAddonManager() {
     }, 500);
 
     setTimeout(() => {
-        console.log('Better UI: Timeout - nie znaleziono managera');
         clearInterval(checkForManager);
     }, 20000);
 }
@@ -775,7 +772,7 @@ function createSettingsPanel() {
     
     panel.innerHTML = `
         <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444;">
-            Better UI - Ustawienia
+            Better UI - Settings
         </div>
         
         <div style="margin-bottom: 15px;">
