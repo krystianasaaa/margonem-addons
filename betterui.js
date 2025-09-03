@@ -888,7 +888,9 @@ function init() {
     loadConfig();
     updateBonusNames(); 
     setupEngineHooks();
-    hookMargonemFunctions();    
+    hookMargonemFunctions();
+    integrateWithAddonManager();
+    setupBackupObserver();   
 }
     init();
 
