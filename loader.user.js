@@ -8,32 +8,31 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @run-at       document-start
 // @icon        https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png
+// @run-at       document-body
 // @updateURL    https://krystianasaaa.github.io/margonem-addons/loader.user.js
 // @downloadURL  https://krystianasaaa.github.io/margonem-addons/loader.user.js
 // ==/UserScript==
 
 (function() {
     'use strict';
-    
+
     const CONFIG = {
         SERVER_URL: 'https://krystianasaaa.github.io/margonem-addons',
-        CHECK_INTERVAL: 30000,
         VERSION_KEY: 'margonem_addons_version'
     };
-    
+
     let addonsLoaded = false;
     let currentVersion = GM_getValue(CONFIG.VERSION_KEY, '0');
-    
-    
+
+
     if (!window.location.href.includes('dream.margonem')) {
         return;
     }
-    
+
     console.log(' Kaczor Addons Manager - załadowane');
-    
-    
+
+
     function fetchFromServer(url) {
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
@@ -52,50 +51,50 @@
             });
         });
     }
-    
-    
+
+
     function loadAddonsNow() {
         console.log('⚡ Ładuję dodatki NATYCHMIAST...');
-        
+
         fetchFromServer(`${CONFIG.SERVER_URL}/addons.js?t=${Date.now()}`)
             .then(addonsCode => {
                 console.log('✅ Kod dodatków pobrany!');
-                
-                
+
+
                 const oldScript = document.getElementById('margonem-addons');
                 if (oldScript) oldScript.remove();
-                
-                
+
+
                 const script = document.createElement('script');
                 script.id = 'margonem-addons';
                 script.textContent = addonsCode;
                 (document.head || document.documentElement).appendChild(script);
-                
+
                 addonsLoaded = true;
                 console.log('załadowane!');
-                
-                
+
+
                 checkVersionInBackground();
             })
             .catch(error => {
                 console.error('❌ Błąd ładowania:', error);
-                
+
                 setTimeout(loadAddonsNow, 2000);
             });
     }
-    
-    
+
+
     function checkVersionInBackground() {
         fetchFromServer(`${CONFIG.SERVER_URL}/version.json?t=${Date.now()}`)
             .then(versionData => {
                 const serverVersion = JSON.parse(versionData);
-                
+
                 if (serverVersion.version !== currentVersion) {
                     console.log('🔄 Nowa wersja dostępna:', serverVersion.version);
                     GM_setValue(CONFIG.VERSION_KEY, serverVersion.version);
                     currentVersion = serverVersion.version;
-                    
-                    
+
+
                     loadAddonsNow();
                 }
             })
@@ -103,11 +102,8 @@
                 console.log('ℹ️ Nie można sprawdzić wersji:', error.message);
             });
     }
-    
-    
+
+
     loadAddonsNow();
-    
-    
-    setInterval(checkVersionInBackground, CONFIG.CHECK_INTERVAL);
-    
+
 })();
