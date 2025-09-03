@@ -883,15 +883,14 @@ function toggleSettingsPanel() {
     }
 }
 
-    function init() {
-        setupEngineHooks();
-        hookMargonemFunctions();
-        setTimeout(setupBackupObserver, 1000);
-
-        // Stwórz GUI po załadowaniu strony
-setTimeout(integrateWithAddonManager, 500);
-    }
-loadConfig();
+function init() {
+    loadConfig();
+    updateBonusNames(); 
+    setupEngineHooks();
+    hookMargonemFunctions();
+    setTimeout(setupBackupObserver, 1000);
+    setTimeout(integrateWithAddonManager, 500);
+}
     init();
 
 })();
