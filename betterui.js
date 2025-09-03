@@ -10,113 +10,110 @@
 
 function saveConfig() {
     try {
-        // Usuń poprzedni skrypt jeśli istnieje
-        const oldScript = document.getElementById('better-ui-storage');
-        if (oldScript) {
-            oldScript.remove();
-        }
-
-        // Dodaj nowy skrypt do head (będzie trwały podczas sesji)
-        const script = document.createElement('script');
-        script.id = 'better-ui-storage';
-        script.type = 'application/json';
-        script.style.display = 'none';
-        script.textContent = JSON.stringify(config);
-        document.head.appendChild(script);
-
+        window.localStorage.setItem('betterUI_config', JSON.stringify(config));
         console.log('Better UI: Konfiguracja zapisana');
     } catch (e) {
         console.log('Better UI: Błąd podczas zapisywania:', e);
     }
 }
-
 function loadConfig() {
     try {
-        const storageScript = document.getElementById('better-ui-storage');
-        if (storageScript && storageScript.textContent) {
-            const savedConfig = JSON.parse(storageScript.textContent);
+        const saved = window.localStorage.getItem('betterUI_config');
+        if (saved) {
+            const savedConfig = JSON.parse(saved);
             config = { ...config, ...savedConfig };
             console.log('Better UI: Konfiguracja wczytana');
         }
     } catch (e) {
-        console.log('Better UI: Nie można wczytać konfiguracji, używam domyślnej');
+        console.log('Better UI: Używam domyślnej konfiguracji');
     }
+    updateBonusNames(); // Zaktualizuj bonusy po wczytaniu
 }
 
     // Wywołaj wczytywanie konfiguracji na początku
     loadConfig();
-    const bonusNames = {
-        // Bonusy legendarne
-        ...(config.bonusyLegendarne ? {
-       'Cios bardzo krytyczny': '💀 POTĘŻNE PIERDOLNIĘCIE 💀',
-        'Dotyk anioła': 'Dotyczek',
-        'Klątwa': 'Klątewka',
-        'Oślepienie': 'Oślepa',
-        'Ostatni ratunek': 'OR',
-        'Krytyczna osłona': 'KO',
-        'Fasada opieki': 'Fasada',
-        'Płomienne oczyszczenie': 'Płomienne',
-        'Krwawa udręka': 'Krwawa',
-        'Przeszywająca skuteczność': 'Przeszywajka'
-        } : {}),
+let bonusNames = {};
 
-        // Statystyki przedmiotów
-        ...(config.statystykiPrzedmiotow ? {
-        'Cios krytyczny': 'Kryt',
-        'Przebicie': 'Przebitka',
-        'Głęboka rana': 'GR',
-        'Unik': 'Unik',
-        'Blok': 'Blok',
-        'Blok przebicia': 'Blok Przebicia',
-        'Kontra': 'Kontra',
-        'Ogłuszenie': 'Stun',
-        'Szybkość ataku': 'SA',
-        'Zręczność': 'Zręka',
-        'Energia': 'Ena',
-        'Życie': 'HP',
-        'Wszystkie cechy': 'Cechy',
-        'Przywracanie życia': 'Turka',
-        'Trucizna': 'Truta',
-        'Niszczenie pancerza': 'Niszczara panca',
-        'Obniżanie szybkości ataku': 'Obniżka SA',
-        'Obniżanie uniku': 'Obniżka uniku',
-        'Podczas ataku unik przeciwnika jest mniejszy o': 'Obniżka uniku o',
-        'Obniża szybkość ataku przeciwnika o': 'Obniżka SA o',
-        'Pancerz': 'Panc',
-        'Przywraca': 'Turka',
-        'punktów życia podczas walki': '',
-        'Odporność': 'Odpy',
-        'Moc ciosu krytycznego fizycznego': 'SKF',
-        'Moc ciosu krytycznego magicznego': 'SKM',
-        'Podczas obrony szansa na cios krytyczny przeciwnika jest mniejsza o ': 'Obniżka Kryta o ',
-        'punktów procentowych': '',
-        'Obrażenia': 'DMG',
-        'fizyczne dystansowe': 'FIZ',
-        'trucizny': 'truty',
-        'Spowalnia cel o': 'Slow o',
-        'punktów pancerza podczas ciosu': 'panca',
-        'Ogłuszający cios': 'UGA BUGA MACZUGA',
-        '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75% DODATKOWO: 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
-        'Absorbuje': 'Absa',
-        'obrażeń fizycznych': 'DMG FIZ',
-        'obrażeń magicznych': 'DMG MAG',
-        'Zmniejsza o': 'Slow o',
-        'szybkość ataku celu': 'SA',
-        'Niszczenie odporności magicznych o': 'Niszczara odpów o',
-        'podczas ciosu': 'przy hicie',
-        'szans na kontratak po ciosie krytycznym': 'na kontre'
-        } : {}),
+function updateBonusNames() {
+    bonusNames = {};
+    
+    // Bonusy legendarne
+    if (config.bonusyLegendarne) {
+        Object.assign(bonusNames, {
+            'Cios bardzo krytyczny': '💀 POTĘŻNE PIERDOLNIĘCIE 💀',
+            'Dotyk anioła': 'Dotyczek',
+            'Klątwa': 'Klątewka',
+            'Oślepienie': 'Oślepa',
+            'Ostatni ratunek': 'OR',
+            'Krytyczna osłona': 'KO',
+            'Fasada opieki': 'Fasada',
+            'Płomienne oczyszczenie': 'Płomienne',
+            'Krwawa udręka': 'Krwawa',
+            'Przeszywająca skuteczność': 'Przeszywajka'
+        });
+    }
 
-        // Interfejs
-        ...(config.interfejs ? {
+    // Statystyki przedmiotów
+    if (config.statystykiPrzedmiotow) {
+        Object.assign(bonusNames, {
+            'Cios krytyczny': 'Kryt',
+            'Przebicie': 'Przebitka',
+            'Głęboka rana': 'GR',
+            'Unik': 'Unik',
+            'Blok': 'Blok',
+            'Blok przebicia': 'Blok Przebicia',
+            'Kontra': 'Kontra',
+            'Ogłuszenie': 'Stun',
+            'Szybkość ataku': 'SA',
+            'Zręczność': 'Zręka',
+            'Energia': 'Ena',
+            'Życie': 'HP',
+            'Wszystkie cechy': 'Cechy',
+            'Przywracanie życia': 'Turka',
+            'Trucizna': 'Truta',
+            'Niszczenie pancerza': 'Niszczara panca',
+            'Obniżanie szybkości ataku': 'Obniżka SA',
+            'Obniżanie uniku': 'Obniżka uniku',
+            'Podczas ataku unik przeciwnika jest mniejszy o': 'Obniżka uniku o',
+            'Obniża szybkość ataku przeciwnika o': 'Obniżka SA o',
+            'Pancerz': 'Panc',
+            'Przywraca': 'Turka',
+            'punktów życia podczas walki': '',
+            'Odporność': 'Odpy',
+            'Moc ciosu krytycznego fizycznego': 'SKF',
+            'Moc ciosu krytycznego magicznego': 'SKM',
+            'Podczas obrony szansa na cios krytyczny przeciwnika jest mniejsza o ': 'Obniżka Kryta o ',
+            'punktów procentowych': '',
+            'Obrażenia': 'DMG',
+            'fizyczne dystansowe': 'FIZ',
+            'trucizny': 'truty',
+            'Spowalnia cel o': 'Slow o',
+            'punktów pancerza podczas ciosu': 'panca',
+            'Ogłuszający cios': 'UGA BUGA MACZUGA',
+            '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75% DODATKOWO: 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
+            'Absorbuje': 'Absa',
+            'obrażeń fizycznych': 'DMG FIZ',
+            'obrażeń magicznych': 'DMG MAG',
+            'Zmniejsza o': 'Slow o',
+            'szybkość ataku celu': 'SA',
+            'Niszczenie odporności magicznych o': 'Niszczara odpów o',
+            'podczas ciosu': 'przy hicie',
+            'szans na kontratak po ciosie krytycznym': 'na kontre'
+        });
+    }
+
+    // Interfejs
+    if (config.interfejs) {
+        Object.assign(bonusNames, {
             'Punkty Honoru': 'PH',
-        'Teleportuje gracza na mapę': 'Tepa na',
-        'Wewnętrzny spokój': 'umka dla cweli',
-        'Smocze Runy': 'SR',
-        'Turkanie energii': 'Przywro energii',
-        'Przywracanie energii': 'Przywro energii',
-        } : {})
-    };
+            'Teleportuje gracza na mapę': 'Tepa na',
+            'Wewnętrzny spokój': 'umka dla cweli',
+            'Smocze Runy': 'SR',
+            'Turkanie energii': 'Przywro energii',
+            'Przywracanie energii': 'Przywro energii'
+        });
+    }
+}
 
 
     // Lista wszystkich typów przedmiotów, które mogą być ulepszone
@@ -850,18 +847,21 @@ function createSettingsPanel() {
 panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
     e.stopPropagation();
     config.bonusyLegendarne = e.target.checked;
+    updateBonusNames();
     saveConfig();
 });
 
 panel.querySelector('#statystyki-przedmiotow').addEventListener('change', (e) => {
     e.stopPropagation();
     config.statystykiPrzedmiotow = e.target.checked;
+    updateBonusNames();
     saveConfig();
 });
 
 panel.querySelector('#interfejs').addEventListener('change', (e) => {
     e.stopPropagation();
     config.interfejs = e.target.checked;
+    updateBonusNames();
     saveConfig();
 });
     
