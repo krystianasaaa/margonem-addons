@@ -878,13 +878,20 @@ function toggleSettingsPanel() {
     }
 }
 
+const initInterval = setInterval(() => {
+    if (typeof Engine !== 'undefined' && Engine?.allInit) {
+        clearInterval(initInterval);
+        init();
+    }
+}, 250);
 function init() {
     loadConfig();
     updateBonusNames(); 
     setupEngineHooks();
     hookMargonemFunctions();
-    setTimeout(setupBackupObserver, 1000);
-    setTimeout(integrateWithAddonManager, 500);
+    
+    setTimeout(integrateWithAddonManager, 1);
+    setTimeout(setupBackupObserver, 2);
 }
     init();
 
