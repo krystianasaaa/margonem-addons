@@ -359,12 +359,13 @@ function updateBonusNames() {
     // Funkcja do znajdowania najlepszego miejsca do wstawienia kalkulatora
     function findInsertionPoint(tooltipContent) {
         // 1. Szukaj statusu związania - wstaw przed nim
-        const boundPatterns = [
-            /Związany z właścicielem/i,
-            /Związane z właścicielem/i,
-            /Bound to owner/i,
-            /Soulbound/i
-        ];
+const boundPatterns = [
+    /Związany z właścicielem/i,
+    /Związane z właścicielem/i,
+    /Bound to owner/i,
+    /Soulbound/i,
+    /Wiąże po założeniu/i
+];
 
         for (const pattern of boundPatterns) {
             const boundMatch = tooltipContent.match(pattern);
