@@ -7,6 +7,7 @@
         statystykiPrzedmiotow: true,
         interfejs: true
     };
+    loadConfig();
 
 function saveConfig() {
     try {
@@ -30,8 +31,6 @@ function loadConfig() {
     updateBonusNames(); // Zaktualizuj bonusy po wczytaniu
 }
 
-    // Wywołaj wczytywanie konfiguracji na początku
-    loadConfig();
 let bonusNames = {};
 
 function updateBonusNames() {
