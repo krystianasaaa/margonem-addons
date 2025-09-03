@@ -28,7 +28,6 @@ function loadConfig() {
     } catch (e) {
         console.log('Better UI: Używam domyślnej konfiguracji');
     }
-    updateBonusNames(); // Zaktualizuj bonusy po wczytaniu
 }
 
 let bonusNames = {};
