@@ -724,7 +724,11 @@ function addSettingsButton(container) {
     // Stwórz panel od razu
     createSettingsPanel();
     
-    settingsBtn.addEventListener('click', toggleSettingsPanel);
+settingsBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleSettingsPanel();
+});
 }
 function createSettingsPanel() {
     const panel = document.createElement('div');
@@ -843,24 +847,34 @@ function createSettingsPanel() {
     
     document.body.appendChild(panel);
     
-    // Event listenery
-    panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
-        config.bonusyLegendarne = e.target.checked;
-        saveConfig();
-    });
+panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
+    e.stopPropagation();
+    config.bonusyLegendarne = e.target.checked;
+    saveConfig();
+});
+
+panel.querySelector('#statystyki-przedmiotow').addEventListener('change', (e) => {
+    e.stopPropagation();
+    config.statystykiPrzedmiotow = e.target.checked;
+    saveConfig();
+});
+
+panel.querySelector('#interfejs').addEventListener('change', (e) => {
+    e.stopPropagation();
+    config.interfejs = e.target.checked;
+    saveConfig();
+});
     
-    panel.querySelector('#statystyki-przedmiotow').addEventListener('change', (e) => {
-        config.statystykiPrzedmiotow = e.target.checked;
-        saveConfig();
-    });
-    
-    panel.querySelector('#interfejs').addEventListener('change', (e) => {
-        config.interfejs = e.target.checked;
-        saveConfig();
-    });
-    
-    panel.querySelector('#close-settings').addEventListener('click', toggleSettingsPanel);
-    panel.querySelector('#reload-game').addEventListener('click', () => location.reload());
+panel.querySelector('#close-settings').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleSettingsPanel();
+});
+panel.querySelector('#reload-game').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    location.reload();
+});
 }
 function toggleSettingsPanel() {
     const panel = document.getElementById('better-ui-settings-panel');
