@@ -725,41 +725,35 @@ function integrateWithAddonManager() {
 }
 
 function addSettingsButton(container) {
-    // Dodaj przycisk ustawień obok znaku zapytania
-    const settingsBtn = document.createElement('button');
+    // Znajdź znak zapytania
+    const helpIcon = container.querySelector('.addon-help-icon');
+    if (!helpIcon) return;
+    
+    // Dodaj przycisk dokładnie obok
+    const settingsBtn = document.createElement('span');
     settingsBtn.id = 'better-ui-settings-btn';
     settingsBtn.innerHTML = '⚙️';
     settingsBtn.style.cssText = `
-        background: none;
-        border: none;
         color: #fff;
         font-size: 14px;
         cursor: pointer;
-        padding: 2px 4px;
-        margin-left: 5px;
+        margin-left: 2px;
         opacity: 0.7;
         transition: opacity 0.2s;
+        display: inline-block;
     `;
     
     settingsBtn.onmouseover = () => settingsBtn.style.opacity = '1';
     settingsBtn.onmouseout = () => settingsBtn.style.opacity = '0.7';
     
-    // Znajdź znak zapytania i wstaw obok niego
-    const helpIcon = container.querySelector('.addon-help-icon');
-    if (helpIcon) {
-        helpIcon.parentNode.insertBefore(settingsBtn, helpIcon.nextSibling);
-    } else {
-        // Jeśli nie ma znaku zapytania, dodaj na koniec kontenera
-        container.appendChild(settingsBtn);
-    }
+    // Wstaw dokładnie po znaku zapytania
+    helpIcon.insertAdjacentElement('afterend', settingsBtn);
     
-    // Stwórz panel ustawień (ukryty)
+    // Stwórz panel od razu
     createSettingsPanel();
     
-    // Dodaj event listener do przycisku
     settingsBtn.addEventListener('click', toggleSettingsPanel);
 }
-
 function createSettingsPanel() {
     const panel = document.createElement('div');
     panel.id = 'better-ui-settings-panel';
@@ -768,49 +762,112 @@ function createSettingsPanel() {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.9);
-        border: 2px solid #444;
-        border-radius: 8px;
-        padding: 20px;
+        background: #2a2a2a;
+        border: 1px solid #444;
+        border-radius: 4px;
+        padding: 15px;
         z-index: 10000;
         display: none;
-        min-width: 300px;
+        min-width: 280px;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     `;
     
     panel.innerHTML = `
-        <div style="color: #fff; font-size: 16px; margin-bottom: 15px; text-align: center; font-weight: bold;">
+        <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444;">
             Better UI - Ustawienia
         </div>
         
         <div style="margin-bottom: 15px;">
-            <label style="display: flex; align-items: center; color: #ccc; margin-bottom: 10px;">
-                <input type="checkbox" id="bonusy-legendarne" ${config.bonusyLegendarne ? 'checked' : ''} 
-                       style="margin-right: 10px;">
-                Bonusy Legendarne
-            </label>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
+                <span style="color: #ccc; font-size: 12px;">Bonusy Legendarne</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="bonusy-legendarne" ${config.bonusyLegendarne ? 'checked' : ''}>
+                    <span class="slider"></span>
+                </label>
+            </div>
             
-            <label style="display: flex; align-items: center; color: #ccc; margin-bottom: 10px;">
-                <input type="checkbox" id="statystyki-przedmiotow" ${config.statystykiPrzedmiotow ? 'checked' : ''} 
-                       style="margin-right: 10px;">
-                Statystyki Przedmiotów
-            </label>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
+                <span style="color: #ccc; font-size: 12px;">Statystyki Przedmiotów</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="statystyki-przedmiotow" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
+                    <span class="slider"></span>
+                </label>
+            </div>
             
-            <label style="display: flex; align-items: center; color: #ccc; margin-bottom: 10px;">
-                <input type="checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''} 
-                       style="margin-right: 10px;">
-                Interfejs
-            </label>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
+                <span style="color: #ccc; font-size: 12px;">Interfejs</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''}>
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
         
-        <div style="display: flex; gap: 10px;">
-            <button id="close-settings" style="flex: 1; padding: 8px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
+            <button id="close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
                 Zamknij
             </button>
-            <button id="reload-game" style="flex: 1; padding: 8px; background: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button id="reload-game" style="flex: 1; padding: 8px 12px; background: #ff9800; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
                 Odśwież grę
             </button>
         </div>
     `;
+    
+    // Dodaj style przełączników jak w managerze
+    if (!document.getElementById('better-ui-toggle-styles')) {
+        const style = document.createElement('style');
+        style.id = 'better-ui-toggle-styles';
+        style.textContent = `
+            .toggle-switch {
+                position: relative;
+                display: inline-block;
+                width: 44px;
+                height: 24px;
+            }
+
+            .toggle-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .toggle-switch .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #555;
+                transition: 0.3s;
+                border-radius: 24px;
+                border: 1px solid #666;
+            }
+
+            .toggle-switch .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 2px;
+                bottom: 2px;
+                background-color: white;
+                transition: 0.3s;
+                border-radius: 50%;
+            }
+
+            .toggle-switch input:checked + .slider {
+                background-color: #4CAF50;
+                border-color: #4CAF50;
+            }
+
+            .toggle-switch input:checked + .slider:before {
+                transform: translateX(20px);
+            }
+        `;
+        document.head.appendChild(style);
+    }
     
     document.body.appendChild(panel);
     
@@ -833,7 +890,6 @@ function createSettingsPanel() {
     panel.querySelector('#close-settings').addEventListener('click', toggleSettingsPanel);
     panel.querySelector('#reload-game').addEventListener('click', () => location.reload());
 }
-
 function toggleSettingsPanel() {
     const panel = document.getElementById('better-ui-settings-panel');
     if (panel) {
