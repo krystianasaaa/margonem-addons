@@ -830,8 +830,7 @@ function updateHeaderRefreshInfo() {
     
     refreshInfo = document.createElement('span');
     refreshInfo.className = 'refresh-info';
-    refreshInfo.innerHTML = ' <span style="color: #666; font-size: 12px;">●</span>';
-    refreshInfo.title = 'Niektóre zmiany wymagają odświeżenia strony';
+    refreshInfo.innerHTML = ' - <span style="color: #ff4444; font-weight: bold; font-size: 12px;">Wymagane odświeżenie gry</span>';
     header.appendChild(refreshInfo);
 }
 
