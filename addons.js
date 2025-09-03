@@ -1016,6 +1016,7 @@
         const leftColumn = document.createElement('div');
         leftColumn.className = 'addon-column';
 
+
         const rightColumn = document.createElement('div');
         rightColumn.className = 'addon-column';
 
@@ -1029,6 +1030,7 @@
             const info = document.createElement('div');
             info.id = `addon-${addon.id}`;
             info.className = 'addon-info';
+            console.log(addon)
 
             // Kontener dla nazwy i ikony pomocy
             const nameContainer = document.createElement('div');
