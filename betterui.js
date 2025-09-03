@@ -63,7 +63,6 @@ function updateBonusNames() {
             'Energia': 'Ena',
             'Życie': 'HP',
             'Wszystkie cechy': 'Cechy',
-            'Przywracanie życia': 'Turka',
             'Trucizna': 'Truta',
             'Niszczenie pancerza': 'Niszczara panca',
             'Obniżanie szybkości ataku': 'Obniżka SA',
