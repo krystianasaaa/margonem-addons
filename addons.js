@@ -67,13 +67,6 @@
             description: 'Zmienia nazwy statystyk, bonusów legendarnych oraz dodaje kalkulator ulepszania do tipów.',
             enabled: false,
             url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/betterui.js'
-        },
-        addon8: {
-            id: 'better_ui_old',
-            name: 'Better UI Old',
-            description: 'Stara Wersja Better UI(tymczasowa).',
-            enabled: false,
-            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/betteruiold.js'
         }
     };
 // Obiekt do przechowywania załadowanych dodatków
