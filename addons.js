@@ -18,247 +18,255 @@
         return;
     }
 
-const addonConfig = {
-    addon1: {
-        name: 'Players Online',
-        description: 'Wyświetla liczbę graczy online na serwerze, z podziałem na tytanów.',
-        enabled: false,
-        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online.js'
-    },
-    addon2: {
-        name: 'Players Online - Alarm',
-        description: 'Wysyła wiadmość na discorda gdy liczba graczy online przekroczy określony próg.',
-        enabled: false,
-        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online%20alarm.js'
-    },
-    addon3: {
-        name: 'Titans on Discord',
-        description: 'Wysyła powiadomienie na discorda gdy tytan zrespi.',
-        enabled: false,
-        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/titans%20on%20discord.js'
-    },
-    addon4: {
-        name: 'Heroes on Discord',
-        description: 'Wysyła powiadomienie na discorda gdy znajdziesz herosa.',
-        enabled: false,
-        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/heroes%20on%20discord.js'
-    },
-    addon5: {
-        name: 'Inventory Search',
-        description: 'Dodaje funkcję wyszukiwania przedmiotów w ekwipunku.',
-        enabled: false,
-        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/inventory%20search.js'
-    },
-    addon6: {
-        name: 'Shop Hotkey',
-        description: 'Dodaje skróty klawiszowe do szybkiego sprzedawania przedmiotów.',
-        enabled: false,
-        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/better%20sellings.js'
-    },
-    addon7: {
-        name: 'Better UI',
-        description: 'Zmienia nazwy statystyk, bonusów legendarnych oraz dodaje kalkulator ulepszania do tipów.',
-        enabled: false,
-        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/betterui.js'
-    },
-    addon8: {
-        name: 'Better UI Old',
-        description: 'Stara Wersja Better UI(tymczasowa).',
-        enabled: false,
-        url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/betteruiold.js'
-    }
-};
+    const addonConfig = {
+        addon1: {
+            id: 'players_online',
+            name: 'Players Online',
+            description: 'Wyświetla liczbę graczy online na serwerze, z podziałem na tytanów.',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online.js'
+        },
+        addon2: {
+            id: 'players_online_alarm',
+            name: 'Players Online - Alarm',
+            description: 'Wysyła wiadmość na discorda gdy liczba graczy online przekroczy określony próg.',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/players%20online%20alarm.js'
+        },
+        addon3: {
+            id: 'titans_on_discord',
+            name: 'Titans on Discord',
+            description: 'Wysyła powiadomienie na discorda gdy tytan zrespi.',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/titans%20on%20discord.js'
+        },
+        addon4: {
+            id: 'heroes_on_discord',
+            name: 'Heroes on Discord',
+            description: 'Wysyła powiadomienie na discorda gdy znajdziesz herosa.',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/heroes%20on%20discord.js'
+        },
+        addon5: {
+            id: 'inventory_search',
+            name: 'Inventory Search',
+            description: 'Dodaje funkcję wyszukiwania przedmiotów w ekwipunku.',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/inventory%20search.js'
+        },
+        addon6: {
+            id: 'shop_hotkey',
+            name: 'Shop Hotkey',
+            description: 'Dodaje skróty klawiszowe do szybkiego sprzedawania przedmiotów.',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/better%20sellings.js'
+        },
+        addon7: {
+            id: 'better_ui',
+            name: 'Better UI',
+            description: 'Zmienia nazwy statystyk, bonusów legendarnych oraz dodaje kalkulator ulepszania do tipów.',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/betterui.js'
+        },
+        addon8: {
+            id: 'better_ui_old',
+            name: 'Better UI Old',
+            description: 'Stara Wersja Better UI(tymczasowa).',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/betteruiold.js'
+        }
+    };
 // Obiekt do przechowywania załadowanych dodatków
-const loadedAddons = {};
+    const loadedAddons = {};
 
 // Funkcja do ładowania kodu dodatku z GitHub
-async function loadAddonCode(url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    async function loadAddonCode(url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const code = await response.text();
+            return code;
+        } catch (error) {
+            console.error('Błąd podczas ładowania dodatku:', error);
+            throw error;
         }
-        const code = await response.text();
-        return code;
-    } catch (error) {
-        console.error('Błąd podczas ładowania dodatku:', error);
-        throw error;
     }
-}
 
 // Funkcja do tworzenia dodatku
-async function createAddon(addonId, config) {
-    try {
-        console.log(`Ładowanie dodatku: ${config.name}...`);
-        
-        // Załaduj kod z GitHub
-        const addonCode = await loadAddonCode(config.url);
-        
-        // Stwórz obiekt dodatku
-        const addon = {
-            name: config.name,
-            enabled: false,
-            code: addonCode,
-            addonFunction: null,
-            init: function() {
-                console.log(`${config.name} włączony`);
-                try {
-                    // Dodaj polyfill dla funkcji GM_
-                    window.GM_getValue = window.GM_getValue || function(key, defaultValue) {
-                        const stored = localStorage.getItem('gm_' + key);
-                        return stored !== null ? JSON.parse(stored) : defaultValue;
-                    };
+    async function createAddon(addonId, config) {
+        try {
+            console.log(`Ładowanie dodatku: ${config.name}...`);
 
-                    window.GM_setValue = window.GM_setValue || function(key, value) {
-                        localStorage.setItem('gm_' + key, JSON.stringify(value));
-                    };
+            // Załaduj kod z GitHub
+            const addonCode = await loadAddonCode(config.url);
 
-                    window.GM_deleteValue = window.GM_deleteValue || function(key) {
-                        localStorage.removeItem('gm_' + key);
-                    };
+            // Stwórz obiekt dodatku
+            const addon = {
+                name: config.name,
+                enabled: false,
+                code: addonCode,
+                addonFunction: null,
+                init: function() {
+                    console.log(`${config.name} włączony`);
+                    try {
+                        // Dodaj polyfill dla funkcji GM_
+                        window.GM_getValue = window.GM_getValue || function(key, defaultValue) {
+                            const stored = localStorage.getItem('gm_' + key);
+                            return stored !== null ? JSON.parse(stored) : defaultValue;
+                        };
 
-                    // Wykonaj kod dodatku w bezpiecznym kontekście
-                    this.addonFunction = new Function(
-                        'addonId', 
-                        'console', 
-                        'document', 
-                        'window',
-                        'cleanupAddon',
-                        this.code
-                    );
-                                    
-                    // Uruchom dodatek
-                    this.addonFunction(addonId, console, document, window, cleanupAddon);
-                } catch (error) {
-                    console.error(`Błąd podczas inicjalizacji ${config.name}:`, error);
-                    throw error;
+                        window.GM_setValue = window.GM_setValue || function(key, value) {
+                            localStorage.setItem('gm_' + key, JSON.stringify(value));
+                        };
+
+                        window.GM_deleteValue = window.GM_deleteValue || function(key) {
+                            localStorage.removeItem('gm_' + key);
+                        };
+
+                        // Wykonaj kod dodatku w bezpiecznym kontekście
+                        this.addonFunction = new Function(
+                            'addonId',
+                            'console',
+                            'document',
+                            'window',
+                            'cleanupAddon',
+                            this.code
+                        );
+
+                        // Uruchom dodatek
+                        this.addonFunction(addonId, console, document, window, cleanupAddon);
+                    } catch (error) {
+                        console.error(`Błąd podczas inicjalizacji ${config.name}:`, error);
+                        throw error;
+                    }
+                },
+                destroy: function() {
+                    cleanupAddon(addonId);
                 }
-            },
-            destroy: function() {
-                cleanupAddon(addonId);
-            }
-        };
-        
-        return addon;
-    } catch (error) {
-        console.error(`Błąd podczas tworzenia dodatku ${config.name}:`, error);
-        return null;
-    }
-}
+            };
 
-// Funkcja do ładowania wszystkich dodatków
-async function loadAllAddons() {
-    for (const [addonId, config] of Object.entries(addonConfig)) {
-        const addon = await createAddon(addonId, config);
-        if (addon) {
-            loadedAddons[addonId] = addon;
-            console.log(`✅ Załadowano: ${config.name}`);
-            
-            // Sprawdź zapisany stan i włącz dodatek jeśli był włączony
-            const wasEnabled = loadAddonState(addonId);
-            if (wasEnabled) {
-                try {
-                    await addon.init();
-                    addon.enabled = true;
-                    console.log(`🔄 Przywrócono stan: ${config.name} - włączony`);
-                } catch (error) {
-                    console.error(`Błąd podczas przywracania ${config.name}:`, error);
-                    addon.enabled = false;
-                    saveAddonState(addonId, false);
-                }
-            }
-        } else {
-            console.log(`❌ Nie udało się załadować: ${config.name}`);
+            return addon;
+        } catch (error) {
+            console.error(`Błąd podczas tworzenia dodatku ${config.name}:`, error);
+            return null;
         }
     }
-}
+
+// Funkcja do ładowania wszystkich dodatków
+    async function loadAllAddons() {
+        for (const [addonId, config] of Object.entries(addonConfig)) {
+            const addon = await createAddon(addonId, config);
+            if (addon) {
+                loadedAddons[addonId] = addon;
+                console.log(`✅ Załadowano: ${config.name}`);
+
+                // Sprawdź zapisany stan i włącz dodatek jeśli był włączony
+                const wasEnabled = loadAddonState(addonId);
+                if (wasEnabled) {
+                    try {
+                        await addon.init();
+                        addon.enabled = true;
+                        console.log(`🔄 Przywrócono stan: ${config.name} - włączony`);
+                    } catch (error) {
+                        console.error(`Błąd podczas przywracania ${config.name}:`, error);
+                        addon.enabled = false;
+                        saveAddonState(addonId, false);
+                    }
+                }
+            } else {
+                console.log(`❌ Nie udało się załadować: ${config.name}`);
+            }
+        }
+    }
 
 // Funkcja do włączania dodatku
-async function enableAddon(addonId) {
-    const addon = loadedAddons[addonId];
-    if (!addon) {
-        console.error(`Dodatek ${addonId} nie został załadowany`);
-        return false;
+    async function enableAddon(addonId) {
+        const addon = loadedAddons[addonId];
+        if (!addon) {
+            console.error(`Dodatek ${addonId} nie został załadowany`);
+            return false;
+        }
+
+        if (addon.enabled) {
+            console.log(`Dodatek ${addon.name} jest już włączony`);
+            return true;
+        }
+
+        try {
+            await addon.init();
+            addon.enabled = true;
+            saveAddonState(addonId, true); // Zapisz stan
+            console.log(`✅ Włączono: ${addon.name}`);
+            return true;
+        } catch (error) {
+            console.error(`Błąd podczas włączania ${addon.name}:`, error);
+            return false;
+        }
     }
-    
-    if (addon.enabled) {
-        console.log(`Dodatek ${addon.name} jest już włączony`);
-        return true;
-    }
-    
-    try {
-        await addon.init();
-        addon.enabled = true;
-        saveAddonState(addonId, true); // Zapisz stan
-        console.log(`✅ Włączono: ${addon.name}`);
-        return true;
-    } catch (error) {
-        console.error(`Błąd podczas włączania ${addon.name}:`, error);
-        return false;
-    }
-}
 
 // Funkcja do wyłączania dodatku
-function disableAddon(addonId) {
-    const addon = loadedAddons[addonId];
-    if (!addon) {
-        console.error(`Dodatek ${addonId} nie został załadowany`);
-        return false;
+    function disableAddon(addonId) {
+        const addon = loadedAddons[addonId];
+        if (!addon) {
+            console.error(`Dodatek ${addonId} nie został załadowany`);
+            return false;
+        }
+
+        if (!addon.enabled) {
+            console.log(`Dodatek ${addon.name} jest już wyłączony`);
+            return true;
+        }
+
+        try {
+            addon.destroy();
+            addon.enabled = false;
+            saveAddonState(addonId, false); // Zapisz stan
+            console.log(`✅ Wyłączono: ${addon.name}`);
+
+            // Pokaż powiadomienie o konieczności odświeżenia strony
+            showRefreshNotification(`Dodatek "${addon.name}" został wyłączony. Odśwież stronę aby zastosować zmiany.`);
+
+            return true;
+        } catch (error) {
+            console.error(`Błąd podczas wyłączania ${addon.name}:`, error);
+            return false;
+        }
     }
-    
-    if (!addon.enabled) {
-        console.log(`Dodatek ${addon.name} jest już wyłączony`);
-        return true;
-    }
-    
-    try {
-        addon.destroy();
-        addon.enabled = false;
-        saveAddonState(addonId, false); // Zapisz stan
-        console.log(`✅ Wyłączono: ${addon.name}`);
-        
-        // Pokaż powiadomienie o konieczności odświeżenia strony
-        showRefreshNotification(`Dodatek "${addon.name}" został wyłączony. Odśwież stronę aby zastosować zmiany.`);
-        
-        return true;
-    } catch (error) {
-        console.error(`Błąd podczas wyłączania ${addon.name}:`, error);
-        return false;
-    }
-}
 
 // Funkcja do przełączania stanu dodatku
-async function toggleAddon(addonId) {
-    const addon = loadedAddons[addonId];
-    if (!addon) {
-        console.error(`Dodatek ${addonId} nie został załadowany`);
-        return false;
+    async function toggleAddon(addonId) {
+        const addon = loadedAddons[addonId];
+        if (!addon) {
+            console.error(`Dodatek ${addonId} nie został załadowany`);
+            return false;
+        }
+
+        if (addon.enabled) {
+            return disableAddon(addonId);
+        } else {
+            return await enableAddon(addonId);
+        }
     }
-    
-    if (addon.enabled) {
-        return disableAddon(addonId);
-    } else {
-        return await enableAddon(addonId);
-    }
-}
 
 // Funkcja do pobierania listy dodatków
-function getAddonsList() {
-    return Object.entries(loadedAddons).map(([id, addon]) => ({
-        id,
-        name: addon.name,
-        enabled: addon.enabled
-    }));
-}
+    function getAddonsList() {
+        return Object.entries(loadedAddons).map(([id, addon]) => ({
+            id,
+            name: addon.name,
+            enabled: addon.enabled
+        }));
+    }
 
 // Funkcja cleanup (musisz ją dostosować do swoich potrzeb)
-function cleanupAddon(addonId) {
-    console.log(`Czyszczenie dodatku: ${addonId}`);
-    // Tutaj umieść kod do czyszczenia zasobów dodatku
-    // np. usuwanie event listenerów, elementów DOM, itp.
-}
+    function cleanupAddon(addonId) {
+        console.log(`Czyszczenie dodatku: ${addonId}`);
+        // Tutaj umieść kod do czyszczenia zasobów dodatku
+        // np. usuwanie event listenerów, elementów DOM, itp.
+    }
 
-const styles = `
+    const styles = `
 .addon-manager {
     position: fixed;
     z-index: 10000;
@@ -761,64 +769,64 @@ const styles = `
 `;
 
 // Dodaj style do strony
-const styleSheet = document.createElement('style');
-styleSheet.textContent = styles;
-document.head.appendChild(styleSheet);
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
 
 // System zapisywania stanu w cookies (alternatywa dla localStorage)
-function setCookie(name, value, days = 30) {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
-}
-
-function getAddonCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        return parts.pop().split(';').shift();
+    function setCookie(name, value, days = 30) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
     }
-    return null;
-}
+
+    function getAddonCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+        return null;
+    }
 
 // Funkcja do zapisywania stanu dodatku
-function saveAddonState(addonId, enabled) {
-    setCookie(`addon_${addonId}_enabled`, enabled.toString());
-}
-
-// Funkcja do wczytywania stanu dodatku
-function loadAddonState(addonId) {
-    const saved = getAddonCookie(`addon_${addonId}_enabled`);
-    return saved === 'true';
-}
-
-// Funkcja do zapisywania pozycji
-function savePosition(x, y) {
-    setCookie('addon_manager_x', x.toString());
-    setCookie('addon_manager_y', y.toString());
-}
-
-// Funkcja do wczytywania pozycji
-function loadPosition() {
-    const x = getAddonCookie('addon_manager_x');
-    const y = getAddonCookie('addon_manager_y');
-    return {
-        x: x ? parseInt(x) : null,
-        y: y ? parseInt(y) : null
-    };
-}
-
-function showRefreshNotification(message) {
-    // Sprawdź czy powiadomienie już istnieje
-    const existing = document.querySelector('.refresh-notification');
-    if (existing) {
-        existing.remove();
+    function saveAddonState(addonId, enabled) {
+        setCookie(`addon_${addonId}_enabled`, enabled.toString());
     }
 
-    const notification = document.createElement('div');
-    notification.className = 'refresh-notification';
+// Funkcja do wczytywania stanu dodatku
+    function loadAddonState(addonId) {
+        const saved = getAddonCookie(`addon_${addonId}_enabled`);
+        return saved === 'true';
+    }
 
-    notification.innerHTML = `
+// Funkcja do zapisywania pozycji
+    function savePosition(x, y) {
+        setCookie('addon_manager_x', x.toString());
+        setCookie('addon_manager_y', y.toString());
+    }
+
+// Funkcja do wczytywania pozycji
+    function loadPosition() {
+        const x = getAddonCookie('addon_manager_x');
+        const y = getAddonCookie('addon_manager_y');
+        return {
+            x: x ? parseInt(x) : null,
+            y: y ? parseInt(y) : null
+        };
+    }
+
+    function showRefreshNotification(message) {
+        // Sprawdź czy powiadomienie już istnieje
+        const existing = document.querySelector('.refresh-notification');
+        if (existing) {
+            existing.remove();
+        }
+
+        const notification = document.createElement('div');
+        notification.className = 'refresh-notification';
+
+        notification.innerHTML = `
         <h3>⚠️ Wymagane odświeżenie</h3>
         <p>${message}</p>
         <div class="refresh-notification-buttons">
@@ -827,356 +835,357 @@ function showRefreshNotification(message) {
         </div>
     `;
 
-    // Dodaj event listenery do przycisków
-    const refreshBtn = notification.querySelector('.refresh-btn');
-    const dismissBtn = notification.querySelector('.dismiss-btn');
+        // Dodaj event listenery do przycisków
+        const refreshBtn = notification.querySelector('.refresh-btn');
+        const dismissBtn = notification.querySelector('.dismiss-btn');
 
-    refreshBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Zatrzymaj propagację eventu
-        window.location.reload();
-    });
+        refreshBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Zatrzymaj propagację eventu
+            window.location.reload();
+        });
 
-    dismissBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Zatrzymaj propagację eventu - TO JEST KLUCZ!
-        notification.remove();
-    });
-
-    // Automatyczne usunięcie po 10 sekundach
-    setTimeout(() => {
-        if (notification.parentNode) {
+        dismissBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Zatrzymaj propagację eventu - TO JEST KLUCZ!
             notification.remove();
-        }
-    }, 10000);
+        });
 
-    document.body.appendChild(notification);
-}
+        // Automatyczne usunięcie po 10 sekundach
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 10000);
+
+        document.body.appendChild(notification);
+    }
 
 // Make element draggable
-function makeDraggable(element, handle) {
-    let isDragging = false;
-    let hasDragged = false;
-    let startX, startY, initialX, initialY;
+    function makeDraggable(element, handle) {
+        let isDragging = false;
+        let hasDragged = false;
+        let startX, startY, initialX, initialY;
 
-    handle.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        hasDragged = false;
+        handle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            hasDragged = false;
 
-        startX = e.clientX;
-        startY = e.clientY;
+            startX = e.clientX;
+            startY = e.clientY;
 
-        const rect = element.getBoundingClientRect();
-        initialX = rect.left;
-        initialY = rect.top;
+            const rect = element.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
 
-        element.style.position = 'fixed';
-        element.style.left = initialX + 'px';
-        element.style.top = initialY + 'px';
-        element.style.right = 'auto';
+            element.style.position = 'fixed';
+            element.style.left = initialX + 'px';
+            element.style.top = initialY + 'px';
+            element.style.right = 'auto';
 
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
 
-        e.preventDefault();
-    });
+            e.preventDefault();
+        });
 
-    function handleMouseMove(e) {
-        if (!isDragging) return;
+        function handleMouseMove(e) {
+            if (!isDragging) return;
 
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
 
-        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-            hasDragged = true;
-            element.classList.add('dragging');
-            handle.classList.add('dragging');
+            if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+                hasDragged = true;
+                element.classList.add('dragging');
+                handle.classList.add('dragging');
+            }
+
+            let newX = initialX + deltaX;
+            let newY = initialY + deltaY;
+
+            const rect = element.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            newX = Math.max(0, Math.min(newX, viewportWidth - rect.width));
+            newY = Math.max(0, Math.min(newY, viewportHeight - rect.height));
+
+            element.style.left = newX + 'px';
+            element.style.top = newY + 'px';
         }
 
-        let newX = initialX + deltaX;
-        let newY = initialY + deltaY;
+        function handleMouseUp() {
+            if (!isDragging) return;
 
-        const rect = element.getBoundingClientRect();
+            isDragging = false;
+
+            // Zapisz pozycję po zakończeniu przeciągnięcia
+            const rect = element.getBoundingClientRect();
+            savePosition(rect.left, rect.top);
+
+            setTimeout(() => {
+                element.classList.remove('dragging');
+                handle.classList.remove('dragging');
+                hasDragged = false;
+            }, 100);
+
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => hasDragged;
+    }
+    function positionTooltip(helpIcon, tooltip) {
+        const iconRect = helpIcon.getBoundingClientRect();
+        const tooltipWidth = 280;
+        const tooltipHeight = tooltip.offsetHeight || 60; // przybliżona wysokość
+
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
 
-        newX = Math.max(0, Math.min(newX, viewportWidth - rect.width));
-        newY = Math.max(0, Math.min(newY, viewportHeight - rect.height));
+        // Oblicz pozycję
+        let left = iconRect.left + iconRect.width / 2 - tooltipWidth / 2;
+        let top = iconRect.bottom + 8; // 8px poniżej ikony
 
-        element.style.left = newX + 'px';
-        element.style.top = newY + 'px';
+        // Sprawdź czy tooltip nie wychodzi poza prawą krawędź
+        if (left + tooltipWidth > viewportWidth - 10) {
+            left = viewportWidth - tooltipWidth - 10;
+        }
+
+        // Sprawdź czy tooltip nie wychodzi poza lewą krawędź
+        if (left < 10) {
+            left = 10;
+        }
+
+        // Sprawdź czy tooltip nie wychodzi poza dolną krawędź
+        if (top + tooltipHeight > viewportHeight - 10) {
+            top = iconRect.top - tooltipHeight - 8; // Pokaż nad ikoną
+            tooltip.classList.add('tooltip-above');
+        } else {
+            tooltip.classList.remove('tooltip-above');
+        }
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
     }
-
-    function handleMouseUp() {
-        if (!isDragging) return;
-
-        isDragging = false;
-
-        // Zapisz pozycję po zakończeniu przeciągnięcia
-        const rect = element.getBoundingClientRect();
-        savePosition(rect.left, rect.top);
-
-        setTimeout(() => {
-            element.classList.remove('dragging');
-            handle.classList.remove('dragging');
-            hasDragged = false;
-        }, 100);
-
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => hasDragged;
-}
-function positionTooltip(helpIcon, tooltip) {
-    const iconRect = helpIcon.getBoundingClientRect();
-    const tooltipWidth = 280;
-    const tooltipHeight = tooltip.offsetHeight || 60; // przybliżona wysokość
-    
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    // Oblicz pozycję
-    let left = iconRect.left + iconRect.width / 2 - tooltipWidth / 2;
-    let top = iconRect.bottom + 8; // 8px poniżej ikony
-    
-    // Sprawdź czy tooltip nie wychodzi poza prawą krawędź
-    if (left + tooltipWidth > viewportWidth - 10) {
-        left = viewportWidth - tooltipWidth - 10;
-    }
-    
-    // Sprawdź czy tooltip nie wychodzi poza lewą krawędź
-    if (left < 10) {
-        left = 10;
-    }
-    
-    // Sprawdź czy tooltip nie wychodzi poza dolną krawędź
-    if (top + tooltipHeight > viewportHeight - 10) {
-        top = iconRect.top - tooltipHeight - 8; // Pokaż nad ikoną
-        tooltip.classList.add('tooltip-above');
-    } else {
-        tooltip.classList.remove('tooltip-above');
-    }
-    
-    tooltip.style.left = left + 'px';
-    tooltip.style.top = top + 'px';
-}
 
 // Create GUI - ZMIENIONA FUNKCJA
-function createGUI() {
-    const container = document.createElement('div');
-    container.className = 'addon-manager';
+    function createGUI() {
+        const container = document.createElement('div');
+        container.className = 'addon-manager';
 
-    // Wczytaj zapisaną pozycję
-    const savedPosition = loadPosition();
-    if (savedPosition.x !== null && savedPosition.y !== null) {
-        container.style.left = savedPosition.x + 'px';
-        container.style.top = savedPosition.y + 'px';
-    } else {
-        // Domyślna pozycja
-        container.style.top = '10px';
-        container.style.right = '10px';
-    }
+        // Wczytaj zapisaną pozycję
+        const savedPosition = loadPosition();
+        if (savedPosition.x !== null && savedPosition.y !== null) {
+            container.style.left = savedPosition.x + 'px';
+            container.style.top = savedPosition.y + 'px';
+        } else {
+            // Domyślna pozycja
+            container.style.top = '10px';
+            container.style.right = '10px';
+        }
 
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'addon-toggle-btn';
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'addon-toggle-btn';
 
-    const wasDragged = makeDraggable(container, toggleBtn);
+        const wasDragged = makeDraggable(container, toggleBtn);
 
-    const menu = document.createElement('div');
-    menu.className = 'addon-menu';
+        const menu = document.createElement('div');
+        menu.className = 'addon-menu';
 
-    const header = document.createElement('div');
-    header.className = 'addon-menu-header';
-    header.textContent = 'Manager Dodatków';
+        const header = document.createElement('div');
+        header.className = 'addon-menu-header';
+        header.textContent = 'Manager Dodatków';
 
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'addon-close-btn';
-    closeBtn.innerHTML = '×';
-    closeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.remove('active');
-    });
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'addon-close-btn';
+        closeBtn.innerHTML = '×';
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.remove('active');
+        });
 
-    header.appendChild(closeBtn);
-    makeDraggable(menu, header);
-    menu.appendChild(header);
+        header.appendChild(closeBtn);
+        makeDraggable(menu, header);
+        menu.appendChild(header);
 
-    // Kontener dla dodatków z dwiema kolumnami
-    const content = document.createElement('div');
-    content.className = 'addon-content';
+        // Kontener dla dodatków z dwiema kolumnami
+        const content = document.createElement('div');
+        content.className = 'addon-content';
 
-    // Tworzenie dwóch kolumn
-    const leftColumn = document.createElement('div');
-    leftColumn.className = 'addon-column';
-    
-    const rightColumn = document.createElement('div');
-    rightColumn.className = 'addon-column';
+        // Tworzenie dwóch kolumn
+        const leftColumn = document.createElement('div');
+        leftColumn.className = 'addon-column';
 
-    // Podziel dodatki na dwie kolumny
-    const addonEntries = Object.entries(loadedAddons);
-    
-    addonEntries.forEach(([addonId, addon], index) => {
-    const item = document.createElement('div');
-    item.className = 'addon-item';
+        const rightColumn = document.createElement('div');
+        rightColumn.className = 'addon-column';
 
-    const info = document.createElement('div');
-    info.className = 'addon-info';
-    
-    // Kontener dla nazwy i ikony pomocy
-    const nameContainer = document.createElement('div');
-    nameContainer.className = 'addon-name-container';
-    
-    const name = document.createElement('div');
-    name.className = 'addon-name';
-    name.textContent = addon.name;
+        // Podziel dodatki na dwie kolumny
+        const addonEntries = Object.entries(loadedAddons);
 
-const helpIcon = document.createElement('div');
-helpIcon.className = 'addon-help-icon';
-helpIcon.textContent = '?';
+        addonEntries.forEach(([addonId, addon], index) => {
+            const item = document.createElement('div');
+            item.className = 'addon-item';
+
+            const info = document.createElement('div');
+            info.id = `addon-${addon.id}`;
+            info.className = 'addon-info';
+
+            // Kontener dla nazwy i ikony pomocy
+            const nameContainer = document.createElement('div');
+            nameContainer.className = 'addon-name-container';
+
+            const name = document.createElement('div');
+            name.className = 'addon-name';
+            name.textContent = addon.name;
+
+            const helpIcon = document.createElement('div');
+            helpIcon.className = 'addon-help-icon';
+            helpIcon.textContent = '?';
 
 // Tooltip z opisem
-const tooltip = document.createElement('div');
-tooltip.className = 'addon-tooltip';
-tooltip.textContent = addonConfig[addonId].description || 'Brak opisu dla tego dodatku.';
+            const tooltip = document.createElement('div');
+            tooltip.className = 'addon-tooltip';
+            tooltip.textContent = addonConfig[addonId].description || 'Brak opisu dla tego dodatku.';
 
 // Event listenery dla pokazywania/ukrywania tooltipa
-helpIcon.addEventListener('mouseenter', () => {
-    document.body.appendChild(tooltip); // Dodaj tooltip do body
-    positionTooltip(helpIcon, tooltip);
-    tooltip.style.opacity = '1';
-    tooltip.style.visibility = 'visible';
-});
+            helpIcon.addEventListener('mouseenter', () => {
+                document.body.appendChild(tooltip); // Dodaj tooltip do body
+                positionTooltip(helpIcon, tooltip);
+                tooltip.style.opacity = '1';
+                tooltip.style.visibility = 'visible';
+            });
 
-helpIcon.addEventListener('mouseleave', () => {
-    tooltip.style.opacity = '0';
-    tooltip.style.visibility = 'hidden';
-    setTimeout(() => {
-        if (tooltip.parentNode) {
-            tooltip.parentNode.removeChild(tooltip);
-        }
-    }, 200);
-});
+            helpIcon.addEventListener('mouseleave', () => {
+                tooltip.style.opacity = '0';
+                tooltip.style.visibility = 'hidden';
+                setTimeout(() => {
+                    if (tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                }, 200);
+            });
 
-nameContainer.appendChild(name);
-nameContainer.appendChild(helpIcon);
+            nameContainer.appendChild(name);
+            nameContainer.appendChild(helpIcon);
 
-    const status = document.createElement('div');
-    status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
-    status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
-
-    info.appendChild(nameContainer); // Zmienione z name na nameContainer
-    info.appendChild(status);
-
-    const switchElement = document.createElement('div');
-    switchElement.className = `addon-switch ${addon.enabled ? 'active' : ''}`;
-
-    switchElement.addEventListener('click', async () => {
-        const success = await toggleAddon(addonId);
-        if (success) {
-            switchElement.classList.toggle('active', addon.enabled);
-            status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
+            const status = document.createElement('div');
             status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
-        }
-    });
+            status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
 
-    item.appendChild(info);
-    item.appendChild(switchElement);
-    
-    // Dodaj do odpowiedniej kolumny (naprzemiennie)
-    if (index % 2 === 0) {
-        leftColumn.appendChild(item);
-    } else {
-        rightColumn.appendChild(item);
-    }
-});
+            info.appendChild(nameContainer); // Zmienione z name na nameContainer
+            info.appendChild(status);
 
-    content.appendChild(leftColumn);
-    content.appendChild(rightColumn);
+            const switchElement = document.createElement('div');
+            switchElement.className = `addon-switch ${addon.enabled ? 'active' : ''}`;
 
-    // Control buttons
-    const controls = document.createElement('div');
-    controls.className = 'addon-controls';
+            switchElement.addEventListener('click', async () => {
+                const success = await toggleAddon(addonId);
+                if (success) {
+                    switchElement.classList.toggle('active', addon.enabled);
+                    status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
+                    status.className = `addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
+                }
+            });
 
-    const enableAllBtn = document.createElement('button');
-    enableAllBtn.className = 'control-btn enable-all-btn';
-    enableAllBtn.textContent = 'Włącz wszystkie';
-    enableAllBtn.addEventListener('click', async () => {
-        for (const addonId of Object.keys(loadedAddons)) {
-            if (!loadedAddons[addonId].enabled) {
-                await enableAddon(addonId);
-            }
-        }
-        updateGUI();
-    });
+            item.appendChild(info);
+            item.appendChild(switchElement);
 
-    const disableAllBtn = document.createElement('button');
-    disableAllBtn.className = 'control-btn disable-all-btn';
-    disableAllBtn.textContent = 'Wyłącz wszystkie';
-    disableAllBtn.addEventListener('click', () => {
-        Object.keys(loadedAddons).forEach(addonId => {
-            if (loadedAddons[addonId].enabled) {
-                disableAddon(addonId);
+            // Dodaj do odpowiedniej kolumny (naprzemiennie)
+            if (index % 2 === 0) {
+                leftColumn.appendChild(item);
+            } else {
+                rightColumn.appendChild(item);
             }
         });
-        updateGUI();
-    });
 
-    controls.appendChild(enableAllBtn);
-    controls.appendChild(disableAllBtn);
+        content.appendChild(leftColumn);
+        content.appendChild(rightColumn);
 
-    menu.appendChild(content);
-    menu.appendChild(controls);
+        // Control buttons
+        const controls = document.createElement('div');
+        controls.className = 'addon-controls';
 
-    toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        setTimeout(() => {
-            if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
-                menu.classList.toggle('active');
+        const enableAllBtn = document.createElement('button');
+        enableAllBtn.className = 'control-btn enable-all-btn';
+        enableAllBtn.textContent = 'Włącz wszystkie';
+        enableAllBtn.addEventListener('click', async () => {
+            for (const addonId of Object.keys(loadedAddons)) {
+                if (!loadedAddons[addonId].enabled) {
+                    await enableAddon(addonId);
+                }
             }
-        }, 10);
-    });
+            updateGUI();
+        });
 
-    document.addEventListener('click', (e) => {
-        if (!container.contains(e.target)) {
-            menu.classList.remove('active');
-        }
-    });
+        const disableAllBtn = document.createElement('button');
+        disableAllBtn.className = 'control-btn disable-all-btn';
+        disableAllBtn.textContent = 'Wyłącz wszystkie';
+        disableAllBtn.addEventListener('click', () => {
+            Object.keys(loadedAddons).forEach(addonId => {
+                if (loadedAddons[addonId].enabled) {
+                    disableAddon(addonId);
+                }
+            });
+            updateGUI();
+        });
 
-    container.appendChild(toggleBtn);
-    container.appendChild(menu);
-    document.body.appendChild(container);
-}
+        controls.appendChild(enableAllBtn);
+        controls.appendChild(disableAllBtn);
+
+        menu.appendChild(content);
+        menu.appendChild(controls);
+
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setTimeout(() => {
+                if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
+                    menu.classList.toggle('active');
+                }
+            }, 10);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        container.appendChild(toggleBtn);
+        container.appendChild(menu);
+        document.body.appendChild(container);
+    }
 
 // Update GUI - ZMIENIONA FUNKCJA
-function updateGUI() {
-    // Usuń istniejące menu i stwórz nowe z aktualnym stanem
-    const existingManager = document.querySelector('.addon-manager');
-    if (existingManager) {
-        const position = {
-            left: existingManager.style.left,
-            top: existingManager.style.top
-        };
-        existingManager.remove();
-        
-        // Ponownie stwórz GUI z zachowaniem pozycji
-        setTimeout(() => {
-            createGUI();
-            const newManager = document.querySelector('.addon-manager');
-            if (newManager && position.left && position.top) {
-                newManager.style.left = position.left;
-                newManager.style.top = position.top;
-            }
-        }, 50);
+    function updateGUI() {
+        // Usuń istniejące menu i stwórz nowe z aktualnym stanem
+        const existingManager = document.querySelector('.addon-manager');
+        if (existingManager) {
+            const position = {
+                left: existingManager.style.left,
+                top: existingManager.style.top
+            };
+            existingManager.remove();
+
+            // Ponownie stwórz GUI z zachowaniem pozycji
+            setTimeout(() => {
+                createGUI();
+                const newManager = document.querySelector('.addon-manager');
+                if (newManager && position.left && position.top) {
+                    newManager.style.left = position.left;
+                    newManager.style.top = position.top;
+                }
+            }, 50);
+        }
     }
-}
 
 // Inicjalizacja - załaduj wszystkie dodatki przy starcie
-loadAllAddons().then(() => {
-    console.log('🚀 Manager dodatków gotowy!');
-    console.log('Dostępne dodatki:', getAddonsList());
-    
-    // Stwórz GUI
-    createGUI();
-        
+    loadAllAddons().then(() => {
+        console.log('🚀 Manager dodatków gotowy!');
+        console.log('Dostępne dodatki:', getAddonsList());
+
+        // Stwórz GUI
+        createGUI();
+
         // Globalne API do zarządzania dodatkami
         window.AddonManager = {
             enable: enableAddon,
@@ -1190,7 +1199,7 @@ loadAllAddons().then(() => {
             getAddon: (addonId) => loadedAddons[addonId],
             refresh: updateGUI,
         };
-        
+
         console.log('🎮 Dostępne komendy w konsoli:');
         console.log('• AddonManager.enable("addon1") - włącz dodatek');
         console.log('• AddonManager.disable("addon1") - wyłącz dodatek');
