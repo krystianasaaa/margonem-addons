@@ -695,77 +695,148 @@
         });
     }
 function integrateWithAddonManager() {
+    console.log('Better UI: Szukam managera dodatków...');
+    
     const checkForManager = setInterval(() => {
-        // Szukaj dokładnie Better UI w liście dodatków
-        const addonRows = document.querySelectorAll('div');
+        // Sprawdź różne możliwe selektory dla managera
+        const possibleSelectors = [
+            'div', 
+            '.addon-row', 
+            '.addon-item',
+            '[data-addon]',
+            '.manager-row'
+        ];
         
-        for (const row of addonRows) {
-            const text = row.textContent || '';
-            // Sprawdź czy to dokładnie wiersz z Better UI
-            if (text.includes('Better UI') && text.includes('WŁĄCZONY') && !document.getElementById('better-ui-integrated-settings')) {
-                addSettingsToManager(row);
-                clearInterval(checkForManager);
-                return;
+        let betterUIElement = null;
+        
+        // Przeszukaj wszystkie możliwe elementy
+        for (const selector of possibleSelectors) {
+            const elements = document.querySelectorAll(selector);
+            
+            for (const element of elements) {
+                const text = element.textContent || '';
+                const innerHTML = element.innerHTML || '';
+                
+                // Sprawdź różne warianty tekstu Better UI
+                const isBetterUI = text.includes('Better UI') || 
+                                 text.includes('better ui') || 
+                                 text.includes('BetterUI') ||
+                                 innerHTML.includes('Better UI');
+                
+                // Sprawdź czy jest włączony (różne możliwe wskaźniki)
+                const isEnabled = text.includes('WŁĄCZONY') || 
+                                text.includes('ENABLED') || 
+                                text.includes('ON') ||
+                                element.querySelector('input[checked]') ||
+                                element.querySelector('.enabled') ||
+                                element.querySelector('.active') ||
+                                innerHTML.includes('checked') ||
+                                innerHTML.includes('enabled');
+                
+                if (isBetterUI) {
+                    console.log('Better UI: Znaleziono element Better UI:', element);
+                    console.log('Better UI: Tekst elementu:', text);
+                    console.log('Better UI: Czy włączony:', isEnabled);
+                    
+                    if (isEnabled && !document.getElementById('better-ui-integrated-settings')) {
+                        betterUIElement = element;
+                        break;
+                    }
+                }
             }
+            
+            if (betterUIElement) break;
+        }
+        
+        if (betterUIElement) {
+            console.log('Better UI: Dodaję ustawienia do managera');
+            addSettingsToManager(betterUIElement);
+            clearInterval(checkForManager);
         }
     }, 500);
 
-    setTimeout(() => clearInterval(checkForManager), 15000);
+    // Zwiększ timeout dla pewności
+    setTimeout(() => {
+        console.log('Better UI: Timeout - nie znaleziono managera');
+        clearInterval(checkForManager);
+    }, 20000);
 }
 
+// Ulepszona funkcja dodawania ustawień
 function addSettingsToManager(betterUIElement) {
+    console.log('Better UI: Tworzę panel ustawień dla elementu:', betterUIElement);
+    
+    // Spróbuj znaleźć najlepsze miejsce do wstawienia
+    let targetElement = betterUIElement;
+    
+    // Jeśli element ma parent container, użyj go
+    if (betterUIElement.parentElement && 
+        (betterUIElement.parentElement.className.includes('addon') || 
+         betterUIElement.parentElement.className.includes('row'))) {
+        targetElement = betterUIElement.parentElement;
+    }
+    
     // Stwórz panel ustawień
     const settingsPanel = document.createElement('div');
     settingsPanel.id = 'better-ui-integrated-settings';
     settingsPanel.style.cssText = `
-        margin-top: 8px;
-        padding: 8px;
-        background: rgba(0,0,0,0.4);
-        border-radius: 4px;
-        border: 1px solid rgba(255,255,255,0.1);
+        margin: 8px 0;
+        padding: 10px;
+        background: rgba(0,0,0,0.6);
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.2);
+        font-family: Arial, sans-serif;
     `;
 
     settingsPanel.innerHTML = `
-        <div style="color: #fff; font-size: 11px; margin-bottom: 6px; font-weight: bold;">Ustawienia:</div>
+        <div style="color: #fff; font-size: 12px; margin-bottom: 8px; font-weight: bold; text-align: center;">
+            ⚙️ Ustawienia Better UI
+        </div>
         
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <span style="color: #ccc; font-size: 10px;">Bonusy Legendarne</span>
-            <label class="toggle-switch-mini">
-                <input type="checkbox" id="bonusy-legendarne-mini" ${config.bonusyLegendarne ? 'checked' : ''}>
-                <span class="slider-mini"></span>
-            </label>
-        </div>
+        <div style="display: grid; gap: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: #ccc; font-size: 11px;">💀 Bonusy Legendarne</span>
+                <label class="toggle-switch-mini">
+                    <input type="checkbox" id="bonusy-legendarne-mini" ${config.bonusyLegendarne ? 'checked' : ''}>
+                    <span class="slider-mini"></span>
+                </label>
+            </div>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <span style="color: #ccc; font-size: 10px;">Statystyki Przedmiotów</span>
-            <label class="toggle-switch-mini">
-                <input type="checkbox" id="statystyki-przedmiotow-mini" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
-                <span class="slider-mini"></span>
-            </label>
-        </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: #ccc; font-size: 11px;">📊 Statystyki Przedmiotów</span>
+                <label class="toggle-switch-mini">
+                    <input type="checkbox" id="statystyki-przedmiotow-mini" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
+                    <span class="slider-mini"></span>
+                </label>
+            </div>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <span style="color: #ccc; font-size: 10px;">Interfejs</span>
-            <label class="toggle-switch-mini">
-                <input type="checkbox" id="interfejs-mini" ${config.interfejs ? 'checked' : ''}>
-                <span class="slider-mini"></span>
-            </label>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: #ccc; font-size: 11px;">🎮 Interfejs</span>
+                <label class="toggle-switch-mini">
+                    <input type="checkbox" id="interfejs-mini" ${config.interfejs ? 'checked' : ''}>
+                    <span class="slider-mini"></span>
+                </label>
+            </div>
         </div>
 
         <button id="reload-game-mini" style="
             width: 100%; 
-            padding: 4px; 
-            background: #ff9800; 
+            margin-top: 8px;
+            padding: 6px; 
+            background: linear-gradient(45deg, #ff6b35, #ff9800); 
             color: white; 
             border: none; 
-            border-radius: 3px; 
-            font-size: 10px; 
+            border-radius: 4px; 
+            font-size: 11px; 
             cursor: pointer;
             font-weight: bold;
-        ">Odśwież grę</button>
+            transition: all 0.2s;
+        " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            🔄 Odśwież grę aby zastosować zmiany
+        </button>
     `;
 
-    // Dodaj style dla mini przełączników
+    // Dodaj style dla mini przełączników (jeśli jeszcze nie istnieją)
     if (!document.getElementById('better-ui-mini-styles')) {
         const style = document.createElement('style');
         style.id = 'better-ui-mini-styles';
@@ -773,8 +844,8 @@ function addSettingsToManager(betterUIElement) {
             .toggle-switch-mini {
                 position: relative;
                 display: inline-block;
-                width: 28px;
-                height: 16px;
+                width: 32px;
+                height: 18px;
             }
 
             .toggle-switch-mini input {
@@ -790,58 +861,104 @@ function addSettingsToManager(betterUIElement) {
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(255, 255, 255, 0.2);
+                background: rgba(255, 255, 255, 0.3);
                 transition: 0.3s;
-                border-radius: 16px;
-                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 18px;
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
             }
 
             .toggle-switch-mini .slider-mini:before {
                 position: absolute;
                 content: "";
-                height: 12px;
-                width: 12px;
+                height: 14px;
+                width: 14px;
                 left: 1px;
                 bottom: 1px;
-                background: #fff;
+                background: linear-gradient(45deg, #fff, #f0f0f0);
                 transition: 0.3s;
                 border-radius: 50%;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             }
 
             .toggle-switch-mini input:checked + .slider-mini {
-                background: #2196F3;
-                border-color: #2196F3;
+                background: linear-gradient(45deg, #4CAF50, #45a049);
+                border-color: #4CAF50;
             }
 
             .toggle-switch-mini input:checked + .slider-mini:before {
-                transform: translateX(12px);
+                transform: translateX(14px);
+            }
+
+            .toggle-switch-mini .slider-mini:active:before {
+                width: 16px;
             }
         `;
         document.head.appendChild(style);
     }
 
     // Dodaj event listenery
-    settingsPanel.querySelector('#bonusy-legendarne-mini').addEventListener('change', (e) => {
-        config.bonusyLegendarne = e.target.checked;
-        saveConfig();
-    });
+    setTimeout(() => {
+        const bonusyCheckbox = settingsPanel.querySelector('#bonusy-legendarne-mini');
+        const statystykiCheckbox = settingsPanel.querySelector('#statystyki-przedmiotow-mini');
+        const interfejsCheckbox = settingsPanel.querySelector('#interfejs-mini');
+        const reloadButton = settingsPanel.querySelector('#reload-game-mini');
 
-    settingsPanel.querySelector('#statystyki-przedmiotow-mini').addEventListener('change', (e) => {
-        config.statystykiPrzedmiotow = e.target.checked;
-        saveConfig();
-    });
+        if (bonusyCheckbox) {
+            bonusyCheckbox.addEventListener('change', (e) => {
+                config.bonusyLegendarne = e.target.checked;
+                saveConfig();
+                console.log('Better UI: Bonusy legendarne:', e.target.checked);
+            });
+        }
 
-    settingsPanel.querySelector('#interfejs-mini').addEventListener('change', (e) => {
-        config.interfejs = e.target.checked;
-        saveConfig();
-    });
+        if (statystykiCheckbox) {
+            statystykiCheckbox.addEventListener('change', (e) => {
+                config.statystykiPrzedmiotow = e.target.checked;
+                saveConfig();
+                console.log('Better UI: Statystyki przedmiotów:', e.target.checked);
+            });
+        }
 
-    settingsPanel.querySelector('#reload-game-mini').addEventListener('click', () => {
-        location.reload();
-    });
+        if (interfejsCheckbox) {
+            interfejsCheckbox.addEventListener('change', (e) => {
+                config.interfejs = e.target.checked;
+                saveConfig();
+                console.log('Better UI: Interfejs:', e.target.checked);
+            });
+        }
 
-    // Dodaj panel do kontenera Better UI
-    betterUIElement.appendChild(settingsPanel);
+        if (reloadButton) {
+            reloadButton.addEventListener('click', () => {
+                console.log('Better UI: Odświeżam grę...');
+                location.reload();
+            });
+        }
+    }, 100);
+
+    // Spróbuj różne sposoby dodania panelu
+    try {
+        // Metoda 1: Dodaj jako następny element
+        if (targetElement.nextSibling) {
+            targetElement.parentNode.insertBefore(settingsPanel, targetElement.nextSibling);
+        } else {
+            targetElement.parentNode.appendChild(settingsPanel);
+        }
+    } catch (e) {
+        try {
+            // Metoda 2: Dodaj bezpośrednio do elementu
+            targetElement.appendChild(settingsPanel);
+        } catch (e2) {
+            try {
+                // Metoda 3: Dodaj po elemencie
+                targetElement.insertAdjacentElement('afterend', settingsPanel);
+            } catch (e3) {
+                console.error('Better UI: Nie można dodać panelu ustawień:', e3);
+            }
+        }
+    }
+    
+    console.log('Better UI: Panel ustawień został dodany');
 }
 
     function init() {
