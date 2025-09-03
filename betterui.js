@@ -8,65 +8,40 @@
         interfejs: true
     };
 
-   function saveConfig() {
-        try {
-            // Tworzymy unikalny klucz dla tej domeny
-            const storageKey = 'betterUI_config_' + window.location.hostname;
-
-            // Używamy prostego sposobu zapisywania w pamięci przeglądarki
-            const script = document.createElement('script');
-            script.id = 'better-ui-storage';
-            script.type = 'application/json';
-            script.textContent = JSON.stringify(config);
-
-            // Usuń poprzedni skrypt jeśli istnieje
-            const oldScript = document.getElementById('better-ui-storage');
-            if (oldScript) {
-                oldScript.remove();
-            }
-
-            // Dodaj nowy skrypt do head (będzie trwały podczas sesji)
-            document.head.appendChild(script);
-
-            // Dodatkowo spróbuj zapisać w sessionStorage jeśli dostępne
-            if (typeof sessionStorage !== 'undefined') {
-                sessionStorage.setItem(storageKey, JSON.stringify(config));
-            }
-        } catch (e) {
-            console.log('Better UI: Nie można zapisać konfiguracji');
+function saveConfig() {
+    try {
+        // Usuń poprzedni skrypt jeśli istnieje
+        const oldScript = document.getElementById('better-ui-storage');
+        if (oldScript) {
+            oldScript.remove();
         }
+
+        // Dodaj nowy skrypt do head (będzie trwały podczas sesji)
+        const script = document.createElement('script');
+        script.id = 'better-ui-storage';
+        script.type = 'application/json';
+        script.style.display = 'none';
+        script.textContent = JSON.stringify(config);
+        document.head.appendChild(script);
+
+        console.log('Better UI: Konfiguracja zapisana');
+    } catch (e) {
+        console.log('Better UI: Błąd podczas zapisywania:', e);
     }
+}
 
-    // Próba odczytu konfiguracji z pamięci (jeśli istnieje)
-    function loadConfig() {
-        try {
-            const storageKey = 'betterUI_config_' + window.location.hostname;
-            let savedConfig = {};
-
-            // Najpierw sprawdź sessionStorage
-            if (typeof sessionStorage !== 'undefined') {
-                const sessionData = sessionStorage.getItem(storageKey);
-                if (sessionData) {
-                    savedConfig = JSON.parse(sessionData);
-                }
-            }
-
-            // Jeśli nie ma w sessionStorage, sprawdź skrypt w DOM
-            if (Object.keys(savedConfig).length === 0) {
-                const storageScript = document.getElementById('better-ui-storage');
-                if (storageScript && storageScript.textContent) {
-                    savedConfig = JSON.parse(storageScript.textContent);
-                }
-            }
-
-            // Zastosuj zapisaną konfigurację
-            if (Object.keys(savedConfig).length > 0) {
-                config = { ...config, ...savedConfig };
-            }
-        } catch (e) {
-            console.log('Better UI: Nie można wczytać konfiguracji, używam domyślnej');
+function loadConfig() {
+    try {
+        const storageScript = document.getElementById('better-ui-storage');
+        if (storageScript && storageScript.textContent) {
+            const savedConfig = JSON.parse(storageScript.textContent);
+            config = { ...config, ...savedConfig };
+            console.log('Better UI: Konfiguracja wczytana');
         }
+    } catch (e) {
+        console.log('Better UI: Nie można wczytać konfiguracji, używam domyślnej');
     }
+}
 
     // Wywołaj wczytywanie konfiguracji na początku
     loadConfig();
