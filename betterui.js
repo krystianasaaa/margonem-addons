@@ -665,6 +665,7 @@ function integrateWithAddonManager() {
     const checkForManager = setInterval(() => {
         const addonContainer = document.getElementById('addon-better_ui');
         if (!addonContainer) return; 
+        console.log(addonContainer)
         
         if (addonContainer.getElementById('better-ui-settings-btn')) {
             clearInterval(checkForManager);
