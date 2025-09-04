@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    // Konfiguracja - co ma być włączone
+    // Konfiguracja - co ma być włączon
     let config = {
         bonusyLegendarne: true,
         statystykiPrzedmiotow: true,
