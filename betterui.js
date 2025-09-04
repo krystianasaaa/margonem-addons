@@ -661,16 +661,16 @@ const boundPatterns = [
     }
 function integrateWithAddonManager() {
     const checkForManager = setInterval(() => {
-        const addonContainer = document.getElementById('addon-better_ui');
+        const addonContainer = document.getElementById('kwak-addon-better_ui');
         if (!addonContainer) return;
 
 
-        if (addonContainer.querySelector('#better-ui-settings-btn')) {
+        if (addonContainer.querySelector('#kwak-better-ui-settings-btn')) {
             clearInterval(checkForManager);
             return;
         }
 
-        let addonNameContainer = addonContainer.querySelector('.addon-name-container');
+        let addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
         addSettingsButton(addonNameContainer);
         clearInterval(checkForManager);
     }, 500);
@@ -683,12 +683,12 @@ function integrateWithAddonManager() {
 
 function addSettingsButton(container) {
     // Znajdź znak zapytania
-    const helpIcon = container.querySelector('.addon-help-icon');
+    const helpIcon = container.querySelector('.kwak-addon-help-icon');
     if (!helpIcon) return;
 
     // Dodaj przycisk dokładnie obok
     const settingsBtn = document.createElement('span');
-    settingsBtn.id = 'better-ui-settings-btn';
+    settingsBtn.id = 'kwak-better-ui-settings-btn';
     settingsBtn.innerHTML = '⚙️';
     settingsBtn.style.cssText = `
         color: #fff;
@@ -717,7 +717,7 @@ settingsBtn.addEventListener('click', (e) => {
 }
 function createSettingsPanel() {
     const panel = document.createElement('div');
-    panel.id = 'better-ui-settings-panel';
+    panel.id = 'kwak-better-ui-settings-panel';
     panel.style.cssText = `
         position: fixed;
         top: 50%;
@@ -742,7 +742,7 @@ function createSettingsPanel() {
         <div style="margin-bottom: 15px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
                 <span style="color: #ccc; font-size: 12px;">Bonusy Legendarne</span>
-                <label class="toggle-switch">
+                <label class="kwak-toggle-switch">
                     <input type="checkbox" id="bonusy-legendarne" ${config.bonusyLegendarne ? 'checked' : ''}>
                     <span class="slider"></span>
                 </label>
@@ -750,7 +750,7 @@ function createSettingsPanel() {
 
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
                 <span style="color: #ccc; font-size: 12px;">Statystyki Przedmiotów</span>
-                <label class="toggle-switch">
+                <label class="kwak-toggle-switch">
                     <input type="checkbox" id="statystyki-przedmiotow" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
                     <span class="slider"></span>
                 </label>
@@ -758,7 +758,7 @@ function createSettingsPanel() {
 
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
                 <span style="color: #ccc; font-size: 12px;">Interfejs</span>
-                <label class="toggle-switch">
+                <label class="kwak-toggle-switch">
                     <input type="checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''}>
                     <span class="slider"></span>
                 </label>
@@ -776,24 +776,24 @@ function createSettingsPanel() {
     `;
 
     // Dodaj style przełączników jak w managerze
-    if (!document.getElementById('better-ui-toggle-styles')) {
+    if (!document.getElementById('kwak-better-ui-toggle-styles')) {
         const style = document.createElement('style');
-        style.id = 'better-ui-toggle-styles';
+        style.id = 'kwak-better-ui-toggle-styles';
         style.textContent = `
-            .toggle-switch {
+            .kwak-toggle-switch {
                 position: relative;
                 display: inline-block;
                 width: 44px;
                 height: 24px;
             }
 
-            .toggle-switch input {
+            .kwak-toggle-switch input {
                 opacity: 0;
                 width: 0;
                 height: 0;
             }
 
-            .toggle-switch .slider {
+            .kwak-toggle-switch .slider {
                 position: absolute;
                 cursor: pointer;
                 top: 0;
@@ -806,7 +806,7 @@ function createSettingsPanel() {
                 border: 1px solid #666;
             }
 
-            .toggle-switch .slider:before {
+            .kwak-toggle-switch .slider:before {
                 position: absolute;
                 content: "";
                 height: 18px;
@@ -818,12 +818,12 @@ function createSettingsPanel() {
                 border-radius: 50%;
             }
 
-            .toggle-switch input:checked + .slider {
+            .kwak-toggle-switch input:checked + .slider {
                 background-color: #4CAF50;
                 border-color: #4CAF50;
             }
 
-            .toggle-switch input:checked + .slider:before {
+            .kwak-toggle-switch input:checked + .slider:before {
                 transform: translateX(20px);
             }
         `;
@@ -865,7 +865,7 @@ panel.querySelector('#reload-game').addEventListener('click', (e) => {
 });
 }
 function toggleSettingsPanel() {
-    const panel = document.getElementById('better-ui-settings-panel');
+    const panel = document.getElementById('kwak-better-ui-settings-panel');
     if (panel) {
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     }
