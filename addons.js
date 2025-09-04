@@ -1120,11 +1120,6 @@ menu.appendChild(header);
             }, 10);
         });
 
-        document.addEventListener('click', (e) => {
-            if (!container.contains(e.target)) {
-                menu.classList.remove('active');
-            }
-        });
 
         container.appendChild(toggleBtn);
         container.appendChild(menu);
