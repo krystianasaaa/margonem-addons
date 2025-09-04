@@ -661,7 +661,7 @@ const boundPatterns = [
     }
 function integrateWithAddonManager() {
     const checkForManager = setInterval(() => {
-        const addonContainer = document.getElementById('kwak-addon-better_ui');
+        const addonContainer = document.getElementById('addon-better_ui');
         if (!addonContainer) return;
 
 
