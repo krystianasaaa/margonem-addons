@@ -670,7 +670,7 @@ function integrateWithAddonManager() {
             return;
         }
 
-        let addonNameContainer = addonContainer.querySelector('.addon-name-container');
+        let addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
         addSettingsButton(addonNameContainer);
         clearInterval(checkForManager);
     }, 500);
@@ -683,7 +683,7 @@ function integrateWithAddonManager() {
 
 function addSettingsButton(container) {
     // Znajdź znak zapytania
-    const helpIcon = container.querySelector('.addon-help-icon');
+    const helpIcon = container.querySelector('.kwak-addon-help-icon');
     if (!helpIcon) return;
 
     // Dodaj przycisk dokładnie obok
@@ -778,7 +778,7 @@ function createSettingsPanel() {
     // Dodaj style przełączników jak w managerze
     if (!document.getElementById('better-ui-toggle-styles')) {
         const style = document.createElement('style');
-        style.id = 'better-ui-toggle-styles';
+        style.id = 'kwak-better-ui-toggle-styles';
         style.textContent = `
             .toggle-switch {
                 position: relative;
@@ -865,7 +865,7 @@ panel.querySelector('#reload-game').addEventListener('click', (e) => {
 });
 }
 function toggleSettingsPanel() {
-    const panel = document.getElementById('better-ui-settings-panel');
+    const panel = document.getElementById('kwak-better-ui-settings-panel');
     if (panel) {
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     }
