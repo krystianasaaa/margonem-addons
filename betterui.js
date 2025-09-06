@@ -489,25 +489,34 @@ const boundPatterns = [
         return tooltipContent.slice(0, insertionPoint.position) + upgradeInfo + tooltipContent.slice(insertionPoint.position);
     }
 
-    function replaceText(text) {
-        if (!text || typeof text !== 'string') return text;
+function replaceText(text) {
+    if (!text || typeof text !== 'string') return text;
 
-        let result = text;
+    let result = text;
 
-        // Najpierw zastąp nazwy bonusów
-        for (const [original, replacement] of Object.entries(bonusNames)) {
-            if (result.includes(original)) {
-               result = result.replace(new RegExp(original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
+    // Najpierw zastąp nazwy bonusów - używaj dokładnego dopasowania
+    for (const [original, replacement] of Object.entries(bonusNames)) {
+        if (result.includes(original)) {
+            // Użyj bardziej precyzyjnego dopasowania - dodaj granice słów tam gdzie to ma sens
+            const escapedOriginal = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            
+            // Dla krótkich skrótów jak "PH", "SA" etc. używaj granic słów
+            if (original.length <= 3 && /^[A-ZĄĆĘŁŃÓŚŹŻ]+$/i.test(original)) {
+                result = result.replace(new RegExp(`\\b${escapedOriginal}\\b`, 'g'), replacement);
+            } else {
+                // Dla dłuższych tekstów używaj zwykłego zastąpienia
+                result = result.replace(new RegExp(escapedOriginal, 'g'), replacement);
             }
         }
-
-        // Następnie dodaj informacje o ulepszeniu dla wszystkich przedmiotów
-        if ((result.includes('item-tip') || result.includes('Poziom:')) && isUpgradeableItem(result)) {
-            result = addUpgradeInfo(result);
-        }
-
-        return result;
     }
+
+    // Następnie dodaj informacje o ulepszeniu dla wszystkich przedmiotów
+    if ((result.includes('item-tip') || result.includes('Poziom:') || result.includes('poziom:')) && isUpgradeableItem(result)) {
+        result = addUpgradeInfo(result);
+    }
+
+    return result;
+}
 
     function setupEngineHooks() {
         const originalInnerHTMLSetter = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML').set;
@@ -678,6 +687,87 @@ function integrateWithAddonManager() {
     setTimeout(() => {
         clearInterval(checkForManager);
     }, 20000);
+}
+function setupStatsObserver() {
+    // Obserwuj zmiany w panelu statystyk po lewej stronie
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Sprawdź czy to panel statystyk
+                    if (node.classList && (
+                        node.classList.contains('extended-stats-tpl') ||
+                        node.classList.contains('extended-stats') ||
+                        node.id === 'extended-stats' ||
+                        (node.querySelector && node.querySelector('.extended-stats-tpl'))
+                    )) {
+                        
+                        // Poczekaj chwilę na pełne załadowanie
+                        setTimeout(() => {
+                            processStatsPanel(node);
+                        }, 100);
+                    }
+                    
+                    // Sprawdź też wszystkie elementy potomne
+                    if (node.querySelector) {
+                        const statsElements = node.querySelectorAll('[class*="extended-stats"], [id*="stats"]');
+                        statsElements.forEach(el => {
+                            setTimeout(() => {
+                                processStatsPanel(el);
+                            }, 100);
+                        });
+                    }
+                }
+            });
+            
+            // Obserwuj też zmiany tekstu
+            if (mutation.target && mutation.target.nodeType === Node.TEXT_NODE) {
+                const newText = replaceText(mutation.target.textContent);
+                if (newText !== mutation.target.textContent) {
+                    mutation.target.textContent = newText;
+                }
+            }
+        });
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true
+    });
+}
+
+function processStatsPanel(element) {
+    if (!element) return;
+    
+    // Przetwórz wszystkie węzły tekstowe w elemencie
+    const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+
+    const textNodes = [];
+    let textNode;
+    while (textNode = walker.nextNode()) {
+        textNodes.push(textNode);
+    }
+
+    textNodes.forEach(tn => {
+        const newText = replaceText(tn.textContent);
+        if (newText !== tn.textContent) {
+            tn.textContent = newText;
+        }
+    });
+    
+    // Sprawdź też innerHTML całego elementu
+    if (element.innerHTML) {
+        const newHTML = replaceText(element.innerHTML);
+        if (newHTML !== element.innerHTML) {
+            element.innerHTML = newHTML;
+        }
+    }
 }
 
 
@@ -884,6 +974,7 @@ function init() {
     hookMargonemFunctions();
     integrateWithAddonManager();
     setupBackupObserver();
+    setupStatsObserver();
 }
     init();
 
