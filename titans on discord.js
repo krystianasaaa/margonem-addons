@@ -5,6 +5,12 @@ if (window.titanNotifierRunning) {
     return;
 }
 window.titanNotifierRunning = true;
+window.addEventListener('error', function(e) {
+    if (e.filename && e.filename.includes('titans')) {
+        e.preventDefault();
+        return false;
+    }
+});
 let config = {
     enabled: localStorage.getItem('titanNotifierEnabled') !== 'false',
     webhookUrl: localStorage.getItem('titanNotifierWebhook') || '',
@@ -935,11 +941,15 @@ function init() {
     // Rozpocznij sprawdzanie respawnów co 10 sekund
     titanCheckInterval = setInterval(checkTitanRespawns, 10000);
     
-    // DODAJ TĘ LINIĘ:
-    integrateWithAddonManager();
+    // ZMIEŃ TĘ LINIĘ - dodaj try/catch:
+    try {
+        integrateWithAddonManager();
+    } catch (error) {
+        console.warn('Addon manager integration failed:', error);
+    }
     
     console.log('Dodatek uruchomiony!');
-} 
+}
 
 
 // Uruchom gdy strona się załaduje
