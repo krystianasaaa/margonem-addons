@@ -712,7 +712,7 @@ async function checkTitanRespawns() {
     }
 
     // Funkcja pokazywania ustawień
-    function addSettingsButton(container) {
+ function addManagerSettingsButton(container) {
     const helpIcon = container.querySelector('.kwak-addon-help-icon');
     if (!helpIcon) return;
 
@@ -732,7 +732,10 @@ async function checkTitanRespawns() {
     settingsBtn.onmouseover = () => settingsBtn.style.opacity = '1';
     settingsBtn.onmouseout = () => settingsBtn.style.opacity = '0.7';
 
+    // Wstaw dokładnie po znaku zapytania
     helpIcon.insertAdjacentElement('afterend', settingsBtn);
+
+    // Stwórz panel od razu
     createSettingsPanel();
 
     settingsBtn.addEventListener('click', (e) => {
@@ -741,6 +744,7 @@ async function checkTitanRespawns() {
         toggleSettingsPanel();
     });
 }
+
 
 function createSettingsPanel() {
     const panel = document.createElement('div');
@@ -890,6 +894,27 @@ function toggleSettingsPanel() {
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     }
 }
+function integrateWithAddonManager() {
+    const checkForManager = setInterval(() => {
+        const addonContainer = document.getElementById('addon-titans_on_discord');
+        if (!addonContainer) return;
+
+        // Sprawdź czy przycisk już istnieje
+        if (addonContainer.querySelector('#titans-on-discord-settings-btn')) {
+            clearInterval(checkForManager);
+            return;
+        }
+
+        let addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
+        if (addonNameContainer) {
+            addManagerSettingsButton(addonNameContainer);
+            clearInterval(checkForManager);
+        }
+    }, 500);
+
+    // Zatrzymaj po 20 sekundach jeśli nie znajdzie managera
+    setTimeout(() => clearInterval(checkForManager), 20000);
+}
 
 function init() {
     const existingButton = document.getElementById('titan-notifier-button');
@@ -910,16 +935,11 @@ function init() {
     // Rozpocznij sprawdzanie respawnów co 10 sekund
     titanCheckInterval = setInterval(checkTitanRespawns, 10000);
     
-    // Integracja z managerem dodatków
-    const managerCheckInterval = setInterval(() => {
-        const manager = document.querySelector('[data-addon*="titans"], [data-addon*="Titans"]');
-        if (manager) {
-            clearInterval(managerCheckInterval);
-            addSettingsButton(manager);
-        }
-    }, 500);
+    // DODAJ TĘ LINIĘ:
+    integrateWithAddonManager();
     
     console.log('Dodatek uruchomiony!');
+} console.log('Dodatek uruchomiony!');
 }
 
 // Uruchom gdy strona się załaduje
