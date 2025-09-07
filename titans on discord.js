@@ -23,6 +23,21 @@ function saveConfig() {
     localStorage.setItem('titanNotifierRoleIds', JSON.stringify(config.roleIds));
     updateButtonAppearance();
 }
+const predefinedWorldRoles = {
+    "Dream": {
+        "Dziewicza Orlica": "1247119737641762857",
+        "Zabójczy Królik": "1247119736777736232", 
+        "Renegat Baulus": "1247119735540420638",
+        "Piekielny Arcymag": "1247119733916962886",
+        "Versus Zoons": "1247119725734133790",
+        "Łowczyni Wspomnień": "1247119529939832853",
+        "Przyzywacz Demonów": "1247119293204922419",
+        "Maddok Magua": "1247118585944477778",
+        "Tezcatlipoca": "1247116815503593472",
+        "Barbatos Smoczy Strażnik": "1247134084702932993",
+        "Tanroth": "1247116703704547339"
+    }
+};
 
     // Śledzenie wykrytych tytanów
     let lastDetectedTitans = new Set();
@@ -750,7 +765,31 @@ async function checkTitanRespawns() {
         toggleSettingsPanel();
     });
 }
-
+function loadPredefinedSettings() {
+    const worldName = window.location.hostname.split('.')[0] || 'Unknown';
+    
+    if (predefinedWorldRoles[worldName]) {
+        const worldRoles = predefinedWorldRoles[worldName];
+        const dreamWebhook = "https://discord.com/api/webhooks/1247112892050468884/YOgX6k0oKTPDL9pLs0SU4CXtZ1eYvM9WCRb2R3x-kAoOBFYmGmk6Ap6cUOCvqGFD3H33";
+        
+        config.webhookUrl = dreamWebhook;
+        config.roleIds = { ...worldRoles };
+        config.enabled = true;
+        
+        saveConfig();
+        
+        // Odśwież panel ustawień jeśli jest otwarty
+        const panel = document.getElementById('titans-on-discord-settings-panel');
+        if (panel && panel.style.display === 'block') {
+            toggleSettingsPanel();
+            setTimeout(() => toggleSettingsPanel(), 100);
+        }
+        
+        return true;
+    }
+    
+    return false;
+}
 
 function createSettingsPanel() {
     const panel = document.createElement('div');
@@ -773,19 +812,22 @@ function createSettingsPanel() {
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     `;
 
-          const popularTitans = [
-            {name: "Dziewicza Orlica", level: 51},
-            {name: "Zabójczy Królik", level: 70},
-            {name: "Renegat Baulus", level: 101},
-            {name: "Piekielny Arcymag", level: 131},
-            {name: "Versus Zoons", level: 154},
-            {name: "Łowczyni Wspomnień", level: 177},
-            {name: "Przyzywacz Demonów", level: 204},
-            {name: "Maddok Magua", level: 231},
-            {name: "Tezcatlipoca", level: 258},
-            {name: "Barbatos Smoczy Strażnik", level: 285},
-            {name: "Tanroth", level: 300}
-        ];
+    const popularTitans = [
+        {name: "Dziewicza Orlica", level: 51},
+        {name: "Zabójczy Królik", level: 70},
+        {name: "Renegat Baulus", level: 101},
+        {name: "Piekielny Arcymag", level: 131},
+        {name: "Versus Zoons", level: 154},
+        {name: "Łowczyni Wspomnień", level: 177},
+        {name: "Przyzywacz Demonów", level: 204},
+        {name: "Maddok Magua", level: 231},
+        {name: "Tezcatlipoca", level: 258},
+        {name: "Barbatos Smoczy Strażnik", level: 285},
+        {name: "Tanroth", level: 300}
+    ];
+
+    const worldName = window.location.hostname.split('.')[0] || 'Unknown';
+    const hasPredefSettings = predefinedWorldRoles[worldName];
 
     panel.innerHTML = `
         <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444;">
@@ -793,13 +835,13 @@ function createSettingsPanel() {
         </div>
 
         <div style="margin-bottom: 15px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                <span style="color: #ccc; font-size: 12px;">Włącz dodatek</span>
-                <label class="kwak-toggle-switch">
-                    <input type="checkbox" id="titan-enabled" ${config.enabled ? 'checked' : ''}>
-                    <span class="slider"></span>
-                </label>
+            ${hasPredefSettings ? `
+            <div style="margin-bottom: 10px;">
+                <button id="load-predefined-settings" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                    📖 Załaduj ustawienia dla świata ${worldName}
+                </button>
             </div>
+            ` : ''}
 
             <div style="margin-bottom: 10px;">
                 <span style="color: #ccc; font-size: 12px; display: block; margin-bottom: 5px;">Discord Webhook URL:</span>
@@ -827,60 +869,40 @@ function createSettingsPanel() {
         </div>
     `;
 
-    if (!document.getElementById('titans-toggle-styles')) {
-        const style = document.createElement('style');
-        style.id = 'titans-toggle-styles';
-        style.textContent = `
-            .kwak-toggle-switch {
-                position: relative;
-                display: inline-block;
-                width: 44px;
-                height: 24px;
-            }
-            .kwak-toggle-switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-            .kwak-toggle-switch .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #555;
-                transition: 0.3s;
-                border-radius: 24px;
-                border: 1px solid #666;
-            }
-            .kwak-toggle-switch .slider:before {
-                position: absolute;
-                content: "";
-                height: 18px;
-                width: 18px;
-                left: 2px;
-                bottom: 2px;
-                background-color: white;
-                transition: 0.3s;
-                border-radius: 50%;
-            }
-            .kwak-toggle-switch input:checked + .slider {
-                background-color: #4CAF50;
-                border-color: #4CAF50;
-            }
-            .kwak-toggle-switch input:checked + .slider:before {
-                transform: translateX(20px);
-            }
-        `;
-        document.head.appendChild(style);
-    }
+    // Usuń stare style jeśli istnieją
+    const oldStyles = document.getElementById('titans-toggle-styles');
+    if (oldStyles) oldStyles.remove();
 
     document.body.appendChild(panel);
 
+    // Event listener dla przycisku ładowania predefiniowanych ustawień
+    const loadBtn = panel.querySelector('#load-predefined-settings');
+    if (loadBtn) {
+        loadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const success = loadPredefinedSettings();
+            if (success) {
+                // Odśwież wartości w panelu
+                panel.querySelector('#titan-webhook').value = config.webhookUrl;
+                panel.querySelectorAll('input[data-titan]').forEach(input => {
+                    const titanName = input.getAttribute('data-titan');
+                    input.value = config.roleIds[titanName] || '';
+                });
+                
+                // Pokaż komunikat sukcesu
+                loadBtn.style.background = '#28a745';
+                loadBtn.textContent = '✅ Załadowano!';
+                setTimeout(() => {
+                    loadBtn.style.background = '#4CAF50';
+                    loadBtn.innerHTML = `📖 Załaduj ustawienia dla świata ${worldName}`;
+                }, 2000);
+            }
+        });
+    }
+
     panel.querySelector('#save-titans-settings').addEventListener('click', (e) => {
         e.preventDefault();
-        config.enabled = panel.querySelector('#titan-enabled').checked;
+        config.enabled = true; // Automatycznie włącz po zapisaniu
         config.webhookUrl = panel.querySelector('#titan-webhook').value.trim();
         
         const newRoleIds = {};
