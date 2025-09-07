@@ -773,12 +773,19 @@ function createSettingsPanel() {
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     `;
 
-    const popularTitans = [
-        {name: "Dziewicza Orlica", level: 51},
-        {name: "Zabójczy Królik", level: 70},
-        {name: "Renegat Baulus", level: 101},
-        {name: "Piekielny Arcymag", level: 131}
-    ];
+          const popularTitans = [
+            {name: "Dziewicza Orlica", level: 51},
+            {name: "Zabójczy Królik", level: 70},
+            {name: "Renegat Baulus", level: 101},
+            {name: "Piekielny Arcymag", level: 131},
+            {name: "Versus Zoons", level: 154},
+            {name: "Łowczyni Wspomnień", level: 177},
+            {name: "Przyzywacz Demonów", level: 204},
+            {name: "Maddok Magua", level: 231},
+            {name: "Tezcatlipoca", level: 258},
+            {name: "Barbatos Smoczy Strażnik", level: 285},
+            {name: "Tanroth", level: 300}
+        ];
 
     panel.innerHTML = `
         <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444;">
