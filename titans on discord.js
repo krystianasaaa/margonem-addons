@@ -939,8 +939,8 @@ function init() {
     integrateWithAddonManager();
     
     console.log('Dodatek uruchomiony!');
-} console.log('Dodatek uruchomiony!');
-}
+} 
+
 
 // Uruchom gdy strona się załaduje
     if (document.readyState === 'loading') {
