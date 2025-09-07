@@ -835,13 +835,19 @@ function createSettingsPanel() {
         </div>
 
         <div style="margin-bottom: 15px;">
-            ${hasPredefSettings ? `
-            <div style="margin-bottom: 10px;">
-                <button id="load-predefined-settings" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold;">
-                    📖 Załaduj ustawienia dla świata ${worldName}
-                </button>
-            </div>
-            ` : ''}
+<div style="margin-bottom: 15px; padding: 12px; background: rgba(157,78,221,0.1); border: 1px solid #7b2cbf; border-radius: 6px;">
+    <div style="color: #a8dadc; font-size: 12px; margin-bottom: 8px; font-weight: bold;">Załaduj predefiniowane role dla świata:</div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+        <select id="world-selector" style="flex: 1; padding: 6px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;">
+            <option value="">— Wybierz Świat —</option>
+            <option value="Dream">Dream</option>
+        </select>
+        <button id="load-predefined-settings" style="padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+            Załaduj
+        </button>
+    </div>
+    <div style="color: #888; font-size: 10px; margin-top: 5px;">Automatycznie uzupełni ID ról dla wybranego świata.</div>
+</div>
 
             <div style="margin-bottom: 10px;">
                 <span style="color: #ccc; font-size: 12px; display: block; margin-bottom: 5px;">Discord Webhook URL:</span>
@@ -875,30 +881,50 @@ function createSettingsPanel() {
 
     document.body.appendChild(panel);
 
-    // Event listener dla przycisku ładowania predefiniowanych ustawień
-    const loadBtn = panel.querySelector('#load-predefined-settings');
-    if (loadBtn) {
-        loadBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const success = loadPredefinedSettings();
-            if (success) {
-                // Odśwież wartości w panelu
-                panel.querySelector('#titan-webhook').value = config.webhookUrl;
-                panel.querySelectorAll('input[data-titan]').forEach(input => {
-                    const titanName = input.getAttribute('data-titan');
-                    input.value = config.roleIds[titanName] || '';
-                });
-                
-                // Pokaż komunikat sukcesu
-                loadBtn.style.background = '#28a745';
-                loadBtn.textContent = '✅ Załadowano!';
-                setTimeout(() => {
-                    loadBtn.style.background = '#4CAF50';
-                    loadBtn.innerHTML = `📖 Załaduj ustawienia dla świata ${worldName}`;
-                }, 2000);
-            }
-        });
-    }
+// Event listener dla przycisku ładowania predefiniowanych ustawień
+const loadBtn = panel.querySelector('#load-predefined-settings');
+const worldSelector = panel.querySelector('#world-selector');
+if (loadBtn && worldSelector) {
+    loadBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const selectedWorld = worldSelector.value;
+        
+        if (!selectedWorld) {
+            loadBtn.style.background = '#dc3545';
+            loadBtn.textContent = '⚠️ Wybierz świat!';
+            setTimeout(() => {
+                loadBtn.style.background = '#4CAF50';
+                loadBtn.textContent = 'Załaduj';
+            }, 2000);
+            return;
+        }
+        
+        if (predefinedWorldRoles[selectedWorld]) {
+            const worldRoles = predefinedWorldRoles[selectedWorld];
+            const dreamWebhook = "https://discord.com/api/webhooks/1247112892050468884/YOgX6k0oKTPDL9pLs0SU4CXtZ1eYvM9WCRb2R3x-kAoOBFYmGmk6Ap6cUOCvqGFD3H33";
+            
+            config.webhookUrl = dreamWebhook;
+            config.roleIds = { ...worldRoles };
+            config.enabled = true;
+            saveConfig();
+            
+            // Odśwież wartości w panelu
+            panel.querySelector('#titan-webhook').value = config.webhookUrl;
+            panel.querySelectorAll('input[data-titan]').forEach(input => {
+                const titanName = input.getAttribute('data-titan');
+                input.value = config.roleIds[titanName] || '';
+            });
+            
+            // Pokaż komunikat sukcesu
+            loadBtn.style.background = '#28a745';
+            loadBtn.textContent = '✅ Załadowano!';
+            setTimeout(() => {
+                loadBtn.style.background = '#4CAF50';
+                loadBtn.textContent = 'Załaduj';
+            }, 2000);
+        }
+    });
+}
 
     panel.querySelector('#save-titans-settings').addEventListener('click', (e) => {
         e.preventDefault();
