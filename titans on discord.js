@@ -891,47 +891,36 @@ function toggleSettingsPanel() {
     }
 }
 
-    // Inicjalizacja
-    function init() {
+function init() {
     const existingButton = document.getElementById('titan-notifier-button');
     if (existingButton) {
         existingButton.remove();
         console.log('Usunięto duplikat przycisku Titans on Discord');
     }
-if (titanCheckInterval) {
-    clearInterval(titanCheckInterval);
-}
-        // Dodaj style
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
-        document.head.appendChild(styleSheet);
-
-        // Utwórz przycisk ustawień
-        const settingsButton = document.createElement('div');
-        settingsButton.id = 'titan-notifier-button';
-        settingsButton.innerHTML = '⚔️';
-
-        // Przywróć zapisaną pozycję
-        const savedPos = JSON.parse(localStorage.getItem('titanNotifierButtonPosition') || '{}');
-        if (savedPos.x !== undefined && savedPos.y !== undefined) {
-            settingsButton.style.left = `${savedPos.x}px`;
-            settingsButton.style.top = `${savedPos.y}px`;
-            settingsButton.style.right = 'auto';
-        }
-
-        document.body.appendChild(settingsButton);
-
-        // Dodaj funkcję przeciągania
-        makeDraggable(settingsButton);
-
-        // Ustaw wygląd przycisku
-        updateButtonAppearance();
-
-        // Rozpocznij sprawdzanie respawnów co 10 sekund
-       titanCheckInterval = setInterval(checkTitanRespawns, 10000);
-
-        console.log('Dodatek uruchomiony!');
+    
+    if (titanCheckInterval) {
+        clearInterval(titanCheckInterval);
     }
+    
+    // Dodaj style
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+    
+    // Rozpocznij sprawdzanie respawnów co 10 sekund
+    titanCheckInterval = setInterval(checkTitanRespawns, 10000);
+    
+    // Integracja z managerem dodatków
+    const managerCheckInterval = setInterval(() => {
+        const manager = document.querySelector('[data-addon*="titans"], [data-addon*="Titans"]');
+        if (manager) {
+            clearInterval(managerCheckInterval);
+            addSettingsButton(manager);
+        }
+    }, 500);
+    
+    console.log('Dodatek uruchomiony!');
+}
 
 // Uruchom gdy strona się załaduje
     if (document.readyState === 'loading') {
