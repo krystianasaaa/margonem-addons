@@ -744,64 +744,56 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
     // Sprawdź czy okno już istnieje
     if (document.getElementById('hero-detection-window')) return;
 
-    const mapName = heroData.mapName || getCurrentMapName() || 'Nieznana mapa';
-    const heroCoords = heroData.heroCoords || getHeroCoordinates(heroData.npcData) || '[?, ?]';
-    const finderName = heroData.finderName || getCurrentPlayerName() || 'Nieznany gracz';
-    const worldName = window.location.hostname.split('.')[0] || 'Nieznany';
-
     const gameWindow = document.createElement('div');
     gameWindow.id = 'hero-detection-window';
     gameWindow.style.cssText = `
         position: fixed;
         top: 50%;
-        left: 20%;
+        left: 50%;
         transform: translate(-50%, -50%);
-        width: 320px;
-        background: linear-gradient(135deg, #2e1a1a, #3e1616);
-        border: 3px solid #dc3545;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.7);
-        z-index: 9998;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #e8f4fd;
+        background: #2a2a2a;
+        border: 1px solid #444;
+        border-radius: 4px;
+        padding: 0;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        min-width: 380px;
+        max-width: 420px;
+        font-family: Arial, sans-serif;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         user-select: none;
     `;
 
     gameWindow.innerHTML = `
-        <div style="background: linear-gradient(135deg, #dc3545, #fd7e14); padding: 10px; border-radius: 8px 8px 0 0; cursor: move;" id="hero-window-header">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: bold; font-size: 14px;">🛡️ Wykryto Herosa!</span>
-                <button style="background: none; border: none; color: white; font-size: 16px; cursor: pointer; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;" id="hero-window-close">×</button>
+        <div id="hero-window-header" style="color: #fff; font-size: 14px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; flex-shrink: 0; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <span>¡HEROS!</span>
+            <button style="background: none; border: none; color: #ccc; font-size: 16px; cursor: pointer; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 2px;" id="hero-window-close" onmouseover="this.style.background='#555'" onmouseout="this.style.background='none'">×</button>
+        </div>
+
+        <div style="flex: 1; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 20px; color: #fff; font-weight: bold;">
+                    ${heroName}
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div style="color: #ccc; font-size: 12px; margin-bottom: 8px; font-weight: bold;">Dodatkowa wiadomość:</div>
+                <textarea id="hero-custom-message" placeholder="Wpisz dodatkową wiadomość do powiadomienia (opcjonalne)..."
+                          style="width: 100%; height: 60px; padding: 8px; background: #555; border: 1px solid #666; border-radius: 3px; color: #fff; font-size: 12px; box-sizing: border-box; resize: vertical; font-family: Arial, sans-serif;"></textarea>
+                <div style="color: #888; font-size: 10px; margin-top: 4px;">Ta wiadomość zostanie dodana do powiadomienia na Discordzie</div>
             </div>
         </div>
 
-        <div style="padding: 15px;">
-            <div style="text-align: center; margin-bottom: 12px;">
-                <div style="font-size: 16px; color: #fd7e14; font-weight: bold; margin-bottom: 3px;">
-                    ${heroName}
-                </div>
-                <div style="font-size: 14px; color: #dc3545;">
-                    Poziom: ${heroLevel}
-                </div>
-            </div>
-
-            <div style="background: rgba(220,53,69,0.1); border: 1px solid #dc3545; border-radius: 6px; padding: 8px; margin: 10px 0; font-size: 11px;">
-                <div><strong>Mapa:</strong> ${mapName} ${heroCoords}</div>
-                <div><strong>Znalazł:</strong> ${finderName}</div>
-                <div><strong>Świat:</strong> ${worldName}</div>
-                <div><strong>Czas:</strong> ${new Date().toLocaleString('pl-PL')}</div>
-            </div>
-
-            <div style="margin: 10px 0;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #fd7e14; font-size: 12px;">Dodatkowa wiadomość:</label>
-                <textarea id="hero-custom-message" placeholder="Wpisz dodatkową wiadomość (opcjonalne)..."
-                          style="width: 100%; height: 45px; padding: 6px; background: rgba(157,78,221,0.2); border: 1px solid #dc3545; border-radius: 4px; color: #e8f4fd; font-size: 11px; box-sizing: border-box; resize: vertical;"></textarea>
-            </div>
-
-            <div style="display: flex; gap: 8px; margin-top: 15px;">
-                <button id="hero-cancel-btn" style="flex: 1; padding: 8px; background: #666; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; font-size: 12px;">Anuluj</button>
-                <button id="hero-send-btn" style="flex: 1; padding: 8px; background: #dc3545; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; font-size: 12px;">Wyślij</button>
-            </div>
+        <div style="display: flex; gap: 10px; margin: 15px 20px 20px 20px; border-top: 1px solid #444; padding-top: 15px; flex-shrink: 0;">
+            <button id="hero-cancel-btn" style="flex: 1; padding: 10px 16px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold;" onmouseover="this.style.background='#666'" onmouseout="this.style.background='#555'">
+                Anuluj
+            </button>
+            <button id="hero-send-btn" style="flex: 1; padding: 10px 16px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                Wyślij Powiadomienie
+            </button>
         </div>
     `;
 
@@ -818,6 +810,7 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
         dragOffsetX = e.clientX - gameWindow.getBoundingClientRect().left;
         dragOffsetY = e.clientY - gameWindow.getBoundingClientRect().top;
         e.preventDefault();
+        header.style.background = '#444';
     });
 
     document.addEventListener('mousemove', (e) => {
@@ -830,7 +823,10 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
     });
 
     document.addEventListener('mouseup', () => {
-        isDragging = false;
+        if (isDragging) {
+            isDragging = false;
+            header.style.background = '#333';
+        }
     });
 
     // Event listeners dla przycisków
@@ -845,7 +841,7 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
     gameWindow.querySelector('#hero-send-btn').onclick = async () => {
         const customMessage = gameWindow.querySelector('#hero-custom-message').value.trim();
 
-        // TUTAJ DOPIERO WYSYŁAJ webhook z custom message
+        // Wyślij webhook z custom message
         const success = await sendHeroRespawnNotificationWithMessage(heroName, heroLevel, {
             ...heroData,
             customMessage: customMessage
@@ -854,29 +850,31 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
         if (success) {
             addToNotificationLog(heroName, heroLevel);
 
-            // Mini komunikat sukcesu w oknie gry
+            // Mini komunikat sukcesu
             const successMsg = document.createElement('div');
             successMsg.style.cssText = `
                 position: fixed; top: 20px; right: 20px;
-                background: #28a745; color: white; padding: 8px 12px;
-                border-radius: 6px; font-weight: bold; z-index: 9999;
-                font-size: 11px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                background: #28a745; color: white; padding: 10px 15px;
+                border-radius: 4px; font-weight: bold; z-index: 10001;
+                font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                font-family: Arial, sans-serif;
             `;
-            successMsg.textContent = 'Powiadomienie wysłane!';
+            successMsg.textContent = '✅ Powiadomienie wysłane!';
             document.body.appendChild(successMsg);
-            setTimeout(() => successMsg.remove(), 2000);
+            setTimeout(() => successMsg.remove(), 3000);
         } else {
             // Mini komunikat błędu
             const errorMsg = document.createElement('div');
             errorMsg.style.cssText = `
                 position: fixed; top: 20px; right: 20px;
-                background: #dc3545; color: white; padding: 8px 12px;
-                border-radius: 6px; font-weight: bold; z-index: 9999;
-                font-size: 11px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                background: #dc3545; color: white; padding: 10px 15px;
+                border-radius: 4px; font-weight: bold; z-index: 10001;
+                font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                font-family: Arial, sans-serif;
             `;
-            errorMsg.textContent = 'Błąd wysyłania!';
+            errorMsg.textContent = '❌ Błąd wysyłania!';
             document.body.appendChild(errorMsg);
-            setTimeout(() => errorMsg.remove(), 2000);
+            setTimeout(() => errorMsg.remove(), 3000);
         }
 
         document.body.removeChild(gameWindow);
