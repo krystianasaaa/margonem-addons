@@ -1200,12 +1200,6 @@ function integrateWithAddonManager() {
 
 function init() {
 
-    // Dodaj funkcję przeciągania
-    makeDraggable(settingsButton);
-
-    // Ustaw wygląd przycisku
-    updateButtonAppearance();
-
     // Rozpocznij sprawdzanie respawnów co 10 sekund
     setInterval(checkHeroRespawns, 10000);
     try {
