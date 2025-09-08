@@ -440,19 +440,6 @@ function addToNotificationLog(heroName, heroLevel) {
     localStorage.setItem('heroNotifierLog', JSON.stringify(log));
 }
 
-function updateButtonAppearance() {
-    const button = document.getElementById('hero-notifier-button'); // ZMIANA: było hero
-    if (button) {
-        if (isNotifierEnabled()) {
-            button.classList.remove('disabled');
-            button.title = 'Dodatek włączony - kliknij aby otworzyć ustawienia';
-        } else {
-            button.classList.add('disabled');
-            button.title = 'Dodatek wyłączony - kliknij aby otworzyć ustawienia';
-        }
-    }
-}
-
 async function sendHeroRespawnNotification(heroName, heroLevel, heroData = {}) {
     const webhookUrl = getWebhookUrl();
     if (!webhookUrl || !isNotifierEnabled()) return false;
@@ -1212,30 +1199,6 @@ function integrateWithAddonManager() {
 
 
 function init() {
-    const existingHeroButton = document.getElementById('hero-notifier-button');
-    if (existingHeroButton) {
-        existingHeroButton.remove();
-        console.log('Usunięto duplikat przycisku Hero Notifier');
-    }
-    // Dodaj style
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = styles;
-    document.head.appendChild(styleSheet);
-
-    // Utwórz przycisk ustawień
-    const settingsButton = document.createElement('div');
-    settingsButton.id = 'hero-notifier-button'; // ZMIANA: było hero-notifier-button
-    settingsButton.innerHTML = '🛡️';
-
-    // Przywróć zapisaną pozycję
-    const savedPos = JSON.parse(localStorage.getItem('heroNotifierButtonPosition') || '{}'); // ZMIANA
-    if (savedPos.x !== undefined && savedPos.y !== undefined) {
-        settingsButton.style.left = `${savedPos.x}px`;
-        settingsButton.style.top = `${savedPos.y}px`;
-        settingsButton.style.right = 'auto';
-    }
-
-    document.body.appendChild(settingsButton);
 
     // Dodaj funkcję przeciągania
     makeDraggable(settingsButton);
