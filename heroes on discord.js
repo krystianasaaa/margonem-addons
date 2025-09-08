@@ -1179,6 +1179,7 @@ function integrateWithAddonManager() {
             clearInterval(checkForManager);
         }
     }, 500);
+}
 
 
 function init() {
@@ -1223,10 +1224,10 @@ function init() {
 
     console.log('Hero Notifier uruchomiony!');
 }
-// Uruchom gdy strona się załaduje
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
- })();
+
+})();
