@@ -411,7 +411,6 @@ function isNotifierEnabled() {
 
 function setNotifierEnabled(enabled) {
     localStorage.setItem('heroNotifierEnabled', enabled.toString());
-    updateButtonAppearance();
 }
 
 function getHeroRoleIds() {
