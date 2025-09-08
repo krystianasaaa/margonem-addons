@@ -1018,10 +1018,12 @@ function createSettingsPanel() {
         z-index: 10000;
         display: none;
         min-width: 350px;
+        max-width: 400px;
         max-height: 80vh;
-        overflow-y: auto;
         font-family: Arial, sans-serif;
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
     `;
 
     const popularHeroes = [
@@ -1057,42 +1059,46 @@ function createSettingsPanel() {
     const roleIds = getHeroRoleIds();
 
     panel.innerHTML = `
-        <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444;">
+        <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444; flex-shrink: 0;">
             Heroes on Discord - Settings
         </div>
 
-        <div style="margin-bottom: 15px;">
-<div style="margin-bottom: 15px; padding: 12px; background: rgba(220,53,69,0.1); border: 1px solid #dc3545; border-radius: 6px;">
-    <div style="color: #fd7e14; font-size: 12px; margin-bottom: 8px; font-weight: bold;">Załaduj predefiniowane role dla świata:</div>
-    <div style="display: flex; gap: 8px; align-items: center;">
-        <select id="world-selector" style="flex: 1; padding: 6px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;">
-            <option value="">— Wybierz Świat —</option>
-            <option value="Dream">Dream</option>
-        </select>
-        <button id="load-predefined-settings" style="padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
-            Załaduj
-        </button>
-    </div>
-    <div style="color: #888; font-size: 10px; margin-top: 5px;">Automatycznie uzupełni ID ról dla wybranego świata.</div>
-</div>
+        <div style="flex: 1; overflow-y: auto; padding-right: 5px; margin-right: -5px;">
+            <div style="margin-bottom: 15px; padding: 12px; background: rgba(220,53,69,0.1); border: 1px solid #dc3545; border-radius: 6px;">
+                <div style="color: #fd7e14; font-size: 12px; margin-bottom: 8px; font-weight: bold;">Załaduj predefiniowane role dla świata:</div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <select id="world-selector" style="flex: 1; padding: 6px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;">
+                        <option value="">— Wybierz Świat —</option>
+                        <option value="Dream">Dream</option>
+                    </select>
+                    <button id="load-predefined-settings" style="padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                        Załaduj
+                    </button>
+                </div>
+                <div style="color: #888; font-size: 10px; margin-top: 5px;">Automatycznie uzupełni ID ról dla wybranego świata.</div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span style="color: #ccc; font-size: 12px; display: block; margin-bottom: 5px;">Discord Webhook URL:</span>
+                <input type="text" id="hero-webhook" style="width: 100%; padding: 5px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px; box-sizing: border-box;" value="${getWebhookUrl()}" placeholder="https://discord.com/api/webhooks/...">
+            </div>
 
             <div style="margin-bottom: 10px;">
-                <span style="color: #ccc; font-size: 12px; display: block; margin-bottom: 5px;">Discord Webhook URL:</span>
-                <input type="text" id="hero-webhook" style="width: 100%; padding: 5px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;" value="${getWebhookUrl()}" placeholder="https://discord.com/api/webhooks/...">
-            </div>
-
-            <div style="color: #ccc; font-size: 11px; margin-bottom: 10px;">
-                Role Discord (ID roli lub 'everyone'):
-            </div>
-            ${popularHeroes.map(hero => `
-                <div style="margin: 5px 0; display: flex; align-items: center;">
-                    <span style="color: #aaa; font-size: 10px; min-width: 120px;">${hero.name} (${hero.level})</span>
-                    <input type="text" data-hero="${hero.name}" style="flex: 1; margin-left: 8px; padding: 3px; background: #555; color: #fff; border: 1px solid #666; border-radius: 2px; font-size: 10px;" value="${roleIds[hero.name] || ''}" placeholder="ID roli">
+                <div style="color: #ccc; font-size: 11px; margin-bottom: 10px;">
+                    Role Discord (ID roli lub 'everyone'):
                 </div>
-            `).join('')}
+                <div id="heroes-list" style="max-height: 300px; overflow-y: auto; padding-right: 8px; margin-right: -8px; scrollbar-width: thin; scrollbar-color: #666 #333;">
+                    ${popularHeroes.map(hero => `
+                        <div style="margin: 5px 0; display: flex; align-items: center; padding: 4px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                            <span style="color: #aaa; font-size: 10px; min-width: 120px; font-weight: 500;">${hero.name} (${hero.level})</span>
+                            <input type="text" data-hero="${hero.name}" style="flex: 1; margin-left: 8px; padding: 4px; background: #555; color: #fff; border: 1px solid #666; border-radius: 2px; font-size: 10px; box-sizing: border-box;" value="${roleIds[hero.name] || ''}" placeholder="ID roli">
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
         </div>
 
-        <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
+        <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px; flex-shrink: 0;">
             <button id="close-heroes-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
                 Zamknij
             </button>
@@ -1102,51 +1108,85 @@ function createSettingsPanel() {
         </div>
     `;
 
+    // Dodaj style dla scrollbara
+    const style = document.createElement('style');
+    style.textContent = `
+        #heroes-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        #heroes-list::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 4px;
+        }
+        #heroes-list::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 4px;
+        }
+        #heroes-list::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+        #heroes-on-discord-settings-panel > div:nth-child(2)::-webkit-scrollbar {
+            width: 8px;
+        }
+        #heroes-on-discord-settings-panel > div:nth-child(2)::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 4px;
+        }
+        #heroes-on-discord-settings-panel > div:nth-child(2)::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 4px;
+        }
+        #heroes-on-discord-settings-panel > div:nth-child(2)::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+    `;
+    document.head.appendChild(style);
+
     document.body.appendChild(panel);
 
-// Event listener dla przycisku ładowania predefiniowanych ustawień
-const loadBtn = panel.querySelector('#load-predefined-settings');
-const worldSelector = panel.querySelector('#world-selector');
-if (loadBtn && worldSelector) {
-    loadBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const selectedWorld = worldSelector.value;
-        
-        if (!selectedWorld) {
-            loadBtn.style.background = '#dc3545';
-            loadBtn.textContent = '⚠️ Wybierz świat!';
-            setTimeout(() => {
-                loadBtn.style.background = '#4CAF50';
-                loadBtn.textContent = 'Załaduj';
-            }, 2000);
-            return;
-        }
-        
-        if (predefinedWorldRoles[selectedWorld]) {
-            const worldRoles = predefinedWorldRoles[selectedWorld];
-            const dreamWebhook = "https://discord.com/api/webhooks/1407468644505747556/BknEaHxuPXEJNkPLgGYLTSPsS8aqXdXDnVpQ3jh5_AmIXjvpYRVONXYdj33NTZBiWkE7";
+    // Event listener dla przycisku ładowania predefiniowanych ustawień
+    const loadBtn = panel.querySelector('#load-predefined-settings');
+    const worldSelector = panel.querySelector('#world-selector');
+    if (loadBtn && worldSelector) {
+        loadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const selectedWorld = worldSelector.value;
             
-            setWebhookUrl(dreamWebhook);
-            setHeroRoleIds({ ...worldRoles });
-            setNotifierEnabled(true);
+            if (!selectedWorld) {
+                loadBtn.style.background = '#dc3545';
+                loadBtn.textContent = '⚠️ Wybierz świat!';
+                setTimeout(() => {
+                    loadBtn.style.background = '#4CAF50';
+                    loadBtn.textContent = 'Załaduj';
+                }, 2000);
+                return;
+            }
             
-            // Odśwież wartości w panelu
-            panel.querySelector('#hero-webhook').value = getWebhookUrl();
-            panel.querySelectorAll('input[data-hero]').forEach(input => {
-                const heroName = input.getAttribute('data-hero');
-                input.value = getHeroRoleIds()[heroName] || '';
-            });
-            
-            // Pokaż komunikat sukcesu
-            loadBtn.style.background = '#28a745';
-            loadBtn.textContent = '✅ Załadowano!';
-            setTimeout(() => {
-                loadBtn.style.background = '#4CAF50';
-                loadBtn.textContent = 'Załaduj';
-            }, 2000);
-        }
-    });
-}
+            if (predefinedWorldRoles[selectedWorld]) {
+                const worldRoles = predefinedWorldRoles[selectedWorld];
+                const dreamWebhook = "https://discord.com/api/webhooks/1407468644505747556/BknEaHxuPXEJNkPLgGYLTSPsS8aqXdXDnVpQ3jh5_AmIXjvpYRVONXYdj33NTZBiWkE7";
+                
+                setWebhookUrl(dreamWebhook);
+                setHeroRoleIds({ ...worldRoles });
+                setNotifierEnabled(true);
+                
+                // Odśwież wartości w panelu
+                panel.querySelector('#hero-webhook').value = getWebhookUrl();
+                panel.querySelectorAll('input[data-hero]').forEach(input => {
+                    const heroName = input.getAttribute('data-hero');
+                    input.value = getHeroRoleIds()[heroName] || '';
+                });
+                
+                // Pokaż komunikat sukcesu
+                loadBtn.style.background = '#28a745';
+                loadBtn.textContent = '✅ Załadowano!';
+                setTimeout(() => {
+                    loadBtn.style.background = '#4CAF50';
+                    loadBtn.textContent = 'Załaduj';
+                }, 2000);
+            }
+        });
+    }
 
     panel.querySelector('#save-heroes-settings').addEventListener('click', (e) => {
         e.preventDefault();
