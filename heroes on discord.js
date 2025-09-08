@@ -4,6 +4,35 @@
     // Śledzenie wykrytych tytanów
     let lastDetectedHeroes = new Set();
 const COOLDOWN_TIME = 5 * 60 * 1000;
+const predefinedWorldRoles = {
+    "Dream": {
+        "Domina Ecclesiae": "1305979736593604629",
+        "Mietek Żul": "1305979736593604629", 
+        "Mroczny Patryk": "1305979736593604629",
+        "Karmazynowy Mściciel": "1305979736593604629",
+        "Złodziej": "1305979736593604629",
+        "Zły Przewodnik": "1305979736593604629",
+        "Opętany Paladyn": "1305979736593604629",
+        "Piekielny Kościej": "1305979736593604629",
+        "Koziec Mąciciel Ścieżek": "1305979736593604629",
+        "Kochanka Nocy": "1305979736593604629",
+        "Książę Kasim": "1305979736593604629",
+        "Święty Braciszek": "1305979736593604629",
+        "Złoty Roger": "1305979736593604629",
+        "Baca bez Łowiec": "1305979736593604629",
+        "Czarująca Atalia": "1305979736593604629",
+        "Obłąkany Łowca Orków": "1305979736593604629",
+        "Lichwiarz Grauhaz": "1305979736593604629",
+        "Viviana Nandin": "1305979736593604629",
+        "Mulher Ma": "1305979736593604629",
+        "Demonis Pan Nicości": "1305979736593604629",
+        "Vapor Veneno": "1305979736593604629",
+        "Dęborożec": "1305979736593604629",
+        "Tepeyollotl": "1305979736593604629",
+        "Negthotep Czarny Kapłan": "1305979736593604629",
+        "Młody Smok": "1305979736593604629"
+    }
+};
 
 const styles = `
     #hero-notifier-button {
