@@ -770,7 +770,7 @@ function loadPredefinedSettings() {
     
     if (predefinedWorldRoles[worldName]) {
         const worldRoles = predefinedWorldRoles[worldName];
-        const dreamWebhook = "https://discord.com/api/webhooks/1247112892050468884/YOgX6k0oKTPDL9pLs0SU4CXtZ1eYvM9WCRb2R3x-kAoOBFYmGmk6Ap6cUOCvqGFD3H33";
+        const dreamWebhook = "https://discord.com/api/webhooks/1399066320716431471/sqljwt0IrBr0KsWl8-PvR3QDuK9Xhq8JYqE0AfrAgpPlRi2COrrOgYNwCqo9FpUQYfqq";
         
         config.webhookUrl = dreamWebhook;
         config.roleIds = { ...worldRoles };
