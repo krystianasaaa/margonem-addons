@@ -726,7 +726,7 @@ function createSettingsPanel() {
         background: #2a2a2a;
         border: 1px solid #444;
         border-radius: 4px;
-        padding: 15px;
+        padding: 0; /* Zmienione z 15px na 0 */
         z-index: 10000;
         display: none;
         min-width: 280px;
@@ -735,43 +735,45 @@ function createSettingsPanel() {
     `;
 
     panel.innerHTML = `
-        <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444;">
+        <div id="better-ui-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
             Better UI - Settings
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                <span style="color: #ccc; font-size: 12px;">Bonusy Legendarne</span>
-                <label class="kwak-toggle-switch">
-                    <input type="checkbox" id="bonusy-legendarne" ${config.bonusyLegendarne ? 'checked' : ''}>
-                    <span class="slider"></span>
-                </label>
+        <div style="padding: 15px;">
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
+                    <span style="color: #ccc; font-size: 12px;">Bonusy Legendarne</span>
+                    <label class="kwak-toggle-switch">
+                        <input type="checkbox" id="bonusy-legendarne" ${config.bonusyLegendarne ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
+                    <span style="color: #ccc; font-size: 12px;">Statystyki Przedmiotów</span>
+                    <label class="kwak-toggle-switch">
+                        <input type="checkbox" id="statystyki-przedmiotow" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
+                    <span style="color: #ccc; font-size: 12px;">Interfejs(w trakcie naprawy)</span>
+                    <label class="kwak-toggle-switch">
+                        <input type="checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
 
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                <span style="color: #ccc; font-size: 12px;">Statystyki Przedmiotów</span>
-                <label class="kwak-toggle-switch">
-                    <input type="checkbox" id="statystyki-przedmiotow" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
-                    <span class="slider"></span>
-                </label>
+            <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
+                <button id="close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                    Zamknij
+                </button>
+                <button id="reload-game" style="flex: 1; padding: 8px 12px; background: #ff9800; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                    Odśwież grę
+                </button>
             </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                <span style="color: #ccc; font-size: 12px;">Interfejs(w trakcie naprawy)</span>
-                <label class="kwak-toggle-switch">
-                    <input type="checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''}>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
-            <button id="close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
-                Zamknij
-            </button>
-            <button id="reload-game" style="flex: 1; padding: 8px 12px; background: #ff9800; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
-                Odśwież grę
-            </button>
         </div>
     `;
 
@@ -832,37 +834,90 @@ function createSettingsPanel() {
 
     document.body.appendChild(panel);
 
-panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
-    e.stopPropagation();
-    config.bonusyLegendarne = e.target.checked;
-    updateBonusNames();
-    saveConfig();
-});
+    // *** DODAJ FUNKCJONALNOŚĆ PRZECIĄGANIA ***
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
 
-panel.querySelector('#statystyki-przedmiotow').addEventListener('change', (e) => {
-    e.stopPropagation();
-    config.statystykiPrzedmiotow = e.target.checked;
-    updateBonusNames();
-    saveConfig();
-});
+    const header = panel.querySelector('#better-ui-panel-header');
+    
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = panel.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        e.preventDefault();
+        
+        // Dodaj visual feedback
+        header.style.background = '#444';
+        panel.style.cursor = 'grabbing';
+    });
 
-panel.querySelector('#interfejs').addEventListener('change', (e) => {
-    e.stopPropagation();
-    config.interfejs = e.target.checked;
-    updateBonusNames();
-    saveConfig();
-});
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
+        const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
+        
+        panel.style.left = `${x}px`;
+        panel.style.top = `${y}px`;
+        panel.style.transform = 'none';
+        
+        // Zapisz pozycję w localStorage
+        localStorage.setItem('betterUISettingsPanelPosition', JSON.stringify({x, y}));
+    });
 
-panel.querySelector('#close-settings').addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleSettingsPanel();
-});
-panel.querySelector('#reload-game').addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    location.reload();
-});
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            
+            // Usuń visual feedback
+            header.style.background = '#333';
+            panel.style.cursor = 'default';
+        }
+    });
+
+    // Przywróć zapisaną pozycję przy otwieraniu
+    const savedPosition = JSON.parse(localStorage.getItem('betterUISettingsPanelPosition') || 'null');
+    if (savedPosition) {
+        panel.style.left = `${savedPosition.x}px`;
+        panel.style.top = `${savedPosition.y}px`;
+        panel.style.transform = 'none';
+    }
+
+    // Event listenery dla przełączników i przycisków
+    panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
+        e.stopPropagation();
+        config.bonusyLegendarne = e.target.checked;
+        updateBonusNames();
+        saveConfig();
+    });
+
+    panel.querySelector('#statystyki-przedmiotow').addEventListener('change', (e) => {
+        e.stopPropagation();
+        config.statystykiPrzedmiotow = e.target.checked;
+        updateBonusNames();
+        saveConfig();
+    });
+
+    panel.querySelector('#interfejs').addEventListener('change', (e) => {
+        e.stopPropagation();
+        config.interfejs = e.target.checked;
+        updateBonusNames();
+        saveConfig();
+    });
+
+    panel.querySelector('#close-settings').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSettingsPanel();
+    });
+    
+    panel.querySelector('#reload-game').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        location.reload();
+    });
 }
 function toggleSettingsPanel() {
     const panel = document.getElementById('kwak-better-ui-settings-panel');
