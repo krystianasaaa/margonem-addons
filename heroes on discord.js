@@ -931,276 +931,255 @@ let description = `**${heroName} (Lvl ${heroLevel})**\n\n` +
     }
 }
 
-function showSettings() {
-    const modal = document.createElement('div');
-    modal.className = 'hero-notifier-modal'; // można zostawić nazwy klas CSS
+function addManagerSettingsButton(container) {
+    const helpIcon = container.querySelector('.kwak-addon-help-icon');
+    if (!helpIcon) return;
 
-    const log = getNotificationLog();
+    const settingsBtn = document.createElement('span');
+    settingsBtn.id = 'heroes-on-discord-settings-btn';
+    settingsBtn.innerHTML = '⚙️';
+    settingsBtn.style.cssText = `
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        margin-left: 2px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+        display: inline-block;
+    `;
 
-    const logHtml = log.length > 0 ?
-        log.map(entry => `
-            <div class="hero-log-item">
-                <span class="hero-log-time">${entry.time}</span> -
-                <span class="hero-log-hero">${entry.hero}</span> (poziom ${entry.level})
-            </div>
-        `).join('') :
-        '<div style="text-align: center; color: #a8dadc; font-style: italic; padding: 20px;">Brak powiadomień</div>';
+    settingsBtn.onmouseover = () => settingsBtn.style.opacity = '1';
+    settingsBtn.onmouseout = () => settingsBtn.style.opacity = '0.7';
 
-    const enabled = isNotifierEnabled();
-    const webhookUrl = getWebhookUrl();
-    const roleIds = getHeroRoleIds(); // ZMIANA: było getheroRoleIds()
+    // Wstaw dokładnie po znaku zapytania
+    helpIcon.insertAdjacentElement('afterend', settingsBtn);
 
-    let statusClass = 'error';
-    let statusText = 'Dodatek wyłączony';
+    // Stwórz panel od razu
+    createSettingsPanel();
 
-    if (enabled && webhookUrl) {
-        statusClass = '';
-        statusText = 'Dodatek włączony i skonfigurowany';
-    } else if (enabled && !webhookUrl) {
-        statusClass = 'warning';
-        statusText = 'Dodatek włączony, ale brak webhook URL';
+    settingsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSettingsPanel();
+    });
+}
+
+function loadPredefinedSettings() {
+    const worldName = window.location.hostname.split('.')[0] || 'Unknown';
+    
+    if (predefinedWorldRoles[worldName]) {
+        const worldRoles = predefinedWorldRoles[worldName];
+        const dreamWebhook = "https://discord.com/api/webhooks/1407468644505747556/BknEaHxuPXEJNkPLgGYLTSPsS8aqXdXDnVpQ3jh5_AmIXjvpYRVONXYdj33NTZBiWkE7";
+        
+        setWebhookUrl(dreamWebhook);
+        setHeroRoleIds({ ...worldRoles });
+        setNotifierEnabled(true);
+        
+        // Odśwież panel ustawień jeśli jest otwarty
+        const panel = document.getElementById('heroes-on-discord-settings-panel');
+        if (panel && panel.style.display === 'block') {
+            toggleSettingsPanel();
+            setTimeout(() => toggleSettingsPanel(), 100);
+        }
+        
+        return true;
     }
+    
+    return false;
+}
 
-    // Lista najpopularniejszych herosów (ZMIANA: były tutaj tytany)
-const popularHeroes = [
-    {name: "Domina Ecclesiae", level: 21},
-    {name: "Mietek Żul", level: 25},
-    {name: "Mroczny Patryk", level: 35},
-    {name: "Karmazynowy Mściciel", level: 45},
-    {name: "Złodziej", level: 51},
-    {name: "Zły Przewodnik", level: 63},
-    {name: "Opętany Paladyn", level: 74},
-    {name: "Piekielny Kościej", level: 85},
-    {name: "Koziec Mąciciel Ścieżek", level: 94},
-    {name: "Kochanka Nocy", level: 102},
-    {name: "Książę Kasim", level: 116},
-    {name: "Święty Braciszek", level: 123},
-    {name: "Złoty Roger", level: 135},
-    {name: "Baca bez Łowiec", level: 144},
-    {name: "Czarująca Atalia", level: 157},
-    {name: "Obłąkany Łowca Orków", level: 165},
-    {name: "Lichwiarz Grauhaz", level: 177},
-    {name: "Viviana Nandin", level: 184},
-    {name: "Mulher Ma", level: 197},
-    {name: "Demonis Pan Nicości", level: 210},
-    {name: "Vapor Veneno", level: 227},
-    {name: "Dęborożec", level: 242},
-    {name: "Tepeyollotl", level: 260},
-    {name: "Negthotep Czarny Kapłan", level: 271},
-    {name: "Młody Smok", level: 282}
-];
+function createSettingsPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'heroes-on-discord-settings-panel';
+    panel.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #2a2a2a;
+        border: 1px solid #444;
+        border-radius: 4px;
+        padding: 15px;
+        z-index: 10000;
+        display: none;
+        min-width: 350px;
+        max-height: 80vh;
+        overflow-y: auto;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    `;
 
-    // ZMIANA: było popularheros
-    const roleSettingsHtml = popularHeroes.map(hero => `
-        <div class="hero-role-item">
-            <span class="hero-name">${hero.name} (${hero.level} lvl)</span>
-            <input type="text" class="hero-setting-input hero-role-input"
-                   placeholder="ID roli, wiele ról przez przecinek, lub 'everyone'"
-                   value="${roleIds[hero.name] || ''}"
-                   data-hero="${hero.name}"
-                   ${!enabled ? 'disabled' : ''}>
+    const popularHeroes = [
+        {name: "Domina Ecclesiae", level: 21},
+        {name: "Mietek Żul", level: 25},
+        {name: "Mroczny Patryk", level: 35},
+        {name: "Karmazynowy Mściciel", level: 45},
+        {name: "Złodziej", level: 51},
+        {name: "Zły Przewodnik", level: 63},
+        {name: "Opętany Paladyn", level: 74},
+        {name: "Piekielny Kościej", level: 85},
+        {name: "Koziec Mąciciel Ścieżek", level: 94},
+        {name: "Kochanka Nocy", level: 102},
+        {name: "Książę Kasim", level: 116},
+        {name: "Święty Braciszek", level: 123},
+        {name: "Złoty Roger", level: 135},
+        {name: "Baca bez Łowiec", level: 144},
+        {name: "Czarująca Atalia", level: 157},
+        {name: "Obłąkany Łowca Orków", level: 165},
+        {name: "Lichwiarz Grauhaz", level: 177},
+        {name: "Viviana Nandin", level: 184},
+        {name: "Mulher Ma", level: 197},
+        {name: "Demonis Pan Nicości", level: 210},
+        {name: "Vapor Veneno", level: 227},
+        {name: "Dęborożec", level: 242},
+        {name: "Tepeyollotl", level: 260},
+        {name: "Negthotep Czarny Kapłan", level: 271},
+        {name: "Młody Smok", level: 282}
+    ];
+
+    const worldName = window.location.hostname.split('.')[0] || 'Unknown';
+    const hasPredefSettings = predefinedWorldRoles[worldName];
+    const roleIds = getHeroRoleIds();
+
+    panel.innerHTML = `
+        <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444;">
+            Heroes on Discord - Settings
         </div>
-    `).join('');
 
-const predefinedWorldRoles = {
-    "Dream": {
-        "Domina Ecclesiae": "",
-        "Mietek Żul": "",
-        "Mroczny Patryk": "",
-        "Karmazynowy Mściciel": "",
-        "Złodziej": "",
-        "Zły Przewodnik": "",
-        "Opętany Paladyn": "",
-        "Piekielny Kościej": "",
-        "Koziec Mąciciel Ścieżek": "",
-        "Kochanka Nocy": "",
-        "Książę Kasim": "",
-        "Święty Braciszek": "",
-        "Złoty Roger": "",
-        "Baca bez Łowiec": "",
-        "Czarująca Atalia": "",
-        "Obłąkany Łowca Orków": "",
-        "Lichwiarz Grauhaz": "",
-        "Viviana Nandin": "",
-        "Mulher Ma": "",
-        "Demonis Pan Nicości": "",
-        "Vapor Veneno": "",
-        "Dęborożec": "",
-        "Tepeyollotl": "",
-        "Negthotep Czarny Kapłan": "",
-        "Młody Smok": ""
-    }
-};
+        <div style="margin-bottom: 15px;">
+<div style="margin-bottom: 15px; padding: 12px; background: rgba(220,53,69,0.1); border: 1px solid #dc3545; border-radius: 6px;">
+    <div style="color: #fd7e14; font-size: 12px; margin-bottom: 8px; font-weight: bold;">Załaduj predefiniowane role dla świata:</div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+        <select id="world-selector" style="flex: 1; padding: 6px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;">
+            <option value="">— Wybierz Świat —</option>
+            <option value="Dream">Dream</option>
+        </select>
+        <button id="load-predefined-settings" style="padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+            Załaduj
+        </button>
+    </div>
+    <div style="color: #888; font-size: 10px; margin-top: 5px;">Automatycznie uzupełni ID ról dla wybranego świata.</div>
+</div>
 
-    modal.innerHTML = `
-        <div class="hero-notifier-dialog">
-            <h3>Ustawienia</h3>
-
-            <div class="hero-dialog-content">
-                <div class="hero-setting-group">
-                    <label class="hero-setting-label">Status Dodatku:</label>
-                    <div class="hero-toggle-container">
-                        <label class="hero-toggle-switch">
-                            <input type="checkbox" id="hero-notifier-enabled" ${enabled ? 'checked' : ''}>
-                            <span class="hero-toggle-slider"></span>
-                        </label>
-                        <span>${enabled ? 'Włączony' : 'Wyłączony'}</span>
-                    </div>
-                    <div class="hero-setting-description">
-                        Włącz lub wyłącz wysyłanie powiadomień o respawnach herosów
-                    </div>
-                </div>
-
-                <div class="hero-setting-group">
-                    <label class="hero-setting-label">Discord Webhook URL:</label>
-                    <input type="text" class="hero-setting-input" id="hero-webhook-url"
-                           placeholder="https://discord.com/api/webhooks/..."
-                           value="${webhookUrl}" ${!enabled ? 'disabled' : ''}>
-                    <div class="hero-setting-description">
-                        Aby utworzyć webhook: Serwer Discord → Edytuj kanał → Integracje → Webhooks → Nowy Webhook<br>
-                        Dodatek może wykrywać herosów z 5 sekundowym opóźnieniem
-                    </div>
-                </div>
-
-                <div class="hero-setting-group">
-                    <label class="hero-setting-label">Załaduj predefiniowane role dla świata:</label>
-                    <div style="display: flex; gap: 10px;">
-                        <select id="hero-world-select" class="hero-setting-select" ${!enabled ? 'disabled' : ''}>
-                            <option value="">-- Wybierz świat --</option>
-                            <option value="Dream">Dream</option>
-                        </select>
-                        <button class="hero-btn hero-btn-secondary" id="hero-load-world-roles" ${!enabled ? 'disabled' : ''}>Załaduj</button>
-                    </div>
-                    <div class="hero-setting-description">
-                        Automatycznie uzupełnij ID ról dla wybranego świata.
-                    </div>
-                </div>
-
-                <div class="hero-setting-group">
-                    <label class="hero-setting-label">ID ról Discord dla pingów:</label>
-                    <div class="hero-setting-description">
-                        Ustaw ID roli Discord dla popularnych herosów. Zostanie ona wypingowana gdy heros zrespi.<br>
-                        Aby otrzymać ID roli: Ustawienia serwera → Role → Kliknij prawym na rolę → Kopiuj ID<br>
-                        <strong>Wskazówki:</strong><br>
-                        • Wpisz "everyone" (bez cudzysłowów) aby pingować @everyone<br>
-                        • Aby pingować wiele ról, wpisz ID oddzielone przecinkami: 123456789,987654321<br>
-                        <strong>Uwaga:</strong> Dodatek wykrywa herosów automatycznie, ale pingi działają tylko dla ustawionych ról.
-                    </div>
-                    <div class="hero-role-settings">
-                        ${roleSettingsHtml}
-                    </div>
-                </div>
-
-                <div class="hero-setting-group">
-                    <label class="hero-setting-label">Ostatnie powiadomienia:</label>
-                    <div class="hero-notification-log">
-                        ${logHtml}
-                    </div>
-                </div>
+            <div style="margin-bottom: 10px;">
+                <span style="color: #ccc; font-size: 12px; display: block; margin-bottom: 5px;">Discord Webhook URL:</span>
+                <input type="text" id="hero-webhook" style="width: 100%; padding: 5px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;" value="${getWebhookUrl()}" placeholder="https://discord.com/api/webhooks/...">
             </div>
 
-            <div class="hero-status-info ${statusClass}">
-                <strong>Status:</strong> ${statusText}
+            <div style="color: #ccc; font-size: 11px; margin-bottom: 10px;">
+                Role Discord (ID roli lub 'everyone'):
             </div>
+            ${popularHeroes.map(hero => `
+                <div style="margin: 5px 0; display: flex; align-items: center;">
+                    <span style="color: #aaa; font-size: 10px; min-width: 120px;">${hero.name} (${hero.level})</span>
+                    <input type="text" data-hero="${hero.name}" style="flex: 1; margin-left: 8px; padding: 3px; background: #555; color: #fff; border: 1px solid #666; border-radius: 2px; font-size: 10px;" value="${roleIds[hero.name] || ''}" placeholder="ID roli">
+                </div>
+            `).join('')}
+        </div>
 
-            <div class="hero-settings-buttons">
-                <button class="hero-btn hero-btn-secondary" id="hero-close-settings">Anuluj</button>
-                <button class="hero-btn hero-btn-primary" id="hero-save-settings">Zapisz ustawienia</button>
-            </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
+            <button id="close-heroes-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                Zamknij
+            </button>
+            <button id="save-heroes-settings" style="flex: 1; padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                Zapisz
+            </button>
         </div>
     `;
 
-    document.body.appendChild(modal);
+    document.body.appendChild(panel);
 
-    // Event listeners - TUTAJ BYŁY BŁĘDY W ID
-    const enabledCheckbox = modal.querySelector('#hero-notifier-enabled'); // ZMIANA: było hero
-    const webhookInput = modal.querySelector('#hero-webhook-url'); // ZMIANA: było hero
-    const roleInputs = modal.querySelectorAll('.hero-role-input');
-
-    enabledCheckbox.onchange = () => {
-        const isEnabled = enabledCheckbox.checked;
-        webhookInput.disabled = !isEnabled;
-        roleInputs.forEach(input => input.disabled = !isEnabled);
-    };
-
-    modal.querySelector('#hero-save-settings').onclick = () => { // ZMIANA: było hero
-        const enabled = enabledCheckbox.checked;
-        const webhookUrl = webhookInput.value.trim();
-
-        // Zbierz ID ról
-        const newRoleIds = {};
-        roleInputs.forEach(input => {
-            const heroName = input.getAttribute('data-hero'); // można zostawić data-hero
-            const roleId = input.value.trim();
-            if (roleId) {
-                newRoleIds[heroName] = roleId;
-            }
-        });
-
-        setNotifierEnabled(enabled);
-        setWebhookUrl(webhookUrl);
-        setHeroRoleIds(newRoleIds); // ZMIANA: było setheroRoleIds
-
-        document.body.removeChild(modal);
-
-        // Pokaż komunikat sukcesu
-        const successMsg = document.createElement('div');
-        successMsg.style.cssText = `
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 10002; background: linear-gradient(135deg, #28a745, #20c997);
-            color: white; padding: 12px 20px; border-radius: 8px;
-            font-weight: bold; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        `;
-        successMsg.innerHTML = 'Ustawienia zapisane pomyślnie!';
-        document.body.appendChild(successMsg);
-
-        setTimeout(() => successMsg.remove(), 3000);
-    };
-
-    modal.querySelector('#hero-close-settings').onclick = () => { // ZMIANA: było hero
-        document.body.removeChild(modal);
-    };
-
-    modal.querySelector('#hero-load-world-roles').onclick = () => { // ZMIANA: było hero
-        const selectedWorld = modal.querySelector('#hero-world-select').value; // ZMIANA: było hero
-        if (!selectedWorld || !predefinedWorldRoles[selectedWorld]) return;
-
-        const rolesForWorld = predefinedWorldRoles[selectedWorld];
-        roleInputs.forEach(input => {
-            const hero = input.getAttribute('data-hero');
-            if (rolesForWorld[hero]) {
-                input.value = rolesForWorld[hero];
-            }
-        });
-
-        // Ustaw także webhook dla Dream
-        if (selectedWorld === 'Dream') {
-            const webhookField = modal.querySelector('#hero-webhook-url'); // ZMIANA: było hero
-            if (webhookField) {
-                webhookField.value = 'https://discord.com/api/webhooks/1407468644505747556/BknEaHxuPXEJNkPLgGYLTSPsS8aqXdXDnVpQ3jh5_AmIXjvpYRVONXYdj33NTZBiWkE7';
-            }
+// Event listener dla przycisku ładowania predefiniowanych ustawień
+const loadBtn = panel.querySelector('#load-predefined-settings');
+const worldSelector = panel.querySelector('#world-selector');
+if (loadBtn && worldSelector) {
+    loadBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const selectedWorld = worldSelector.value;
+        
+        if (!selectedWorld) {
+            loadBtn.style.background = '#dc3545';
+            loadBtn.textContent = '⚠️ Wybierz świat!';
+            setTimeout(() => {
+                loadBtn.style.background = '#4CAF50';
+                loadBtn.textContent = 'Załaduj';
+            }, 2000);
+            return;
         }
-
-        // Komunikat potwierdzający
-        const notice = document.createElement('div');
-        notice.style.cssText = `
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #ffc107; color: black; padding: 10px 20px;
-            font-weight: bold; border-radius: 6px; z-index: 10003;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        `;
-        notice.textContent = `Wczytano ID ról i webhook dla świata: ${selectedWorld}`;
-        document.body.appendChild(notice);
-        setTimeout(() => notice.remove(), 3000);
-    };
-
-    modal.onclick = (e) => {
-        if (e.target === modal) {
-            document.body.removeChild(modal);
+        
+        if (predefinedWorldRoles[selectedWorld]) {
+            const worldRoles = predefinedWorldRoles[selectedWorld];
+            const dreamWebhook = "https://discord.com/api/webhooks/1407468644505747556/BknEaHxuPXEJNkPLgGYLTSPsS8aqXdXDnVpQ3jh5_AmIXjvpYRVONXYdj33NTZBiWkE7";
+            
+            setWebhookUrl(dreamWebhook);
+            setHeroRoleIds({ ...worldRoles });
+            setNotifierEnabled(true);
+            
+            // Odśwież wartości w panelu
+            panel.querySelector('#hero-webhook').value = getWebhookUrl();
+            panel.querySelectorAll('input[data-hero]').forEach(input => {
+                const heroName = input.getAttribute('data-hero');
+                input.value = getHeroRoleIds()[heroName] || '';
+            });
+            
+            // Pokaż komunikat sukcesu
+            loadBtn.style.background = '#28a745';
+            loadBtn.textContent = '✅ Załadowano!';
+            setTimeout(() => {
+                loadBtn.style.background = '#4CAF50';
+                loadBtn.textContent = 'Załaduj';
+            }, 2000);
         }
-    };
+    });
 }
+
+    panel.querySelector('#save-heroes-settings').addEventListener('click', (e) => {
+        e.preventDefault();
+        setNotifierEnabled(true); // Automatycznie włącz po zapisaniu
+        setWebhookUrl(panel.querySelector('#hero-webhook').value.trim());
+        
+        const newRoleIds = {};
+        panel.querySelectorAll('input[data-hero]').forEach(input => {
+            const heroName = input.getAttribute('data-hero');
+            const roleId = input.value.trim();
+            if (roleId) newRoleIds[heroName] = roleId;
+        });
+        setHeroRoleIds(newRoleIds);
+        
+        toggleSettingsPanel();
+    });
+
+    panel.querySelector('#close-heroes-settings').addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleSettingsPanel();
+    });
+}
+
+function toggleSettingsPanel() {
+    const panel = document.getElementById('heroes-on-discord-settings-panel');
+    if (panel) {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function integrateWithAddonManager() {
+    const checkForManager = setInterval(() => {
+        const addonContainer = document.getElementById('addon-heroes_on_discord');
+        if (!addonContainer) return;
+
+        // Sprawdź czy przycisk już istnieje
+        if (addonContainer.querySelector('#heroes-on-discord-settings-btn')) {
+            clearInterval(checkForManager);
+            return;
+        }
+
+        let addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
+        if (addonNameContainer) {
+            addManagerSettingsButton(addonNameContainer);
+            clearInterval(checkForManager);
+        }
+    }, 500);
+
 
 function init() {
     const existingHeroButton = document.getElementById('hero-notifier-button');
@@ -1236,6 +1215,11 @@ function init() {
 
     // Rozpocznij sprawdzanie respawnów co 10 sekund
     setInterval(checkHeroRespawns, 10000);
+    try {
+     integrateWithAddonManager();
+    } catch (error) {
+     console.warn('Addon manager integration failed:', error);
+   }
 
     console.log('Hero Notifier uruchomiony!');
 }
