@@ -1014,7 +1014,7 @@ function createSettingsPanel() {
         background: #2a2a2a;
         border: 1px solid #444;
         border-radius: 4px;
-        padding: 15px;
+        padding: 0; /* Zmienione z 15px na 0 */
         z-index: 10000;
         display: none;
         min-width: 350px;
@@ -1058,11 +1058,11 @@ function createSettingsPanel() {
     const roleIds = getHeroRoleIds();
 
     panel.innerHTML = `
-        <div style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #444; flex-shrink: 0;">
+        <div id="settings-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; flex-shrink: 0; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
             Heroes on Discord - Settings
         </div>
 
-        <div style="flex: 1; overflow-y: auto; padding-right: 5px; margin-right: -5px;">
+        <div style="flex: 1; overflow-y: auto; padding: 15px; padding-right: 10px; margin-right: 5px;">
             <div style="margin-bottom: 15px; padding: 12px; background: rgba(220,53,69,0.1); border: 1px solid #dc3545; border-radius: 6px;">
                 <div style="color: #fd7e14; font-size: 12px; margin-bottom: 8px; font-weight: bold;">Załaduj predefiniowane role dla świata:</div>
                 <div style="display: flex; gap: 8px; align-items: center;">
@@ -1097,7 +1097,7 @@ function createSettingsPanel() {
             </div>
         </div>
 
-        <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px; flex-shrink: 0;">
+        <div style="display: flex; gap: 8px; margin: 12px 15px 15px 15px; border-top: 1px solid #444; padding-top: 12px; flex-shrink: 0;">
             <button id="close-heroes-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
                 Zamknij
             </button>
@@ -1142,6 +1142,57 @@ function createSettingsPanel() {
     document.head.appendChild(style);
 
     document.body.appendChild(panel);
+
+    // *** DODAJ FUNKCJONALNOŚĆ PRZECIĄGANIA ***
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    const header = panel.querySelector('#settings-panel-header');
+    
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = panel.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        e.preventDefault();
+        
+        // Dodaj visual feedback
+        header.style.background = '#444';
+        panel.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
+        const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
+        
+        panel.style.left = `${x}px`;
+        panel.style.top = `${y}px`;
+        panel.style.transform = 'none';
+        
+        // Zapisz pozycję w localStorage
+        localStorage.setItem('heroSettingsPanelPosition', JSON.stringify({x, y}));
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            
+            // Usuń visual feedback
+            header.style.background = '#333';
+            panel.style.cursor = 'default';
+        }
+    });
+
+    // Przywróć zapisaną pozycję przy otwieraniu
+    const savedPosition = JSON.parse(localStorage.getItem('heroSettingsPanelPosition') || 'null');
+    if (savedPosition) {
+        panel.style.left = `${savedPosition.x}px`;
+        panel.style.top = `${savedPosition.y}px`;
+        panel.style.transform = 'none';
+    }
 
     // Event listener dla przycisku ładowania predefiniowanych ustawień
     const loadBtn = panel.querySelector('#load-predefined-settings');
@@ -1189,7 +1240,7 @@ function createSettingsPanel() {
 
     panel.querySelector('#save-heroes-settings').addEventListener('click', (e) => {
         e.preventDefault();
-        setNotifierEnabled(true); // Automatycznie włącz po zapisaniu
+        setNotifierEnabled(true);
         setWebhookUrl(panel.querySelector('#hero-webhook').value.trim());
         
         const newRoleIds = {};
