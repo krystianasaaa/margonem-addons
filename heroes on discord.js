@@ -758,8 +758,8 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
         z-index: 10000;
         display: flex;
         flex-direction: column;
-        min-width: 380px;
-        max-width: 420px;
+        min-width: 200px;
+        max-width: 220px;
         font-family: Arial, sans-serif;
         color: #fff;
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
@@ -767,32 +767,32 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
     `;
 
     gameWindow.innerHTML = `
-        <div id="hero-window-header" style="color: #fff; font-size: 14px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; flex-shrink: 0; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0; display: flex; justify-content: space-between; align-items: center;">
-            <span>¡HEROS!</span>
-            <button style="background: none; border: none; color: #ccc; font-size: 16px; cursor: pointer; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 2px;" id="hero-window-close" onmouseover="this.style.background='#555'" onmouseout="this.style.background='none'">×</button>
+        <div id="hero-window-header" style="color: #fff; font-size: 12px; text-align: center; font-weight: bold; padding: 10px; border-bottom: 1px solid #444; flex-shrink: 0; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <span style="flex: 1; text-align: center;">¡HEROS!</span>
+            <button style="background: none; border: none; color: #ccc; font-size: 14px; cursor: pointer; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 2px; flex-shrink: 0;" id="hero-window-close" onmouseover="this.style.background='#555'" onmouseout="this.style.background='none'">×</button>
         </div>
 
-        <div style="flex: 1; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <div style="font-size: 20px; color: #fff; font-weight: bold;">
+        <div style="flex: 1; padding: 15px;">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <div style="font-size: 16px; color: #fff; font-weight: bold;">
                     ${heroName}
                 </div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <div style="color: #ccc; font-size: 12px; margin-bottom: 8px; font-weight: bold;">Dodatkowa wiadomość:</div>
-                <textarea id="hero-custom-message" placeholder="Wpisz dodatkową wiadomość do powiadomienia (opcjonalne)..."
-                          style="width: 100%; height: 60px; padding: 8px; background: #555; border: 1px solid #666; border-radius: 3px; color: #fff; font-size: 12px; box-sizing: border-box; resize: vertical; font-family: Arial, sans-serif;"></textarea>
-                <div style="color: #888; font-size: 10px; margin-top: 4px;">Ta wiadomość zostanie dodana do powiadomienia na Discordzie</div>
+            <div style="margin-bottom: 15px;">
+                <div style="color: #ccc; font-size: 10px; margin-bottom: 6px; font-weight: bold;">Dodatkowa wiadomość:</div>
+                <textarea id="hero-custom-message" placeholder="Wpisz dodatkową wiadomość..."
+                          style="width: 100%; height: 40px; padding: 6px; background: #555; border: 1px solid #666; border-radius: 3px; color: #fff; font-size: 10px; box-sizing: border-box; resize: vertical; font-family: Arial, sans-serif;"></textarea>
+                <div style="color: #888; font-size: 8px; margin-top: 3px;">Zostanie dodana do powiadomienia</div>
             </div>
         </div>
 
-        <div style="display: flex; gap: 10px; margin: 15px 20px 20px 20px; border-top: 1px solid #444; padding-top: 15px; flex-shrink: 0;">
-            <button id="hero-cancel-btn" style="flex: 1; padding: 10px 16px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold;" onmouseover="this.style.background='#666'" onmouseout="this.style.background='#555'">
+        <div style="display: flex; gap: 6px; margin: 10px; border-top: 1px solid #444; padding-top: 10px; flex-shrink: 0;">
+            <button id="hero-cancel-btn" style="flex: 1; padding: 6px 10px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold;" onmouseover="this.style.background='#666'" onmouseout="this.style.background='#555'">
                 Anuluj
             </button>
-            <button id="hero-send-btn" style="flex: 1; padding: 10px 16px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
-                Wyślij Powiadomienie
+            <button id="hero-send-btn" style="flex: 1; padding: 6px 10px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                Wyślij
             </button>
         </div>
     `;
