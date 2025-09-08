@@ -969,7 +969,7 @@ function updateHeaderRefreshInfo() {
 
         const header = document.createElement('div');
         header.className = 'kwak-addon-menu-header';
-        header.textContent = `siema ${Engine.hero.d.nick}`;
+        header.textContent = `${Engine.hero.d.nick} - Premium`;
 
         const closeBtn = document.createElement('button');
         closeBtn.className = 'kwak-addon-close-btn';
