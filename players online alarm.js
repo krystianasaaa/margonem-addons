@@ -619,7 +619,7 @@ function createManagerSettingsPanel() {
         </div>
     `;
 
-    // Dodaj style przełączników
+    // Dodaj style przełączników jeśli jeszcze nie istnieją
     if (!document.getElementById('kwak-alarm-toggle-styles')) {
         const style = document.createElement('style');
         style.id = 'kwak-alarm-toggle-styles';
@@ -670,6 +670,57 @@ function createManagerSettingsPanel() {
     }
 
     document.body.appendChild(panel);
+
+    // *** DODAJ FUNKCJONALNOŚĆ PRZECIĄGANIA ***
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    const header = panel.querySelector('#alarm-panel-header');
+    
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = panel.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        e.preventDefault();
+        
+        // Dodaj visual feedback
+        header.style.background = '#444';
+        panel.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
+        const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
+        
+        panel.style.left = `${x}px`;
+        panel.style.top = `${y}px`;
+        panel.style.transform = 'none';
+        
+        // Zapisz pozycję w localStorage
+        localStorage.setItem('podAlarmPanelPosition', JSON.stringify({x, y}));
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            
+            // Usuń visual feedback
+            header.style.background = '#333';
+            panel.style.cursor = 'default';
+        }
+    });
+
+    // Przywróć zapisaną pozycję przy otwieraniu
+    const savedPosition = JSON.parse(localStorage.getItem('podAlarmPanelPosition') || 'null');
+    if (savedPosition) {
+        panel.style.left = `${savedPosition.x}px`;
+        panel.style.top = `${savedPosition.y}px`;
+        panel.style.transform = 'none';
+    }
 
     // Event listenery
     const enabledCheckbox = panel.querySelector('#manager-notifier-enabled');
