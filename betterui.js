@@ -5,7 +5,8 @@
     let config = {
         bonusyLegendarne: true,
         statystykiPrzedmiotow: true,
-        interfejs: true
+        interfejs: true,
+        kalkulatorUlepszen: true
     };
 let bonusNames = {};
 
@@ -410,6 +411,10 @@ const boundPatterns = [
 
     // Funkcja do dodawania informacji o ulepszeniu do tooltipa
     function addUpgradeInfo(tooltipContent) {
+        if (!config.kalkulatorUlepszen) {
+        return tooltipContent;
+ }
+
         // Sprawdź czy kalkulator już został dodany
         if (tooltipContent.includes('Koszt ulepszeń:')) {
             return tooltipContent;
@@ -486,25 +491,25 @@ const boundPatterns = [
         return tooltipContent.slice(0, insertionPoint.position) + upgradeInfo + tooltipContent.slice(insertionPoint.position);
     }
 
-    function replaceText(text) {
-        if (!text || typeof text !== 'string') return text;
+function replaceText(text) {
+    if (!text || typeof text !== 'string') return text;
 
-        let result = text;
+    let result = text;
 
-        // Najpierw zastąp nazwy bonusów
-        for (const [original, replacement] of Object.entries(bonusNames)) {
-            if (result.includes(original)) {
-               result = result.replace(new RegExp(original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
-            }
+    // Najpierw zastąp nazwy bonusów
+    for (const [original, replacement] of Object.entries(bonusNames)) {
+        if (result.includes(original)) {
+           result = result.replace(new RegExp(original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
         }
-
-        // Następnie dodaj informacje o ulepszeniu dla wszystkich przedmiotów
-        if ((result.includes('item-tip') || result.includes('Poziom:')) && isUpgradeableItem(result)) {
-            result = addUpgradeInfo(result);
-        }
-
-        return result;
     }
+
+    // Następnie dodaj informacje o ulepszeniu dla wszystkich przedmiotów (tylko jeśli włączone)
+    if (config.kalkulatorUlepszen && ((result.includes('item-tip') || result.includes('Poziom:')) && isUpgradeableItem(result))) {
+        result = addUpgradeInfo(result);
+    }
+
+    return result;
+}
 
     function setupEngineHooks() {
         const originalInnerHTMLSetter = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML').set;
@@ -762,6 +767,13 @@ function createSettingsPanel() {
                     </label>
                 </div>
             </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
+    <span style="color: #ccc; font-size: 12px;">Kalkulator Ulepszeń</span>
+    <label class="kwak-toggle-switch">
+        <input type="checkbox" id="kalkulator-ulepszen" ${config.kalkulatorUlepszen ? 'checked' : ''}>
+        <span class="slider"></span>
+    </label>
+</div>
 
             <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
                 <button id="close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
@@ -903,6 +915,12 @@ function createSettingsPanel() {
         updateBonusNames();
         saveConfig();
     });
+
+    panel.querySelector('#kalkulator-ulepszen').addEventListener('change', (e) => {
+    e.stopPropagation();
+    config.kalkulatorUlepszen = e.target.checked;
+    saveConfig();
+   });
 
     panel.querySelector('#close-settings').addEventListener('click', (e) => {
         e.preventDefault();
