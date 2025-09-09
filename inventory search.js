@@ -250,7 +250,6 @@ header.style.cssText = `
     }
 
 function performSearch(searchTerm) {
-    console.log(`Rozpoczynam wyszukiwanie: "${searchTerm}"`);
 
 
     const allItems = document.querySelectorAll('.item[data-name]');
@@ -267,7 +266,6 @@ function performSearch(searchTerm) {
         item.style.filter = 'none';
     });
 
-    console.log(`Znaleziono ${allItems.length} przedmiotów do przeszukania`);
 
     allItems.forEach(item => {
         const itemName = item.getAttribute('data-name');
@@ -285,14 +283,12 @@ function performSearch(searchTerm) {
 
 
         if (!isVisible || isHidden) {
-            console.log(`Pomijam niewidoczny element: ${itemName}`);
             return;
         }
 
 
         const isInTooltip = item.closest('.tooltip, .popup, .hint, .preview, .overlay, [class*="tooltip"], [class*="popup"], [class*="hint"]');
         if (isInTooltip) {
-            console.log(`Pomijam element w tooltipie: ${itemName}`);
             return;
         }
 
@@ -301,7 +297,6 @@ function performSearch(searchTerm) {
 
 
         if (processedItems.has(itemId)) {
-            console.log(`Pomijam duplikat: ${itemName} (${itemId})`);
             return;
         }
 
@@ -310,7 +305,6 @@ function performSearch(searchTerm) {
         const itemNameLower = itemName.toLowerCase();
         const isMatch = searchTerm === '' || itemNameLower.includes(searchTerm.toLowerCase());
 
-        console.log(`Przedmiot: ${itemName}, Pasuje: ${isMatch}, Pozycja: ${Math.round(rect.left)},${Math.round(rect.top)}`);
 
         if (isMatch) {
 
@@ -326,7 +320,6 @@ function performSearch(searchTerm) {
         }
     });
 
-    console.log(`Znaleziono ${foundItems.length} unikalnych pasujących przedmiotów`);
 
 
     highlightBagsWithItems(foundItems);
@@ -373,7 +366,6 @@ function getBagInfo(item) {
         const bagNum = parseInt(bagNumber);
         if (bagNum > 0) {
             const bagName = findBagName(bagNumber);
-            console.log(`Znaleziono torbę bezpośrednio: ${bagNumber} -> ${bagName}`);
             return { number: bagNumber, name: bagName };
         }
     }
@@ -386,7 +378,6 @@ function getBagInfo(item) {
             const bagNum = parseInt(parentBag);
             if (bagNum > 0) {
                 const bagName = findBagName(parentBag);
-                console.log(`Znaleziono torbę w rodzicu: ${parentBag} -> ${bagName}`);
                 return { number: parentBag, name: bagName };
             }
         }
@@ -398,7 +389,6 @@ function getBagInfo(item) {
                 const bagNum = parseInt(bagFromId);
                 if (bagNum > 0) {
                     const bagName = findBagName(bagFromId);
-                    console.log(`Znaleziono torbę z ID: ${bagFromId} -> ${bagName}`);
                     return { number: bagFromId, name: bagName };
                 }
             }
@@ -420,20 +410,15 @@ function getBagInfo(item) {
 
             if (rect.left >= containerRect.left && rect.right <= containerRect.right &&
                 rect.top >= containerRect.top && rect.bottom <= containerRect.bottom) {
-                console.log(`Przedmiot w głównym ekwipunku: ${item.getAttribute('data-name')}`);
                 return null;
             }
         }
     }
 
-
-    console.log(`Nie można ustalić torby dla przedmiotu: ${item.getAttribute('data-name')}`);
     return null;
 }
 
 function findBagName(bagNumber) {
-    console.log(`Szukam nazwy dla torby: ${bagNumber}`);
-
 
     if (bagNumber === 'main' || bagNumber === '0') {
         return null;
@@ -456,7 +441,6 @@ function findBagName(bagNumber) {
     for (const selector of bagSelectors) {
         try {
             const bagElements = document.querySelectorAll(selector);
-            console.log(`Selektor ${selector} znalazł ${bagElements.length} elementów`);
 
             for (const bagElement of bagElements) {
                 const name = bagElement.getAttribute('data-name') ||
@@ -466,7 +450,6 @@ function findBagName(bagNumber) {
                            bagElement.textContent?.trim();
 
                 if (name && name !== '' && name !== 'null' && name.length > 0) {
-                    console.log(`✅ Znaleziono nazwę torby: ${name}`);
 
                     bagNameMapping[`data-bag=${bagNumber}`] = name;
                     return name;
@@ -489,20 +472,17 @@ function highlightBagsWithItems(foundItems) {
     foundItems.forEach(item => {
         const bagInfo = getBagInfo(item);
         if (bagInfo && bagInfo.number && bagInfo.number !== 'main') {
-            console.log(`Przedmiot "${item.getAttribute('data-name')}" w torbie ${bagInfo.number} (${bagInfo.name})`);
             bagNumbers.add(bagInfo.number);
             bagInfos.set(bagInfo.number, bagInfo.name);
         }
     });
 
-    console.log('Torby do podświetlenia:', Array.from(bagNumbers));
 
 
     clearBagHighlights();
 
 
     bagNumbers.forEach(bagNum => {
-        console.log(`Podświetlam torbę: ${bagNum}`);
 
 
         const bagSelectors = [
@@ -516,13 +496,10 @@ function highlightBagsWithItems(foundItems) {
 
         bagSelectors.forEach(selector => {
             const bagElements = document.querySelectorAll(selector);
-            console.log(`Selektor "${selector}" znalazł ${bagElements.length} elementów`);
 
             bagElements.forEach(element => {
                 const rect = element.getBoundingClientRect();
                 const isVisible = rect.width > 0 && rect.height > 0;
-
-                console.log(`Element torby:`, element, `Widoczny:`, isVisible, `Rozmiar:`, rect.width, 'x', rect.height);
 
                 if (isVisible) {
                     element.style.boxShadow = '0 0 15px #FFD700 !important';
@@ -530,12 +507,10 @@ function highlightBagsWithItems(foundItems) {
                     element.style.border = '2px solid #FFD700 !important';
                     element.classList.add('search-highlighted-bag');
                     highlightedCount++;
-                    console.log(`✅ Podświetlono element torby ${bagNum}`);
                 }
             });
         });
 
-        console.log(`Podświetlono ${highlightedCount} elementów dla torby ${bagNum}`);
     });
 
 }
@@ -584,7 +559,6 @@ foundItems.forEach(item => {
     const bagInfo = getBagInfo(item);
     const itemName = item.getAttribute('data-name');
 
-    console.log('Analizuję przedmiot:', itemName, 'BagInfo:', bagInfo);
 
     if (bagInfo && bagInfo.number && bagInfo.number !== 'null' && bagInfo.number !== '' && bagInfo.number !== '0' && bagInfo.name && bagInfo.name !== 'undefined') {
         const bagKey = `${bagInfo.number}|${bagInfo.name}`;
@@ -592,15 +566,12 @@ foundItems.forEach(item => {
             itemsByBag[bagKey] = [];
         }
         itemsByBag[bagKey].push(itemName);
-        console.log(`✅ Dodano ${itemName} do torby ${bagInfo.name} (${bagInfo.number})`);
     }
     else {
         itemsInMainInventory.push(itemName);
-        console.log(`✅ Dodano ${itemName} do głównego ekwipunku`);
     }
 });
 
-    console.log('Przedmioty w torbach:', itemsByBag);
 
 
     resultWindow = document.createElement('div');
@@ -765,7 +736,6 @@ if (itemsInMainInventory.length > 0) {
 
             const itemName = itemNameElement.getAttribute('data-item-name');
             if (itemName) {
-                console.log('Kliknięto w przedmiot:', itemName);
                 lastSearchTerm = itemName;
                 performSearch(itemName.toLowerCase());
 
