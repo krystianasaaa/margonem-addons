@@ -543,19 +543,15 @@ function createManagerSettingsPanel() {
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     `;
 
-    const enabled = isNotifierEnabled();
     const webhookUrl = getDiscordWebhookUrl();
     const log = getNotificationLog();
 
-    let statusClass = 'error';
-    let statusText = '❌ Dodatek wyłączony';
+    let statusClass = '';
+    let statusText = '✅ Dodatek włączony i skonfigurowany';
 
-    if (enabled && webhookUrl) {
-        statusClass = '';
-        statusText = '✅ Dodatek włączony i skonfigurowany';
-    } else if (enabled && !webhookUrl) {
+    if (!webhookUrl) {
         statusClass = 'warning';
-        statusText = '⚠️ Dodatek włączony, ale brak webhook URL';
+        statusText = '⚠️ Brak webhook URL';
     }
 
     const logHtml = log.length > 0 ?
@@ -574,25 +570,16 @@ function createManagerSettingsPanel() {
 
         <div style="padding: 15px;">
             <div style="margin-bottom: 15px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                    <span style="color: #ccc; font-size: 12px;">Włącz notifier</span>
-                    <label class="kwak-toggle-switch">
-                        <input type="checkbox" id="manager-notifier-enabled" ${enabled ? 'checked' : ''}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
                 <div style="margin-bottom: 12px;">
                     <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 4px;">Discord Webhook URL:</label>
                     <input type="text" id="manager-webhook-url" placeholder="https://discord.com/api/webhooks/..." 
-                           value="${webhookUrl}" ${!enabled ? 'disabled' : ''}
+                           value="${webhookUrl}"
                            style="width: 100%; padding: 6px; background: rgba(50,130,184,0.2); border: 1px solid #0f4c75; border-radius: 3px; color: #e8f4fd; font-size: 12px; box-sizing: border-box;">
                 </div>
 
                 <div style="margin-bottom: 12px;">
                     <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 4px;">Próg powiadomień (graczy):</label>
-                    <input type="number" id="manager-threshold-input" min="1" max="50" value="${getPlayerThreshold()}" 
-                           ${!enabled ? 'disabled' : ''}
+                    <input type="number" id="manager-threshold-input" min="1" max="50" value="${getPlayerThreshold()}"
                            style="width: 80px; padding: 6px; background: rgba(50,130,184,0.2); border: 1px solid #0f4c75; border-radius: 3px; color: #e8f4fd; font-size: 12px; text-align: center;">
                 </div>
 
@@ -603,7 +590,7 @@ function createManagerSettingsPanel() {
                     </div>
                 </div>
 
-                <div style="padding: 8px; border-radius: 3px; margin-bottom: 12px; ${statusClass === 'warning' ? 'background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; color: #ffc107;' : statusClass === 'error' ? 'background: rgba(220, 53, 69, 0.1); border: 1px solid #dc3545; color: #dc3545;' : 'background: rgba(40, 167, 69, 0.1); border: 1px solid #28a745; color: #28a745;'}">
+                <div style="padding: 8px; border-radius: 3px; margin-bottom: 12px; ${statusClass === 'warning' ? 'background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; color: #ffc107;' : 'background: rgba(40, 167, 69, 0.1); border: 1px solid #28a745; color: #28a745;'}">
                     <strong>Status:</strong> ${statusText}
                 </div>
             </div>
@@ -618,56 +605,6 @@ function createManagerSettingsPanel() {
             </div>
         </div>
     `;
-
-    // Dodaj style przełączników jeśli jeszcze nie istnieją
-    if (!document.getElementById('kwak-alarm-toggle-styles')) {
-        const style = document.createElement('style');
-        style.id = 'kwak-alarm-toggle-styles';
-        style.textContent = `
-            .kwak-toggle-switch {
-                position: relative;
-                display: inline-block;
-                width: 44px;
-                height: 24px;
-            }
-            .kwak-toggle-switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-            .kwak-toggle-switch .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #555;
-                transition: 0.3s;
-                border-radius: 24px;
-                border: 1px solid #666;
-            }
-            .kwak-toggle-switch .slider:before {
-                position: absolute;
-                content: "";
-                height: 18px;
-                width: 18px;
-                left: 2px;
-                bottom: 2px;
-                background-color: white;
-                transition: 0.3s;
-                border-radius: 50%;
-            }
-            .kwak-toggle-switch input:checked + .slider {
-                background-color: #4CAF50;
-                border-color: #4CAF50;
-            }
-            .kwak-toggle-switch input:checked + .slider:before {
-                transform: translateX(20px);
-            }
-        `;
-        document.head.appendChild(style);
-    }
 
     document.body.appendChild(panel);
 
@@ -723,18 +660,11 @@ function createManagerSettingsPanel() {
     }
 
     // Event listenery
-    const enabledCheckbox = panel.querySelector('#manager-notifier-enabled');
     const webhookInput = panel.querySelector('#manager-webhook-url');
     const thresholdInput = panel.querySelector('#manager-threshold-input');
 
-    enabledCheckbox.onchange = () => {
-        const isEnabled = enabledCheckbox.checked;
-        webhookInput.disabled = !isEnabled;
-        thresholdInput.disabled = !isEnabled;
-    };
-
     panel.querySelector('#manager-save-settings').onclick = () => {
-        const enabled = enabledCheckbox.checked;
+        const enabled = true;
         const webhookUrl = webhookInput.value.trim();
         const threshold = parseInt(thresholdInput.value);
 
