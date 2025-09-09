@@ -12,9 +12,7 @@ let bonusNames = {};
 function saveConfig() {
     try {
         window.localStorage.setItem('betterUI_config', JSON.stringify(config));
-        console.log('Better UI: Konfiguracja zapisana');
     } catch (e) {
-        console.log('Better UI: Błąd podczas zapisywania:', e);
     }
 }
 function loadConfig() {
@@ -23,7 +21,6 @@ function loadConfig() {
         if (saved) {
             const savedConfig = JSON.parse(saved);
             config = { ...config, ...savedConfig };
-            console.log('Better UI: Konfiguracja wczytana');
         }
     } catch (e) {
     }
