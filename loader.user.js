@@ -54,11 +54,9 @@
 
 
     function loadAddonsNow() {
-        console.log('⚡ Ładuję dodatki NATYCHMIAST...');
-
+        
         fetchFromServer(`${CONFIG.SERVER_URL}/addons.js?t=${Date.now()}`)
             .then(addonsCode => {
-                console.log('✅ Kod dodatków pobrany!');
 
 
                 const oldScript = document.getElementById('margonem-addons');
