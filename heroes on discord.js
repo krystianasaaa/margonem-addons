@@ -1294,8 +1294,6 @@ function init() {
     } catch (error) {
      console.warn('Addon manager integration failed:', error);
    }
-
-    console.log('Hero Notifier uruchomiony!');
 }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
