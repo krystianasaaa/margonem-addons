@@ -760,7 +760,7 @@ function createSettingsPanel() {
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                    <span style="color: #ccc; font-size: 12px;">Interfejs(w trakcie asasanaprawy)</span>
+                    <span style="color: #ccc; font-size: 12px;">Interfejs(w trakcie naprawy ale narazie mi sie nie chce xd)</span>
                     <label class="kwak-toggle-switch">
                         <input type="checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''}>
                         <span class="slider"></span>
