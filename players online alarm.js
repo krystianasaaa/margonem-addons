@@ -756,9 +756,6 @@ function toggleManagerSettingsPanel() {
 
         document.body.appendChild(settingsButton);
 
-        // Dodaj funkcję przeciągania
-        makeDraggable(settingsButton);
-
         // Ustaw wygląd przycisku
         updateButtonAppearance();
         integrateWithAddonManager();
