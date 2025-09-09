@@ -391,186 +391,6 @@
     }
 
     // Funkcja do przeciągania przycisku
-    function makeDraggable(element) {
-        let isDragging = false;
-        let offsetX = 0;
-        let offsetY = 0;
-        let hasMoved = false;
-
-        element.addEventListener('mousedown', (e) => {
-            if (e.button !== 0) return;
-            isDragging = true;
-            hasMoved = false;
-            offsetX = e.clientX - element.getBoundingClientRect().left;
-            offsetY = e.clientY - element.getBoundingClientRect().top;
-            e.preventDefault();
-            e.stopPropagation();
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            hasMoved = true;
-            const x = Math.min(Math.max(0, e.clientX - offsetX), window.innerWidth - element.offsetWidth);
-            const y = Math.min(Math.max(0, e.clientY - offsetY), window.innerHeight - element.offsetHeight);
-            element.style.left = `${x}px`;
-            element.style.top = `${y}px`;
-            element.style.right = 'auto';
-
-            // Zapisz pozycję
-            localStorage.setItem('podSettingsButtonPosition', JSON.stringify({x, y}));
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        // Zapobiegaj kliknięciu gdy przeciągamy
-        element.addEventListener('click', (e) => {
-            if (hasMoved) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            showSettings();
-        });
-    }
-
-    function showSettings() {
-        const modal = document.createElement('div');
-        modal.className = 'pod-settings-modal';
-
-        const log = getNotificationLog();
-        const logHtml = log.length > 0 ?
-            log.map(entry => `
-                <div class="pod-log-item">
-                    <span class="pod-log-time">${entry.time}</span> -
-                    <span class="pod-log-titan">${entry.titan}</span>: ${entry.count} graczy
-                </div>
-            `).join('') :
-            '<div style="text-align: center; color: #a8dadc; font-style: italic; padding: 20px;">Brak powiadomień</div>';
-
-        const enabled = isNotifierEnabled();
-        const webhookUrl = getDiscordWebhookUrl();
-
-        let statusClass = 'error';
-        let statusText = '❌ Dodatek wyłączony';
-
-        if (enabled && webhookUrl) {
-            statusClass = '';
-            statusText = '✅ Dodatek włączony i skonfigurowany';
-        } else if (enabled && !webhookUrl) {
-            statusClass = 'warning';
-            statusText = '⚠️ Dodatek włączony, ale brak webhook URL';
-        }
-
-        modal.innerHTML = `
-            <div class="pod-settings-dialog">
-                <h3>⚙️ Ustawienia</h3>
-
-                <div class="pod-setting-group">
-                    <label class="pod-setting-label">🔌 Status notifierа:</label>
-                    <div class="pod-toggle-container">
-                        <label class="pod-toggle-switch">
-                            <input type="checkbox" id="pod-notifier-enabled" ${enabled ? 'checked' : ''}>
-                            <span class="pod-toggle-slider"></span>
-                        </label>
-                        <span>${enabled ? 'Włączony' : 'Wyłączony'}</span>
-                    </div>
-                    <div class="pod-setting-description">
-                        Włącz lub wyłącz wysyłanie powiadomień na Discord
-                    </div>
-                </div>
-
-                <div class="pod-setting-group">
-                    <label class="pod-setting-label">🔗 Discord Webhook URL:</label>
-                    <input type="text" class="pod-setting-input" id="pod-webhook-url"
-                           placeholder="https://discord.com/api/webhooks/..."
-                           value="${webhookUrl}" ${!enabled ? 'disabled' : ''}>
-                    <div class="pod-setting-description">
-                        💡 Aby utworzyć webhook: Serwer Discord → Edytuj kanał → Integracje → Webhooks → Nowy Webhook
-                    </div>
-                </div>
-
-                <div class="pod-setting-group">
-                    <label class="pod-setting-label">📊 Próg powiadomień:</label>
-                    <div class="pod-threshold-setting">
-                        <input type="number" class="pod-setting-input pod-threshold-input" id="pod-threshold-input"
-                               min="1" max="50" value="${getPlayerThreshold()}" ${!enabled ? 'disabled' : ''}>
-                        <span>graczy na przedziale</span>
-                    </div>
-                    <div class="pod-setting-description">
-                        Powiadomienie zostanie wysłane gdy na dowolnym przedziale będzie co najmniej tyle osób
-                    </div>
-                </div>
-
-                <div class="pod-setting-group">
-                    <label class="pod-setting-label">📋 Ostatnie powiadomienia:</label>
-                    <div class="pod-notification-log">
-                        ${logHtml}
-                    </div>
-                </div>
-
-                <div class="pod-status-info ${statusClass}">
-                    <strong>Status:</strong> ${statusText}
-                </div>
-
-                <div class="pod-settings-buttons">
-                    <button class="pod-btn pod-btn-secondary" id="pod-close-settings">Anuluj</button>
-                    <button class="pod-btn pod-btn-primary" id="pod-save-settings">Zapisz ustawienia</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        // Event listeners
-        const enabledCheckbox = modal.querySelector('#pod-notifier-enabled');
-        const webhookInput = modal.querySelector('#pod-webhook-url');
-        const thresholdInput = modal.querySelector('#pod-threshold-input');
-
-        enabledCheckbox.onchange = () => {
-            const isEnabled = enabledCheckbox.checked;
-            webhookInput.disabled = !isEnabled;
-            thresholdInput.disabled = !isEnabled;
-        };
-
-        modal.querySelector('#pod-save-settings').onclick = () => {
-            const enabled = enabledCheckbox.checked;
-            const webhookUrl = webhookInput.value.trim();
-            const threshold = parseInt(thresholdInput.value);
-
-            setNotifierEnabled(enabled);
-            setDiscordWebhookUrl(webhookUrl);
-            setPlayerThreshold(threshold);
-
-            document.body.removeChild(modal);
-
-            // Pokaż komunikat sukcesu
-            const successMsg = document.createElement('div');
-            successMsg.style.cssText = `
-                position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-                z-index: 10002; background: linear-gradient(135deg, #28a745, #20c997);
-                color: white; padding: 12px 20px; border-radius: 8px;
-                font-weight: bold; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            `;
-            successMsg.innerHTML = '✅ Ustawienia zapisane pomyślnie!';
-            document.body.appendChild(successMsg);
-
-            setTimeout(() => successMsg.remove(), 3000);
-        };
-
-        modal.querySelector('#pod-close-settings').onclick = () => {
-            document.body.removeChild(modal);
-        };
-
-        modal.onclick = (e) => {
-            if (e.target === modal) {
-                document.body.removeChild(modal);
-            }
-        };
-    }
-
     function getPreviousPlayerCounts() {
         return JSON.parse(localStorage.getItem('podAutoNotifierPreviousCounts') || '{}');
     }
@@ -645,8 +465,6 @@
 
                             setLastNotificationData(lastNotificationData);
                             addToNotificationLog(titanName, currentCount);
-
-                            console.log(`✅ Wysłano powiadomienie: ${titanName} - wzrost z ${previousCount} do ${currentCount} graczy`);
                         }
                     }
                 }
@@ -670,6 +488,251 @@
             checkPlayersTimeout = null;
         }
     }
+    function integrateWithAddonManager() {
+    const checkForManager = setInterval(() => {
+        const addonContainer = document.getElementById('addon-players_online_alarm');
+        if (!addonContainer) return;
+
+        if (addonContainer.querySelector('#kwak-alarm-settings-btn')) {
+            clearInterval(checkForManager);
+            return;
+        }
+
+        let addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
+        addSettingsButton(addonNameContainer);
+        clearInterval(checkForManager);
+    }, 500);
+
+    setTimeout(() => {
+        clearInterval(checkForManager);
+    }, 20000);
+}
+
+function addSettingsButton(container) {
+    const helpIcon = container.querySelector('.kwak-addon-help-icon');
+    if (!helpIcon) return;
+
+    const settingsBtn = document.createElement('span');
+    settingsBtn.id = 'kwak-alarm-settings-btn';
+    settingsBtn.innerHTML = '⚙️';
+    settingsBtn.style.cssText = `
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        margin-left: 2px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+        display: inline-block;
+    `;
+
+    settingsBtn.onmouseover = () => settingsBtn.style.opacity = '1';
+    settingsBtn.onmouseout = () => settingsBtn.style.opacity = '0.7';
+
+    helpIcon.insertAdjacentElement('afterend', settingsBtn);
+
+    createManagerSettingsPanel();
+
+    settingsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleManagerSettingsPanel();
+    });
+}
+
+function createManagerSettingsPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'kwak-alarm-manager-panel';
+    panel.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #2a2a2a;
+        border: 1px solid #444;
+        border-radius: 4px;
+        padding: 0;
+        z-index: 10000;
+        display: none;
+        min-width: 350px;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    `;
+
+    const enabled = isNotifierEnabled();
+    const webhookUrl = getDiscordWebhookUrl();
+    const log = getNotificationLog();
+
+    let statusClass = 'error';
+    let statusText = '❌ Dodatek wyłączony';
+
+    if (enabled && webhookUrl) {
+        statusClass = '';
+        statusText = '✅ Dodatek włączony i skonfigurowany';
+    } else if (enabled && !webhookUrl) {
+        statusClass = 'warning';
+        statusText = '⚠️ Dodatek włączony, ale brak webhook URL';
+    }
+
+    const logHtml = log.length > 0 ?
+        log.map(entry => `
+            <div style="font-size: 11px; margin-bottom: 3px; padding: 3px; background: rgba(50,130,184,0.1); border-radius: 3px;">
+                <span style="color: #a8dadc; font-style: italic;">${entry.time}</span> -
+                <span style="font-weight: bold; color: #3282b8;">${entry.titan}</span>: ${entry.count} graczy
+            </div>
+        `).join('') :
+        '<div style="text-align: center; color: #a8dadc; font-style: italic; padding: 10px;">Brak powiadomień</div>';
+
+    panel.innerHTML = `
+        <div id="alarm-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
+            Players Online Alarm - Ustawienia
+        </div>
+
+        <div style="padding: 15px;">
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
+                    <span style="color: #ccc; font-size: 12px;">Włącz notifier</span>
+                    <label class="kwak-toggle-switch">
+                        <input type="checkbox" id="manager-notifier-enabled" ${enabled ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 4px;">Discord Webhook URL:</label>
+                    <input type="text" id="manager-webhook-url" placeholder="https://discord.com/api/webhooks/..." 
+                           value="${webhookUrl}" ${!enabled ? 'disabled' : ''}
+                           style="width: 100%; padding: 6px; background: rgba(50,130,184,0.2); border: 1px solid #0f4c75; border-radius: 3px; color: #e8f4fd; font-size: 12px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 4px;">Próg powiadomień (graczy):</label>
+                    <input type="number" id="manager-threshold-input" min="1" max="50" value="${getPlayerThreshold()}" 
+                           ${!enabled ? 'disabled' : ''}
+                           style="width: 80px; padding: 6px; background: rgba(50,130,184,0.2); border: 1px solid #0f4c75; border-radius: 3px; color: #e8f4fd; font-size: 12px; text-align: center;">
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 4px;">Ostatnie powiadomienia:</label>
+                    <div style="max-height: 100px; overflow-y: auto; background: rgba(0,0,0,0.3); border: 1px solid #0f4c75; border-radius: 3px; padding: 8px;">
+                        ${logHtml}
+                    </div>
+                </div>
+
+                <div style="padding: 8px; border-radius: 3px; margin-bottom: 12px; ${statusClass === 'warning' ? 'background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; color: #ffc107;' : statusClass === 'error' ? 'background: rgba(220, 53, 69, 0.1); border: 1px solid #dc3545; color: #dc3545;' : 'background: rgba(40, 167, 69, 0.1); border: 1px solid #28a745; color: #28a745;'}">
+                    <strong>Status:</strong> ${statusText}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
+                <button id="manager-close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                    Zamknij
+                </button>
+                <button id="manager-save-settings" style="flex: 1; padding: 8px 12px; background: #3282b8; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                    Zapisz
+                </button>
+            </div>
+        </div>
+    `;
+
+    // Dodaj style przełączników
+    if (!document.getElementById('kwak-alarm-toggle-styles')) {
+        const style = document.createElement('style');
+        style.id = 'kwak-alarm-toggle-styles';
+        style.textContent = `
+            .kwak-toggle-switch {
+                position: relative;
+                display: inline-block;
+                width: 44px;
+                height: 24px;
+            }
+            .kwak-toggle-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .kwak-toggle-switch .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #555;
+                transition: 0.3s;
+                border-radius: 24px;
+                border: 1px solid #666;
+            }
+            .kwak-toggle-switch .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 2px;
+                bottom: 2px;
+                background-color: white;
+                transition: 0.3s;
+                border-radius: 50%;
+            }
+            .kwak-toggle-switch input:checked + .slider {
+                background-color: #4CAF50;
+                border-color: #4CAF50;
+            }
+            .kwak-toggle-switch input:checked + .slider:before {
+                transform: translateX(20px);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.body.appendChild(panel);
+
+    // Event listenery
+    const enabledCheckbox = panel.querySelector('#manager-notifier-enabled');
+    const webhookInput = panel.querySelector('#manager-webhook-url');
+    const thresholdInput = panel.querySelector('#manager-threshold-input');
+
+    enabledCheckbox.onchange = () => {
+        const isEnabled = enabledCheckbox.checked;
+        webhookInput.disabled = !isEnabled;
+        thresholdInput.disabled = !isEnabled;
+    };
+
+    panel.querySelector('#manager-save-settings').onclick = () => {
+        const enabled = enabledCheckbox.checked;
+        const webhookUrl = webhookInput.value.trim();
+        const threshold = parseInt(thresholdInput.value);
+
+        setNotifierEnabled(enabled);
+        setDiscordWebhookUrl(webhookUrl);
+        setPlayerThreshold(threshold);
+
+        toggleManagerSettingsPanel();
+
+        const successMsg = document.createElement('div');
+        successMsg.style.cssText = `
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 10002; background: linear-gradient(135deg, #28a745, #20c997);
+            color: white; padding: 12px 20px; border-radius: 8px;
+            font-weight: bold; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        `;
+        successMsg.innerHTML = '✅ Ustawienia zapisane pomyślnie!';
+        document.body.appendChild(successMsg);
+
+        setTimeout(() => successMsg.remove(), 3000);
+    };
+
+    panel.querySelector('#manager-close-settings').onclick = () => {
+        toggleManagerSettingsPanel();
+    };
+}
+
+function toggleManagerSettingsPanel() {
+    const panel = document.getElementById('kwak-alarm-manager-panel');
+    if (panel) {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+}
 
     // Inicjalizacja
     function init() {
@@ -698,6 +761,7 @@
 
         // Ustaw wygląd przycisku
         updateButtonAppearance();
+        integrateWithAddonManager();
 
         // Rozpocznij sprawdzanie po minucie (używając setTimeout zamiast setInterval)
         setTimeout(() => {
@@ -707,8 +771,6 @@
 
         // Zatrzymaj timer gdy strona się wyładowuje
         window.addEventListener('beforeunload', stopTimer);
-
-        console.log('🚀 Dodatek uruchomiony!');
     }
 
     // Uruchom gdy strona się załaduje
