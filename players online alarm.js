@@ -569,7 +569,7 @@ function createManagerSettingsPanel() {
 
     panel.innerHTML = `
         <div id="alarm-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
-            Players Online Alarm - Ustawienia
+            Players Online Alarm - Settings
         </div>
 
         <div style="padding: 15px;">
