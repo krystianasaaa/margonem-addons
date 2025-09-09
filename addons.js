@@ -14,7 +14,6 @@
     const userId = getCookie('user_id');
     if (!allowedUsers.includes(userId)) {
         console.log('🚫 Brak uprawnień dla użytkownika:', userId);
-        console.log('✅ Dozwoleni użytkownicy:', allowedUsers);
         return;
     }
 let refreshRequired = false;
@@ -91,7 +90,6 @@ let refreshRequired = false;
 // Funkcja do tworzenia dodatku
     async function createAddon(addonId, config) {
         try {
-            console.log(`Ładowanie dodatku: ${config.name}...`);
 
             // Załaduj kod z GitHub
             const addonCode = await loadAddonCode(config.url);
@@ -104,7 +102,6 @@ let refreshRequired = false;
                 config: config,
                 addonFunction: null,
                 init: function() {
-                    console.log(`${config.name} włączony`);
                     try {
                         // Dodaj polyfill dla funkcji GM_
                         window.GM_getValue = window.GM_getValue || function(key, defaultValue) {
@@ -155,7 +152,6 @@ let refreshRequired = false;
             const addon = await createAddon(addonId, config);
             if (addon) {
                 loadedAddons[addonId] = addon;
-                console.log(`✅ Załadowano: ${config.name}`);
 
                 // Sprawdź zapisany stan i włącz dodatek jeśli był włączony
                 const wasEnabled = loadAddonState(addonId);
@@ -163,7 +159,6 @@ let refreshRequired = false;
                     try {
                         await addon.init();
                         addon.enabled = true;
-                        console.log(`🔄 Przywrócono stan: ${config.name} - włączony`);
                     } catch (error) {
                         console.error(`Błąd podczas przywracania ${config.name}:`, error);
                         addon.enabled = false;
@@ -171,7 +166,6 @@ let refreshRequired = false;
                     }
                 }
             } else {
-                console.log(`❌ Nie udało się załadować: ${config.name}`);
             }
         }
     }
@@ -185,7 +179,6 @@ let refreshRequired = false;
         }
 
         if (addon.enabled) {
-            console.log(`Dodatek ${addon.name} jest już włączony`);
             return true;
         }
 
@@ -193,7 +186,6 @@ let refreshRequired = false;
             await addon.init();
             addon.enabled = true;
             saveAddonState(addonId, true); // Zapisz stan
-            console.log(`✅ Włączono: ${addon.name}`);
             return true;
         } catch (error) {
             console.error(`Błąd podczas włączania ${addon.name}:`, error);
@@ -210,7 +202,6 @@ let refreshRequired = false;
         }
 
         if (!addon.enabled) {
-            console.log(`Dodatek ${addon.name} jest już wyłączony`);
             return true;
         }
 
@@ -218,7 +209,6 @@ let refreshRequired = false;
             addon.destroy();
             addon.enabled = false;
             saveAddonState(addonId, false); // Zapisz stan
-            console.log(`✅ Wyłączono: ${addon.name}`);
 
            setRefreshRequired();
 
@@ -255,7 +245,6 @@ let refreshRequired = false;
 
 // Funkcja cleanup (musisz ją dostosować do swoich potrzeb)
     function cleanupAddon(addonId) {
-        console.log(`Czyszczenie dodatku: ${addonId}`);
         // Tutaj umieść kod do czyszczenia zasobów dodatku
         // np. usuwanie event listenerów, elementów DOM, itp.
     }
@@ -1151,8 +1140,7 @@ menu.appendChild(header);
 
 // Inicjalizacja - załaduj wszystkie dodatki przy starcie
     loadAllAddons().then(() => {
-        console.log('🚀 Manager dodatków gotowy!');
-        console.log('Dostępne dodatki:', getAddonsList());
+
 
         // Stwórz GUI
         createGUI();
@@ -1170,12 +1158,6 @@ menu.appendChild(header);
             getAddon: (addonId) => loadedAddons[addonId],
             refresh: updateGUI,
         };
-
-        console.log('🎮 Dostępne komendy w konsoli:');
-        console.log('• AddonManager.enable("addon1") - włącz dodatek');
-        console.log('• AddonManager.disable("addon1") - wyłącz dodatek');
-        console.log('• AddonManager.toggle("addon1") - przełącz dodatek');
-        console.log('• AddonManager.list() - lista wszystkich dodatków');
     }).catch(error => {
         console.error('❌ Błąd podczas inicjalizacji managera dodatków:', error);
     });
