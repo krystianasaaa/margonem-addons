@@ -486,7 +486,6 @@ padding-top: 1px;
     // Inicjalizacja
     function init() {
         loadSettings();
-        console.log(`Margonem - Sprzedaż załadowana! Tryb: ${settings.mode === 'auto' ? 'Automatyczny' : 'Manualny'}`);
 
         document.addEventListener('keydown', handleKeyPress);
 
