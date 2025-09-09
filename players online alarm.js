@@ -305,7 +305,6 @@
 
     function setNotifierEnabled(enabled) {
         localStorage.setItem('podAutoNotifierEnabled', enabled.toString());
-        updateButtonAppearance();
     }
 
     function getLastNotificationData() {
@@ -333,20 +332,6 @@
 
         localStorage.setItem('podAutoNotifierLog', JSON.stringify(log));
     }
-
-    function updateButtonAppearance() {
-        const button = document.getElementById('pod-settings-button');
-        if (button) {
-            if (isNotifierEnabled()) {
-                button.classList.remove('disabled');
-                button.title = 'Notifier włączony - kliknij aby otworzyć ustawienia';
-            } else {
-                button.classList.add('disabled');
-                button.title = 'Dodatek - kliknij aby otworzyć ustawienia';
-            }
-        }
-    }
-
     // Funkcja wysyłania na Discord
     async function sendDiscordNotification(titanName, players) {
         const webhookUrl = getDiscordWebhookUrl();
@@ -756,8 +741,6 @@ function toggleManagerSettingsPanel() {
 
         document.body.appendChild(settingsButton);
 
-        // Ustaw wygląd przycisku
-        updateButtonAppearance();
         integrateWithAddonManager();
 
         // Rozpocznij sprawdzanie po minucie (używając setTimeout zamiast setInterval)
