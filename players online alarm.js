@@ -720,38 +720,24 @@ function toggleManagerSettingsPanel() {
 }
 
     // Inicjalizacja
-    function init() {
-        // Dodaj style
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
-        document.head.appendChild(styleSheet);
+ function init() {
+    // Dodaj style
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
 
-        // Utwórz przycisk ustawień
-        const settingsButton = document.createElement('div');
-        settingsButton.id = 'pod-settings-button';
-        settingsButton.innerHTML = '⚙️';
+    // Integracja z addon managerem (bez tworzenia osobnego przycisku)
+    integrateWithAddonManager();
 
-        // Przywróć zapisaną pozycję
-        const savedPos = JSON.parse(localStorage.getItem('podSettingsButtonPosition') || '{}');
-        if (savedPos.x !== undefined && savedPos.y !== undefined) {
-            settingsButton.style.left = `${savedPos.x}px`;
-            settingsButton.style.top = `${savedPos.y}px`;
-            settingsButton.style.right = 'auto';
-        }
+    // Rozpocznij sprawdzanie po minucie (używając setTimeout zamiast setInterval)
+    setTimeout(() => {
+        checkPlayers(); // Pierwsze sprawdzenie po minucie
+        scheduleNextCheck(); // Zaplanuj kolejne sprawdzenia
+    }, 60000);
 
-        document.body.appendChild(settingsButton);
-
-        integrateWithAddonManager();
-
-        // Rozpocznij sprawdzanie po minucie (używając setTimeout zamiast setInterval)
-        setTimeout(() => {
-            checkPlayers(); // Pierwsze sprawdzenie po minucie
-            scheduleNextCheck(); // Zaplanuj kolejne sprawdzenia
-        }, 60000);
-
-        // Zatrzymaj timer gdy strona się wyładowuje
-        window.addEventListener('beforeunload', stopTimer);
-    }
+    // Zatrzymaj timer gdy strona się wyładowuje
+    window.addEventListener('beforeunload', stopTimer);
+}
 
     // Uruchom gdy strona się załaduje
     if (document.readyState === 'loading') {
