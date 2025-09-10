@@ -1169,8 +1169,8 @@ menu.appendChild(header);
                 keyName: 'ADDON_MANAGER',
                 index: WidgetPosition[0],
                 pos: WidgetPosition[1],
-                txt: 'Addons',
-                type: 'red',
+                txt: 'Kaczor Addons',
+                type: 'grey',
                 alwaysExist: true,
                 default: true,
                 clb: () => {
