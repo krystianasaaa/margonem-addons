@@ -1187,13 +1187,6 @@ menu.appendChild(header);
 
 let iconStyle = document.createElement('style');
 iconStyle.innerHTML = `
-    // ... istniejący kod ...
-`;
-
-// ZASTĄP CAŁY iconStyle.innerHTML NA:
-
-let iconStyle = document.createElement('style');
-iconStyle.innerHTML = `
     .main-buttons-container .widget-button .icon.ADDON_MANAGER {
         background-image: url('${logoImage}');
         background-size: 32px 32px;
