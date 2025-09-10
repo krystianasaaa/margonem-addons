@@ -16,6 +16,41 @@
         console.log('🚫 Brak uprawnień dla użytkownika:', userId);
         return;
     }
+    function waitForEngine() {
+    return new Promise((resolve) => {
+        if (typeof Engine !== 'undefined' && Engine.allInit && Engine.widgetManager && Engine.widgetManager.getDefaultWidgetSet) {
+            resolve();
+            return;
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkEngine);
+        } else {
+            checkEngine();
+        }
+
+        function checkEngine() {
+            if (typeof Engine !== 'undefined' && Engine.allInit && Engine.widgetManager && Engine.widgetManager.getDefaultWidgetSet) {
+                resolve();
+                return;
+            }
+
+            if (document.readyState !== 'complete') {
+                window.addEventListener('load', () => {
+                    setTimeout(() => {
+                        if (typeof Engine !== 'undefined' && Engine.allInit && Engine.widgetManager && Engine.widgetManager.getDefaultWidgetSet) {
+                            resolve();
+                        } else {
+                            setTimeout(resolve, 2000);
+                        }
+                    }, 1000);
+                });
+            } else {
+                setTimeout(resolve, 2000);
+            }
+        }
+    });
+}
 let refreshRequired = false;
 
     const addonConfig = {
@@ -1114,6 +1149,67 @@ menu.appendChild(header);
         container.appendChild(menu);
         document.body.appendChild(container);
     }
+    function createAddonWidget() {
+    const logoImage = 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png';
+    
+    waitForEngine().then(() => {
+        if (!Engine || !Engine.widgetManager || !Engine.widgetManager.getDefaultWidgetSet) {
+            return;
+        }
+
+        try {
+            const serverStoragePos = Engine.serverStorage.get(
+                Engine.widgetManager.getPathToHotWidgetVersion()
+            );
+            let emptyWidgetSlot = Engine.widgetManager.getFirstEmptyWidgetSlot();
+            emptyWidgetSlot = [emptyWidgetSlot.slot, emptyWidgetSlot.container];
+            let WidgetPosition = serverStoragePos?.ADDON_MANAGER ? serverStoragePos.ADDON_MANAGER : emptyWidgetSlot;
+
+            Engine.widgetManager.getDefaultWidgetSet().ADDON_MANAGER = {
+                keyName: 'ADDON_MANAGER',
+                index: WidgetPosition[0],
+                pos: WidgetPosition[1],
+                txt: 'Addons',
+                type: 'red',
+                alwaysExist: true,
+                default: true,
+                clb: () => {
+                    const menu = document.querySelector('.kwak-addon-menu');
+                    if (menu) {
+                        menu.classList.toggle('active');
+                    }
+                }
+            };
+
+            Engine.widgetManager.createOneWidget('ADDON_MANAGER', { ADDON_MANAGER: WidgetPosition }, true, []);
+            Engine.widgetManager.setEnableDraggingButtonsWidget(false);
+
+            let iconStyle = document.createElement('style');
+            iconStyle.innerHTML = `
+                .main-buttons-container .widget-button .icon.ADDON_MANAGER {
+                    background-image: url('${logoImage}');
+                    background-position: 1px 1px;
+                    width: 44px;
+                    height: 44px;
+                    margin: 0;
+                    top: 0;
+                    left: 0;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                }
+                .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
+                    filter: brightness(1.2);
+                    transform: scale(1.05);
+                    transition: all 0.2s ease;
+                }
+            `;
+            document.head.appendChild(iconStyle);
+            
+        } catch (error) {
+            console.error('Błąd podczas tworzenia widgetu addon managera:', error);
+        }
+    });
+}
 
 // Update GUI - ZMIENIONA FUNKCJA
     function updateGUI() {
@@ -1139,28 +1235,33 @@ menu.appendChild(header);
     }
 
 // Inicjalizacja - załaduj wszystkie dodatki przy starcie
-    loadAllAddons().then(() => {
+// Inicjalizacja - załaduj wszystkie dodatki przy starcie
+loadAllAddons().then(() => {
 
+    // Stwórz widget jeśli Engine jest dostępny
+    if (typeof Engine !== 'undefined') {
+        createAddonWidget();
+    }
+    
+    // Stwórz GUI (floating button jako fallback)
+    createGUI();
 
-        // Stwórz GUI
-        createGUI();
-
-        // Globalne API do zarządzania dodatkami
-        window.AddonManager = {
-            enable: enableAddon,
-            disable: disableAddon,
-            toggle: toggleAddon,
-            list: getAddonsList,
-            isEnabled: (addonId) => {
-                const addon = loadedAddons[addonId];
-                return addon ? addon.enabled : false;
-            },
-            getAddon: (addonId) => loadedAddons[addonId],
-            refresh: updateGUI,
-        };
-    }).catch(error => {
-        console.error('❌ Błąd podczas inicjalizacji managera dodatków:', error);
-    });
+    // Globalne API do zarządzania dodatkami
+    window.AddonManager = {
+        enable: enableAddon,
+        disable: disableAddon,
+        toggle: toggleAddon,
+        list: getAddonsList,
+        isEnabled: (addonId) => {
+            const addon = loadedAddons[addonId];
+            return addon ? addon.enabled : false;
+        },
+        getAddon: (addonId) => loadedAddons[addonId],
+        refresh: updateGUI,
+    };
+}).catch(error => {
+    console.error('❌ Błąd podczas inicjalizacji managera dodatków:', error);
+});
 
     // Obsługa błędów
     window.addEventListener('error', (e) => {
