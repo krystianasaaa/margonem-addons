@@ -1165,21 +1165,21 @@ menu.appendChild(header);
             emptyWidgetSlot = [emptyWidgetSlot.slot, emptyWidgetSlot.container];
             let WidgetPosition = serverStoragePos?.ADDON_MANAGER ? serverStoragePos.ADDON_MANAGER : emptyWidgetSlot;
 
-            Engine.widgetManager.getDefaultWidgetSet().ADDON_MANAGER = {
-                keyName: 'ADDON_MANAGER',
-                index: WidgetPosition[0],
-                pos: WidgetPosition[1],
-                txt: 'Addons',
-                type: 'red',
-                alwaysExist: true,
-                default: true,
-                clb: () => {
-                    const menu = document.querySelector('.kwak-addon-menu');
-                    if (menu) {
-                        menu.classList.toggle('active');
-                    }
-                }
-            };
+      Engine.widgetManager.getDefaultWidgetSet().ADDON_MANAGER = {
+    keyName: 'ADDON_MANAGER',
+    index: WidgetPosition[0],
+    pos: WidgetPosition[1],
+    txt: 'Kaczor Addons',
+    type: 'normal',
+    alwaysExist: true,
+    default: true,
+    clb: () => {
+        const menu = document.querySelector('.kwak-addon-menu');
+        if (menu) {
+            menu.classList.toggle('active');
+        }
+    }
+};
 
             Engine.widgetManager.createOneWidget('ADDON_MANAGER', { ADDON_MANAGER: WidgetPosition }, true, []);
             Engine.widgetManager.setEnableDraggingButtonsWidget(false);
@@ -1188,27 +1188,59 @@ menu.appendChild(header);
 let iconStyle = document.createElement('style');
 iconStyle.innerHTML = `
     .main-buttons-container .widget-button .icon.ADDON_MANAGER {
-        background-image: url('${logoImage}');
-        background-size: 32px 32px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 44px;
-        height: 44px;
-        margin: 0;
-        top: 0;
-        left: 0;
-        border: none !important;
-        background-color: transparent !important;
-        box-shadow: none !important;
+        background-image: none !important;
+        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
+        border: 2px solid #333 !important;
+        border-radius: 4px !important;
+        box-shadow: 
+            inset 0 1px 0 rgba(255,255,255,0.1),
+            inset 0 -1px 0 rgba(0,0,0,0.3),
+            0 2px 4px rgba(0,0,0,0.5) !important;
+        width: 44px !important;
+        height: 44px !important;
+        margin: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+        position: relative !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .main-buttons-container .widget-button .icon.ADDON_MANAGER::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 28px !important;
+        height: 28px !important;
+        background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png') !important;
+        background-size: contain !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        opacity: 0.9 !important;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)) !important;
     }
     
     .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
-        opacity: 0.8;
+        background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%) !important;
+        border-color: #444 !important;
+        box-shadow: 
+            inset 0 1px 0 rgba(255,255,255,0.15),
+            inset 0 -1px 0 rgba(0,0,0,0.4),
+            0 3px 6px rgba(0,0,0,0.6) !important;
+    }
+    
+    .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover::before {
+        opacity: 1 !important;
+        filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7)) !important;
     }
     
     .main-buttons-container .widget-button .icon.ADDON_MANAGER:active {
-        opacity: 0.6;
-        transform: translateY(1px);
+        background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
+        box-shadow: 
+            inset 0 2px 4px rgba(0,0,0,0.5),
+            inset 0 1px 0 rgba(255,255,255,0.05) !important;
+        transform: translateY(1px) !important;
     }
     
     .main-buttons-container .widget-button.ADDON_MANAGER {
