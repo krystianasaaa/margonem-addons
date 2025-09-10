@@ -1184,27 +1184,61 @@ menu.appendChild(header);
             Engine.widgetManager.createOneWidget('ADDON_MANAGER', { ADDON_MANAGER: WidgetPosition }, true, []);
             Engine.widgetManager.setEnableDraggingButtonsWidget(false);
 
-            let iconStyle = document.createElement('style');
-            iconStyle.innerHTML = `
-                .main-buttons-container .widget-button .icon.ADDON_MANAGER {
-                    background-image: url('${logoImage}');
-                    background-position: 1px 1px;
-                    width: 44px;
-                    height: 44px;
-                    margin: 0;
-                    top: 0;
-                    left: 0;
-                    background-size: contain;
-                    background-repeat: no-repeat;
-                }
-                .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
-                    filter: brightness(1.2);
-                    transform: scale(1.05);
-                    transition: all 0.2s ease;
-                }
-            `;
-            document.head.appendChild(iconStyle);
-            
+
+let iconStyle = document.createElement('style');
+iconStyle.innerHTML = `
+    .main-buttons-container .widget-button .icon.ADDON_MANAGER {
+        background-image: url('${logoImage}');
+        background-size: 24px 24px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 44px;
+        height: 44px;
+        margin: 0;
+        top: 0;
+        left: 0;
+        border: 2px solid #8b4513;
+        border-radius: 4px;
+        background-color: #2a2a2a;
+        box-shadow: 
+            inset 0 1px 0 rgba(255,255,255,0.1),
+            inset 0 -1px 0 rgba(0,0,0,0.3),
+            0 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
+        background-color: #3a3a3a;
+        border-color: #9b5523;
+        box-shadow: 
+            inset 0 1px 0 rgba(255,255,255,0.15),
+            inset 0 -1px 0 rgba(0,0,0,0.4),
+            0 3px 6px rgba(0,0,0,0.6);
+        transform: none;
+        filter: none;
+    }
+    
+    .main-buttons-container .widget-button .icon.ADDON_MANAGER:active {
+        background-color: #1a1a1a;
+        box-shadow: 
+            inset 0 2px 4px rgba(0,0,0,0.5),
+            inset 0 1px 0 rgba(255,255,255,0.05);
+        transform: translateY(1px);
+    }
+    
+    /* Dopasowanie do stylów innych widgetów */
+    .main-buttons-container .widget-button.ADDON_MANAGER {
+        border: none;
+        background: none;
+        padding: 2px;
+    }
+    
+    .main-buttons-container .widget-button.ADDON_MANAGER .widget-button-background {
+        background: linear-gradient(to bottom, #444 0%, #222 100%);
+        border: 1px solid #666;
+        border-radius: 6px;
+    }
+`;
+document.head.appendChild(iconStyle);
         } catch (error) {
             console.error('Błąd podczas tworzenia widgetu addon managera:', error);
         }
