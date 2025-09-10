@@ -1169,8 +1169,8 @@ menu.appendChild(header);
                 keyName: 'ADDON_MANAGER',
                 index: WidgetPosition[0],
                 pos: WidgetPosition[1],
-                txt: 'Kaczor Addons',
-                type: 'grey',
+                txt: 'Addons',
+                type: 'red',
                 alwaysExist: true,
                 default: true,
                 clb: () => {
@@ -1187,6 +1187,13 @@ menu.appendChild(header);
 
 let iconStyle = document.createElement('style');
 iconStyle.innerHTML = `
+    // ... istniejący kod ...
+`;
+
+// ZASTĄP CAŁY iconStyle.innerHTML NA:
+
+let iconStyle = document.createElement('style');
+iconStyle.innerHTML = `
     .main-buttons-container .widget-button .icon.ADDON_MANAGER {
         background-image: url('${logoImage}');
         background-size: 32px 32px;
@@ -1197,9 +1204,9 @@ iconStyle.innerHTML = `
         margin: 0;
         top: 0;
         left: 0;
-        border: none;
-        background-color: transparent;
-        box-shadow: none;
+        border: none !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
     }
     
     .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
@@ -1212,15 +1219,22 @@ iconStyle.innerHTML = `
     }
     
     .main-buttons-container .widget-button.ADDON_MANAGER {
-        border: none;
-        background: none;
-        padding: 0;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        box-shadow: none !important;
     }
     
     .main-buttons-container .widget-button.ADDON_MANAGER .widget-button-background {
-        background: none;
-        border: none;
-        box-shadow: none;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        display: none !important;
+    }
+    
+    .main-buttons-container .widget-button.ADDON_MANAGER::before,
+    .main-buttons-container .widget-button.ADDON_MANAGER::after {
+        display: none !important;
     }
 `;
 document.head.appendChild(iconStyle);
