@@ -1211,14 +1211,14 @@ iconStyle.innerHTML = `
         top: 50% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
-        width: 28px !important;
-        height: 28px !important;
+        width: 18px !important;
+        height: 18px !important;
         background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png') !important;
         background-size: contain !important;
         background-repeat: no-repeat !important;
         background-position: center !important;
         opacity: 0.9 !important;
-        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)) !important;
+        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5)) !important;
     }
     
     .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
