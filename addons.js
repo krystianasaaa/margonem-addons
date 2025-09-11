@@ -969,11 +969,12 @@ function updateHeaderRefreshInfo() {
 
 // Create GUI - ZMIENIONA FUNKCJA
 // Create GUI - tylko menu bez floating ikony
+// Create GUI - naprawiona wersja
 function createGUI() {
     // Stwórz menu
     const menu = document.createElement('div');
     menu.className = 'kwak-addon-menu';
-    menu.style.display = 'none'; // Ukryj menu początkowo
+    menu.style.display = 'none';
 
     const header = document.createElement('div');
     header.className = 'kwak-addon-menu-header';
@@ -997,7 +998,6 @@ function createGUI() {
     const content = document.createElement('div');
     content.className = 'kwak-addon-content';
 
-    // Tworzenie dwóch kolumn
     const leftColumn = document.createElement('div');
     leftColumn.className = 'kwak-addon-column';
 
@@ -1015,7 +1015,6 @@ function createGUI() {
         info.id = `addon-${addon.config.id}`;
         info.className = 'kwak-addon-info';
 
-        // Kontener dla nazwy i ikony pomocy
         const nameContainer = document.createElement('div');
         nameContainer.className = 'kwak-addon-name-container';
 
@@ -1027,12 +1026,10 @@ function createGUI() {
         helpIcon.className = 'kwak-addon-help-icon';
         helpIcon.textContent = '?';
 
-        // Tooltip z opisem
         const tooltip = document.createElement('div');
         tooltip.className = 'kwak-addon-tooltip';
         tooltip.textContent = addonConfig[addonId].description || 'Brak opisu dla tego dodatku.';
 
-        // Event listenery dla pokazywania/ukrywania tooltipa
         helpIcon.addEventListener('mouseenter', () => {
             document.body.appendChild(tooltip);
             positionTooltip(helpIcon, tooltip);
@@ -1075,7 +1072,6 @@ function createGUI() {
         item.appendChild(info);
         item.appendChild(switchElement);
 
-        // Dodaj do odpowiedniej kolumny (naprzemiennie)
         if (index % 2 === 0) {
             leftColumn.appendChild(item);
         } else {
@@ -1086,7 +1082,6 @@ function createGUI() {
     content.appendChild(leftColumn);
     content.appendChild(rightColumn);
 
-    // Przyciski kontrolne
     const controls = document.createElement('div');
     controls.className = 'kwak-addon-controls';
 
@@ -1120,26 +1115,9 @@ function createGUI() {
     menu.appendChild(content);
     menu.appendChild(controls);
 
-    // Dodaj menu do body
     document.body.appendChild(menu);
 
-    // Globalna funkcja do pokazywania menu (wywoływana przez widget)
-    window.showAddonManager = function() {
-        menu.style.display = 'block';
-        menu.classList.add('active');
-        
-        // Wyśrodkuj menu na ekranie
-        const rect = menu.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        const left = Math.max(0, (viewportWidth - rect.width) / 2);
-        const top = Math.max(0, (viewportHeight - rect.height) / 2);
-        
-        menu.style.position = 'fixed';
-        menu.style.left = left + 'px';
-        menu.style.top = top + 'px';
-    };
+    return menu;
 }
 function createAddonWidget() {
     const logoImage = 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png';
@@ -1292,15 +1270,35 @@ function createAddonWidget() {
 
 // Inicjalizacja - załaduj wszystkie dodatki przy starcie
 // Inicjalizacja - załaduj wszystkie dodatki przy starcie
+// Inicjalizacja - zmieniona kolejność
 loadAllAddons().then(() => {
+    // 1. Najpierw stwórz menu
+    const menu = createGUI();
+    
+    // 2. Potem stwórz globalną funkcję do otwierania menu
+    window.showAddonManager = function() {
+        menu.style.display = 'block';
+        menu.classList.add('active');
+        
+        // Wyśrodkuj menu na ekranie
+        setTimeout(() => {
+            const rect = menu.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            const left = Math.max(0, (viewportWidth - rect.width) / 2);
+            const top = Math.max(0, (viewportHeight - rect.height) / 2);
+            
+            menu.style.position = 'fixed';
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+        }, 10);
+    };
 
-    // Stwórz widget jeśli Engine jest dostępny
+    // 3. Na końcu stwórz widget (który już może używać showAddonManager)
     if (typeof Engine !== 'undefined') {
         createAddonWidget();
     }
-    
-    // Stwórz GUI (floating button jako fallback)
-    createGUI();
 
     // Globalne API do zarządzania dodatkami
     window.AddonManager = {
@@ -1314,9 +1312,10 @@ loadAllAddons().then(() => {
         },
         getAddon: (addonId) => loadedAddons[addonId],
         refresh: updateGUI,
+        show: () => window.showAddonManager?.()
     };
 }).catch(error => {
-    console.error('❌ Błąd podczas inicjalizacji managera dodatków:', error);
+    console.error('Błąd podczas inicjalizacji managera dodatków:', error);
 });
 
     // Obsługa błędów
