@@ -1184,12 +1184,11 @@ menu.appendChild(header);
             Engine.widgetManager.createOneWidget('ADDON_MANAGER', { ADDON_MANAGER: WidgetPosition }, true, []);
             Engine.widgetManager.setEnableDraggingButtonsWidget(false);
 
-
 let iconStyle = document.createElement('style');
 iconStyle.innerHTML = `
     .main-buttons-container .widget-button .icon.ADDON_MANAGER {
         background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png') !important;
-        background-size: contain !important;
+        background-size: 32px 32px !important;
         background-repeat: no-repeat !important;
         background-position: center !important;
         width: 44px !important;
