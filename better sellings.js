@@ -7,7 +7,7 @@
         key2: 'Digit2',
         key3: 'Digit3',
         acceptKey: 'Enter',
-        mode: 'auto', // 'auto' lub 'manual'
+        mode: 'auto', // 'auto' lub 'manual' gowno
         delay: 100
     };
 
