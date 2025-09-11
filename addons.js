@@ -1144,6 +1144,7 @@ function createAddonWidget() {
                 alwaysExist: true,
                 default: true,
                 clb: () => {
+               console.log(window.showAddonManager, "gownotext123");
                     // Wywołaj globalną funkcję do pokazania menu
                     if (window.showAddonManager) {
                         window.showAddonManager();
