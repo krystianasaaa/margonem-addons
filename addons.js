@@ -1188,59 +1188,20 @@ menu.appendChild(header);
 let iconStyle = document.createElement('style');
 iconStyle.innerHTML = `
     .main-buttons-container .widget-button .icon.ADDON_MANAGER {
-        background-image: none !important;
-        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
-        border: 2px solid #333 !important;
-        border-radius: 4px !important;
-        box-shadow: 
-            inset 0 1px 0 rgba(255,255,255,0.1),
-            inset 0 -1px 0 rgba(0,0,0,0.3),
-            0 2px 4px rgba(0,0,0,0.5) !important;
-        width: 44px !important;
-        height: 44px !important;
-        margin: 0 !important;
-        top: 0 !important;
-        left: 0 !important;
-        position: relative !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER::before {
-        content: '' !important;
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        width: 28px !important;
-        height: 28px !important;
         background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png') !important;
         background-size: contain !important;
         background-repeat: no-repeat !important;
         background-position: center !important;
-        opacity: 0.9 !important;
-        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5)) !important;
+        width: 44px !important;
+        height: 44px !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background-color: transparent !important;
     }
     
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
-        background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%) !important;
-        border-color: #444 !important;
-        box-shadow: 
-            inset 0 1px 0 rgba(255,255,255,0.15),
-            inset 0 -1px 0 rgba(0,0,0,0.4),
-            0 3px 6px rgba(0,0,0,0.6) !important;
-    }
-    
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover::before {
-        opacity: 1 !important;
-        filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7)) !important;
-    }
-    
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER:active {
-        background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
-        box-shadow: 
-            inset 0 2px 4px rgba(0,0,0,0.5),
-            inset 0 1px 0 rgba(255,255,255,0.05) !important;
-        transform: translateY(1px) !important;
+    .main-buttons-container .widget-button .icon.ADDON_MANAGER::before {
+        display: none !important;
     }
     
     .main-buttons-container .widget-button.ADDON_MANAGER {
@@ -1248,6 +1209,7 @@ iconStyle.innerHTML = `
         background: transparent !important;
         padding: 0 !important;
         box-shadow: none !important;
+        margin: 0 !important;
     }
     
     .main-buttons-container .widget-button.ADDON_MANAGER .widget-button-background {
@@ -1260,6 +1222,20 @@ iconStyle.innerHTML = `
     .main-buttons-container .widget-button.ADDON_MANAGER::before,
     .main-buttons-container .widget-button.ADDON_MANAGER::after {
         display: none !important;
+    }
+    
+    /* Usuń wszystkie dodatkowe efekty wizualne */
+    .main-buttons-container .widget-button.ADDON_MANAGER:hover {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .main-buttons-container .widget-button.ADDON_MANAGER:active {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        transform: none !important;
     }
 `;
 document.head.appendChild(iconStyle);
