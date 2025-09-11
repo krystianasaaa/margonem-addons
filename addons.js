@@ -278,10 +278,8 @@ let refreshRequired = false;
         }));
     }
 
-// Funkcja cleanup (musisz ją dostosować do swoich potrzeb)
+
     function cleanupAddon(addonId) {
-        // Tutaj umieść kod do czyszczenia zasobów dodatku
-        // np. usuwanie event listenerów, elementów DOM, itp.
     }
 
     const styles = `
@@ -298,7 +296,7 @@ let refreshRequired = false;
     background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
     border: 2px solid #333 !important;
     border-radius: 4px !important;
-    box-shadow: 
+    box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.1),
         inset 0 -1px 0 rgba(0,0,0,0.3),
         0 2px 4px rgba(0,0,0,0.5) !important;
@@ -312,7 +310,7 @@ let refreshRequired = false;
 .kwak-addon-toggle-btn:hover {
     background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%) !important;
     border-color: #444 !important;
-    box-shadow: 
+    box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.15),
         inset 0 -1px 0 rgba(0,0,0,0.4),
         0 3px 6px rgba(0,0,0,0.6) !important;
@@ -320,7 +318,7 @@ let refreshRequired = false;
 
 .kwak-addon-toggle-btn:active {
     background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
-    box-shadow: 
+    box-shadow:
         inset 0 2px 4px rgba(0,0,0,0.5),
         inset 0 1px 0 rgba(255,255,255,0.05) !important;
     transform: translateY(1px) !important;
@@ -349,7 +347,7 @@ let refreshRequired = false;
 
 .kwak-addon-menu.active ~ .kwak-addon-toggle-btn {
     border-color: #4CAF50 !important;
-    box-shadow: 
+    box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.2),
         inset 0 -1px 0 rgba(0,0,0,0.3),
         0 0 8px rgba(76, 175, 80, 0.3) !important;
@@ -371,6 +369,7 @@ let refreshRequired = false;
 
 .kwak-addon-menu.active {
     display: block;
+   z-index: 999;
 }
 
 .kwak-addon-menu-header {
@@ -765,21 +764,21 @@ let refreshRequired = false;
         width: 95vw;
         max-width: 500px;
     }
-    
+
     .kwak-addon-content {
         grid-template-columns: 1fr;
     }
-    
+
     .kwak-addon-controls {
         flex-direction: column;
         gap: 4px;
     }
-    
+
     .kwak-refresh-notification {
         max-width: 90vw;
         padding: 15px;
     }
-    
+
     .kwak-refresh-notification-buttons {
         flex-direction: column;
     }
@@ -842,16 +841,16 @@ function setRefreshRequired() {
 function updateHeaderRefreshInfo() {
     const header = document.querySelector('.kwak-addon-menu-header');
     if (!header) return;
-    
+
     let refreshInfo = header.querySelector('.refresh-info');
-    
+
     if (!refreshRequired) {
         refreshInfo?.remove();
         return;
     }
-    
+
     if (refreshInfo) return;
-    
+
     refreshInfo = document.createElement('span');
     refreshInfo.className = 'refresh-info';
     refreshInfo.innerHTML = ' <span style="color: #ff4444; font-weight: bold; font-size: 12px;">!Wymagane odświeżenie gry!</span>';
@@ -967,18 +966,30 @@ function updateHeaderRefreshInfo() {
         tooltip.style.top = top + 'px';
     }
 
-// Create GUI - ZMIENIONA FUNKCJA
-// Create GUI - tylko menu bez floating ikony
-// Create GUI - naprawiona wersja
 function createGUI() {
     // Stwórz menu
     const menu = document.createElement('div');
     menu.className = 'kwak-addon-menu';
     menu.style.display = 'none';
 
+    // NOWE: Ustaw pozycję od razu podczas tworzenia
+    const savedPosition = loadPosition();
+    if (savedPosition.x !== null && savedPosition.y !== null) {
+        menu.style.position = 'fixed';
+        menu.style.left = savedPosition.x + 'px';
+        menu.style.top = savedPosition.y + 'px';
+    } else {
+        // Jeśli nie ma zapisanej pozycji, ustaw domyślną pozycję poza ekranem
+        // (zostanie wyśrodkowana w showAddonManager)
+        menu.style.position = 'fixed';
+        menu.style.left = '50%';
+        menu.style.top = '50%';
+        menu.style.transform = 'translate(-50%, -50%)';
+    }
+
     const header = document.createElement('div');
     header.className = 'kwak-addon-menu-header';
-    header.textContent = `${userId} (${Engine.hero.d.nick}) - Pełny dostęp`;
+    header.textContent = `${userId} (${Engine.hero.d.nick}) - Pełny Dostęp`;
 
     const closeBtn = document.createElement('button');
     closeBtn.className = 'kwak-addon-close-btn';
@@ -990,7 +1001,7 @@ function createGUI() {
     });
 
     header.appendChild(closeBtn);
-    updateHeaderRefreshInfo(); 
+    updateHeaderRefreshInfo();
     makeDraggable(menu, header);
     menu.appendChild(header);
 
@@ -1121,7 +1132,7 @@ function createGUI() {
 }
 function createAddonWidget() {
     const logoImage = 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png';
-    
+
     waitForEngine().then(() => {
         if (!Engine || !Engine.widgetManager || !Engine.widgetManager.getDefaultWidgetSet) {
             return;
@@ -1144,7 +1155,6 @@ function createAddonWidget() {
                 alwaysExist: true,
                 default: true,
                 clb: () => {
-               console.log(window.showAddonManager, "gownotext123");
                     // Wywołaj globalną funkcję do pokazania menu
                     if (window.showAddonManager) {
                         window.showAddonManager();
@@ -1162,7 +1172,7 @@ function createAddonWidget() {
                 background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
                 border: 2px solid #333 !important;
                 border-radius: 4px !important;
-                box-shadow: 
+                box-shadow:
                     inset 0 1px 0 rgba(255,255,255,0.1),
                     inset 0 -1px 0 rgba(0,0,0,0.3),
                     0 2px 4px rgba(0,0,0,0.5) !important;
@@ -1181,7 +1191,7 @@ function createAddonWidget() {
                 transition: all 0.2s ease !important;
                 overflow: hidden !important;
             }
-                
+
                 .main-buttons-container .widget-button .icon.ADDON_MANAGER::before {
                     content: '' !important;
                     position: absolute !important;
@@ -1197,43 +1207,43 @@ function createAddonWidget() {
                     opacity: 0.9 !important;
                     filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5)) !important;
                 }
-                
+
                 .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
                     background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%) !important;
                     border-color: #444 !important;
-                    box-shadow: 
+                    box-shadow:
                         inset 0 1px 0 rgba(255,255,255,0.15),
                         inset 0 -1px 0 rgba(0,0,0,0.4),
                         0 3px 6px rgba(0,0,0,0.6) !important;
                 }
-                
+
                 .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover::before {
                     opacity: 1 !important;
                     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7)) !important;
                 }
-                
+
                 .main-buttons-container .widget-button .icon.ADDON_MANAGER:active {
                     background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
-                    box-shadow: 
+                    box-shadow:
                         inset 0 2px 4px rgba(0,0,0,0.5),
                         inset 0 1px 0 rgba(255,255,255,0.05) !important;
                     transform: translateY(1px) !important;
                 }
-                
+
                 .main-buttons-container .widget-button.ADDON_MANAGER {
                     border: none !important;
                     background: transparent !important;
                     padding: 0 !important;
                     box-shadow: none !important;
                 }
-                
+
                 .main-buttons-container .widget-button.ADDON_MANAGER .widget-button-background {
                     background: transparent !important;
                     border: none !important;
                     box-shadow: none !important;
                     display: none !important;
                 }
-                
+
                 .main-buttons-container .widget-button.ADDON_MANAGER::before,
                 .main-buttons-container .widget-button.ADDON_MANAGER::after {
                     display: none !important;
@@ -1273,26 +1283,30 @@ function createAddonWidget() {
 loadAllAddons().then(() => {
     // 1. Najpierw stwórz menu
     const menu = createGUI();
-    
-    // 2. Potem stwórz globalną funkcję do otwierania menu
-    window.showAddonManager = function() {
-        menu.style.display = 'block';
-        menu.classList.add('active');
-        
-        // Wyśrodkuj menu na ekranie
+
+window.showAddonManager = function() {
+    menu.style.display = 'block';
+    menu.classList.add('active');
+
+    // Jeśli menu nie ma zapisanej pozycji (transform: translate), wyśrodkuj je
+    if (menu.style.transform && menu.style.transform.includes('translate')) {
         setTimeout(() => {
             const rect = menu.getBoundingClientRect();
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
-            
+
             const left = Math.max(0, (viewportWidth - rect.width) / 2);
             const top = Math.max(0, (viewportHeight - rect.height) / 2);
-            
-            menu.style.position = 'fixed';
+
             menu.style.left = left + 'px';
             menu.style.top = top + 'px';
+            menu.style.transform = 'none'; // Usuń transform po ustawieniu pozycji
+
+            // Zapisz wyśrodkowaną pozycję
+            savePosition(left, top);
         }, 10);
-    };
+    }
+};
 
     // 3. Na końcu stwórz widget (który już może używać showAddonManager)
     if (typeof Engine !== 'undefined') {
