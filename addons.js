@@ -968,188 +968,158 @@ function updateHeaderRefreshInfo() {
     }
 
 // Create GUI - ZMIENIONA FUNKCJA
-    function createGUI() {
-        const container = document.createElement('div');
-        container.className = 'kwak-addon-manager';
+// Create GUI - tylko menu bez floating ikony
+// Create GUI - naprawiona wersja
+function createGUI() {
+    // Stwórz menu
+    const menu = document.createElement('div');
+    menu.className = 'kwak-addon-menu';
+    menu.style.display = 'none';
 
-        // Wczytaj zapisaną pozycję
-        const savedPosition = loadPosition();
-        if (savedPosition.x !== null && savedPosition.y !== null) {
-            container.style.left = savedPosition.x + 'px';
-            container.style.top = savedPosition.y + 'px';
-        } else {
-            // Domyślna pozycja
-            container.style.top = '10px';
-            container.style.right = '10px';
-        }
+    const header = document.createElement('div');
+    header.className = 'kwak-addon-menu-header';
+    header.textContent = `${userId} (${Engine.hero.d.nick}) - Pełny dostęp`;
 
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'kwak-addon-toggle-btn';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'kwak-addon-close-btn';
+    closeBtn.innerHTML = '×';
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.remove('active');
+        menu.style.display = 'none';
+    });
 
-        const wasDragged = makeDraggable(container, toggleBtn);
+    header.appendChild(closeBtn);
+    updateHeaderRefreshInfo(); 
+    makeDraggable(menu, header);
+    menu.appendChild(header);
 
-        const menu = document.createElement('div');
-        menu.className = 'kwak-addon-menu';
+    // Kontener dla dodatków z dwiema kolumnami
+    const content = document.createElement('div');
+    content.className = 'kwak-addon-content';
 
-        const header = document.createElement('div');
-        header.className = 'kwak-addon-menu-header';
-        header.textContent = `${userId} (${Engine.hero.d.nick}) - Pełny dostęp`;
+    const leftColumn = document.createElement('div');
+    leftColumn.className = 'kwak-addon-column';
 
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'kwak-addon-close-btn';
-        closeBtn.innerHTML = '×';
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            menu.classList.remove('active');
-        });
-header.appendChild(closeBtn);
-updateHeaderRefreshInfo(); 
-makeDraggable(menu, header);
-menu.appendChild(header);
+    const rightColumn = document.createElement('div');
+    rightColumn.className = 'kwak-addon-column';
 
-        // Kontener dla dodatków z dwiema kolumnami
-        const content = document.createElement('div');
-        content.className = 'kwak-addon-content';
+    // Podziel dodatki na dwie kolumny
+    const addonEntries = Object.entries(loadedAddons);
 
-        // Tworzenie dwóch kolumn
-        const leftColumn = document.createElement('div');
-        leftColumn.className = 'kwak-addon-column';
+    addonEntries.forEach(([addonId, addon], index) => {
+        const item = document.createElement('div');
+        item.className = 'kwak-addon-item';
 
+        const info = document.createElement('div');
+        info.id = `addon-${addon.config.id}`;
+        info.className = 'kwak-addon-info';
 
-        const rightColumn = document.createElement('div');
-        rightColumn.className = 'kwak-addon-column';
+        const nameContainer = document.createElement('div');
+        nameContainer.className = 'kwak-addon-name-container';
 
-        // Podziel dodatki na dwie kolumny
-        const addonEntries = Object.entries(loadedAddons);
+        const name = document.createElement('div');
+        name.className = 'kwak-addon-name';
+        name.textContent = addon.name;
 
-        addonEntries.forEach(([addonId, addon], index) => {
-            const item = document.createElement('div');
-            item.className = 'kwak-addon-item';
+        const helpIcon = document.createElement('div');
+        helpIcon.className = 'kwak-addon-help-icon';
+        helpIcon.textContent = '?';
 
-            const info = document.createElement('div');
-            info.id = `addon-${addon.config.id}`;
-            info.className = 'kwak-addon-info';
+        const tooltip = document.createElement('div');
+        tooltip.className = 'kwak-addon-tooltip';
+        tooltip.textContent = addonConfig[addonId].description || 'Brak opisu dla tego dodatku.';
 
-            // Kontener dla nazwy i ikony pomocy
-            const nameContainer = document.createElement('div');
-            nameContainer.className = 'kwak-addon-name-container';
-
-            const name = document.createElement('div');
-            name.className = 'kwak-addon-name';
-            name.textContent = addon.name;
-
-            const helpIcon = document.createElement('div');
-            helpIcon.className = 'kwak-addon-help-icon';
-            helpIcon.textContent = '?';
-
-// Tooltip z opisem
-            const tooltip = document.createElement('div');
-            tooltip.className = 'kwak-addon-tooltip';
-            tooltip.textContent = addonConfig[addonId].description || 'Brak opisu dla tego dodatku.';
-
-// Event listenery dla pokazywania/ukrywania tooltipa
-            helpIcon.addEventListener('mouseenter', () => {
-                document.body.appendChild(tooltip); // Dodaj tooltip do body
-                positionTooltip(helpIcon, tooltip);
-                tooltip.style.opacity = '1';
-                tooltip.style.visibility = 'visible';
-            });
-
-            helpIcon.addEventListener('mouseleave', () => {
-                tooltip.style.opacity = '0';
-                tooltip.style.visibility = 'hidden';
-                setTimeout(() => {
-                    if (tooltip.parentNode) {
-                        tooltip.parentNode.removeChild(tooltip);
-                    }
-                }, 200);
-            });
-
-            nameContainer.appendChild(name);
-            nameContainer.appendChild(helpIcon);
-
-            const status = document.createElement('div');
-            status.className = `kwak-addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
-            status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
-
-            info.appendChild(nameContainer); // Zmienione z name na nameContainer
-            info.appendChild(status);
-
-            const switchElement = document.createElement('div');
-            switchElement.className = `kwak-addon-switch ${addon.enabled ? 'active' : ''}`;
-
-            switchElement.addEventListener('click', async () => {
-                const success = await toggleAddon(addonId);
-                if (success) {
-                    switchElement.classList.toggle('active', addon.enabled);
-                    status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
-                    status.className = `kwak-addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
-                }
-            });
-
-            item.appendChild(info);
-            item.appendChild(switchElement);
-
-            // Dodaj do odpowiedniej kolumny (naprzemiennie)
-            if (index % 2 === 0) {
-                leftColumn.appendChild(item);
-            } else {
-                rightColumn.appendChild(item);
-            }
+        helpIcon.addEventListener('mouseenter', () => {
+            document.body.appendChild(tooltip);
+            positionTooltip(helpIcon, tooltip);
+            tooltip.style.opacity = '1';
+            tooltip.style.visibility = 'visible';
         });
 
-        content.appendChild(leftColumn);
-        content.appendChild(rightColumn);
-
-        // Control buttons
-        const controls = document.createElement('div');
-        controls.className = 'kwak-addon-controls';
-
-        const enableAllBtn = document.createElement('button');
-        enableAllBtn.className = 'kwak-control-btn kwak-enable-all-btn';
-        enableAllBtn.textContent = 'Włącz wszystkie';
-        enableAllBtn.addEventListener('click', async () => {
-            for (const addonId of Object.keys(loadedAddons)) {
-                if (!loadedAddons[addonId].enabled) {
-                    await enableAddon(addonId);
-                }
-            }
-            updateGUI();
-        });
-
-        const disableAllBtn = document.createElement('button');
-        disableAllBtn.className = 'kwak-control-btn kwak-disable-all-btn';
-        disableAllBtn.textContent = 'Wyłącz wszystkie';
-        disableAllBtn.addEventListener('click', () => {
-            Object.keys(loadedAddons).forEach(addonId => {
-                if (loadedAddons[addonId].enabled) {
-                    disableAddon(addonId);
-                }
-            });
-            updateGUI();
-        });
-
-        controls.appendChild(enableAllBtn);
-        controls.appendChild(disableAllBtn);
-
-        menu.appendChild(content);
-        menu.appendChild(controls);
-
-        toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
+        helpIcon.addEventListener('mouseleave', () => {
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
             setTimeout(() => {
-                if (!toggleBtn.classList.contains('dragging') && !wasDragged()) {
-                    menu.classList.toggle('active');
+                if (tooltip.parentNode) {
+                    tooltip.parentNode.removeChild(tooltip);
                 }
-            }, 10);
+            }, 200);
         });
 
+        nameContainer.appendChild(name);
+        nameContainer.appendChild(helpIcon);
 
-        container.appendChild(toggleBtn);
-        container.appendChild(menu);
-        document.body.appendChild(container);
-    }
-    function createAddonWidget() {
+        const status = document.createElement('div');
+        status.className = `kwak-addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
+        status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
+
+        info.appendChild(nameContainer);
+        info.appendChild(status);
+
+        const switchElement = document.createElement('div');
+        switchElement.className = `kwak-addon-switch ${addon.enabled ? 'active' : ''}`;
+
+        switchElement.addEventListener('click', async () => {
+            const success = await toggleAddon(addonId);
+            if (success) {
+                switchElement.classList.toggle('active', addon.enabled);
+                status.textContent = addon.enabled ? 'Włączony' : 'Wyłączony';
+                status.className = `kwak-addon-status ${addon.enabled ? 'enabled' : 'disabled'}`;
+            }
+        });
+
+        item.appendChild(info);
+        item.appendChild(switchElement);
+
+        if (index % 2 === 0) {
+            leftColumn.appendChild(item);
+        } else {
+            rightColumn.appendChild(item);
+        }
+    });
+
+    content.appendChild(leftColumn);
+    content.appendChild(rightColumn);
+
+    const controls = document.createElement('div');
+    controls.className = 'kwak-addon-controls';
+
+    const enableAllBtn = document.createElement('button');
+    enableAllBtn.className = 'kwak-control-btn kwak-enable-all-btn';
+    enableAllBtn.textContent = 'Włącz wszystkie';
+    enableAllBtn.addEventListener('click', async () => {
+        for (const addonId of Object.keys(loadedAddons)) {
+            if (!loadedAddons[addonId].enabled) {
+                await enableAddon(addonId);
+            }
+        }
+        updateGUI();
+    });
+
+    const disableAllBtn = document.createElement('button');
+    disableAllBtn.className = 'kwak-control-btn kwak-disable-all-btn';
+    disableAllBtn.textContent = 'Wyłącz wszystkie';
+    disableAllBtn.addEventListener('click', () => {
+        Object.keys(loadedAddons).forEach(addonId => {
+            if (loadedAddons[addonId].enabled) {
+                disableAddon(addonId);
+            }
+        });
+        updateGUI();
+    });
+
+    controls.appendChild(enableAllBtn);
+    controls.appendChild(disableAllBtn);
+
+    menu.appendChild(content);
+    menu.appendChild(controls);
+
+    document.body.appendChild(menu);
+
+    return menu;
+}
+function createAddonWidget() {
     const logoImage = 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png';
     
     waitForEngine().then(() => {
@@ -1165,110 +1135,110 @@ menu.appendChild(header);
             emptyWidgetSlot = [emptyWidgetSlot.slot, emptyWidgetSlot.container];
             let WidgetPosition = serverStoragePos?.ADDON_MANAGER ? serverStoragePos.ADDON_MANAGER : emptyWidgetSlot;
 
-      Engine.widgetManager.getDefaultWidgetSet().ADDON_MANAGER = {
-    keyName: 'ADDON_MANAGER',
-    index: WidgetPosition[0],
-    pos: WidgetPosition[1],
-    txt: 'Kaczor Addons',
-    type: 'normal',
-    alwaysExist: true,
-    default: true,
-    clb: () => {
-        const menu = document.querySelector('.kwak-addon-menu');
-        if (menu) {
-            menu.classList.toggle('active');
-        }
-    }
-};
+            Engine.widgetManager.getDefaultWidgetSet().ADDON_MANAGER = {
+                keyName: 'ADDON_MANAGER',
+                index: WidgetPosition[0],
+                pos: WidgetPosition[1],
+                txt: 'Kaczor Addons',
+                type: 'normal',
+                alwaysExist: true,
+                default: true,
+                clb: () => {
+                    // Wywołaj globalną funkcję do pokazania menu
+                    if (window.showAddonManager) {
+                        window.showAddonManager();
+                    }
+                }
+            };
 
             Engine.widgetManager.createOneWidget('ADDON_MANAGER', { ADDON_MANAGER: WidgetPosition }, true, []);
             Engine.widgetManager.setEnableDraggingButtonsWidget(false);
 
-let iconStyle = document.createElement('style');
-iconStyle.innerHTML = `
-.main-buttons-container .widget-button .icon.ADDON_MANAGER {
-    background-image: none !important;
-    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
-    border: 2px solid #333 !important;
-    border-radius: 4px !important;
-    box-shadow: 
-        inset 0 1px 0 rgba(255,255,255,0.1),
-        inset 0 -1px 0 rgba(0,0,0,0.3),
-        0 2px 4px rgba(0,0,0,0.5) !important;
-    width: 44px !important;
-    height: 44px !important;
-    max-width: 44px !important;
-    max-height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    top: 0 !important;
-    left: 0 !important;
-    position: relative !important;
-    transition: all 0.2s ease !important;
-    overflow: hidden !important;
-}
-    
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER::before {
-        content: '' !important;
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        width: 28px !important;
-        height: 28px !important;
-        background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png') !important;
-        background-size: contain !important;
-        background-repeat: no-repeat !important;
-        background-position: center !important;
-        opacity: 0.9 !important;
-        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5)) !important;
-    }
-    
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
-        background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%) !important;
-        border-color: #444 !important;
-        box-shadow: 
-            inset 0 1px 0 rgba(255,255,255,0.15),
-            inset 0 -1px 0 rgba(0,0,0,0.4),
-            0 3px 6px rgba(0,0,0,0.6) !important;
-    }
-    
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover::before {
-        opacity: 1 !important;
-        filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7)) !important;
-    }
-    
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER:active {
-        background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
-        box-shadow: 
-            inset 0 2px 4px rgba(0,0,0,0.5),
-            inset 0 1px 0 rgba(255,255,255,0.05) !important;
-        transform: translateY(1px) !important;
-    }
-    
-    .main-buttons-container .widget-button.ADDON_MANAGER {
-        border: none !important;
-        background: transparent !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-    }
-    
-    .main-buttons-container .widget-button.ADDON_MANAGER .widget-button-background {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        display: none !important;
-    }
-    
-    .main-buttons-container .widget-button.ADDON_MANAGER::before,
-    .main-buttons-container .widget-button.ADDON_MANAGER::after {
-        display: none !important;
-    }
-`;
-document.head.appendChild(iconStyle);
+            let iconStyle = document.createElement('style');
+            iconStyle.innerHTML = `
+            .main-buttons-container .widget-button .icon.ADDON_MANAGER {
+                background-image: none !important;
+                background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
+                border: 2px solid #333 !important;
+                border-radius: 4px !important;
+                box-shadow: 
+                    inset 0 1px 0 rgba(255,255,255,0.1),
+                    inset 0 -1px 0 rgba(0,0,0,0.3),
+                    0 2px 4px rgba(0,0,0,0.5) !important;
+                width: 44px !important;
+                height: 44px !important;
+                max-width: 44px !important;
+                max-height: 44px !important;
+                min-width: 44px !important;
+                min-height: 44px !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                position: relative !important;
+                transition: all 0.2s ease !important;
+                overflow: hidden !important;
+            }
+                
+                .main-buttons-container .widget-button .icon.ADDON_MANAGER::before {
+                    content: '' !important;
+                    position: absolute !important;
+                    top: 50% !important;
+                    left: 50% !important;
+                    transform: translate(-50%, -50%) !important;
+                    width: 28px !important;
+                    height: 28px !important;
+                    background-image: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png') !important;
+                    background-size: contain !important;
+                    background-repeat: no-repeat !important;
+                    background-position: center !important;
+                    opacity: 0.9 !important;
+                    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5)) !important;
+                }
+                
+                .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover {
+                    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%) !important;
+                    border-color: #444 !important;
+                    box-shadow: 
+                        inset 0 1px 0 rgba(255,255,255,0.15),
+                        inset 0 -1px 0 rgba(0,0,0,0.4),
+                        0 3px 6px rgba(0,0,0,0.6) !important;
+                }
+                
+                .main-buttons-container .widget-button .icon.ADDON_MANAGER:hover::before {
+                    opacity: 1 !important;
+                    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7)) !important;
+                }
+                
+                .main-buttons-container .widget-button .icon.ADDON_MANAGER:active {
+                    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
+                    box-shadow: 
+                        inset 0 2px 4px rgba(0,0,0,0.5),
+                        inset 0 1px 0 rgba(255,255,255,0.05) !important;
+                    transform: translateY(1px) !important;
+                }
+                
+                .main-buttons-container .widget-button.ADDON_MANAGER {
+                    border: none !important;
+                    background: transparent !important;
+                    padding: 0 !important;
+                    box-shadow: none !important;
+                }
+                
+                .main-buttons-container .widget-button.ADDON_MANAGER .widget-button-background {
+                    background: transparent !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    display: none !important;
+                }
+                
+                .main-buttons-container .widget-button.ADDON_MANAGER::before,
+                .main-buttons-container .widget-button.ADDON_MANAGER::after {
+                    display: none !important;
+                }
+            `;
+            document.head.appendChild(iconStyle);
         } catch (error) {
             console.error('Błąd podczas tworzenia widgetu addon managera:', error);
         }
@@ -1298,17 +1268,35 @@ document.head.appendChild(iconStyle);
         }
     }
 
-// Inicjalizacja - załaduj wszystkie dodatki przy starcie
-// Inicjalizacja - załaduj wszystkie dodatki przy starcie
-loadAllAddons().then(() => {
 
-    // Stwórz widget jeśli Engine jest dostępny
+loadAllAddons().then(() => {
+    // 1. Najpierw stwórz menu
+    const menu = createGUI();
+    
+    // 2. Potem stwórz globalną funkcję do otwierania menu
+    window.showAddonManager = function() {
+        menu.style.display = 'block';
+        menu.classList.add('active');
+        
+        // Wyśrodkuj menu na ekranie
+        setTimeout(() => {
+            const rect = menu.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            const left = Math.max(0, (viewportWidth - rect.width) / 2);
+            const top = Math.max(0, (viewportHeight - rect.height) / 2);
+            
+            menu.style.position = 'fixed';
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+        }, 10);
+    };
+
+    // 3. Na końcu stwórz widget (który już może używać showAddonManager)
     if (typeof Engine !== 'undefined') {
         createAddonWidget();
     }
-    
-    // Stwórz GUI (floating button jako fallback)
-    createGUI();
 
     // Globalne API do zarządzania dodatkami
     window.AddonManager = {
@@ -1322,9 +1310,10 @@ loadAllAddons().then(() => {
         },
         getAddon: (addonId) => loadedAddons[addonId],
         refresh: updateGUI,
+        show: () => window.showAddonManager?.()
     };
 }).catch(error => {
-    console.error('❌ Błąd podczas inicjalizacji managera dodatków:', error);
+    console.error('Błąd podczas inicjalizacji managera dodatków:', error);
 });
 
     // Obsługa błędów
