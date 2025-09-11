@@ -1186,23 +1186,30 @@ menu.appendChild(header);
 
 let iconStyle = document.createElement('style');
 iconStyle.innerHTML = `
-    .main-buttons-container .widget-button .icon.ADDON_MANAGER {
-        background-image: none !important;
-        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
-        border: 2px solid #333 !important;
-        border-radius: 4px !important;
-        box-shadow: 
-            inset 0 1px 0 rgba(255,255,255,0.1),
-            inset 0 -1px 0 rgba(0,0,0,0.3),
-            0 2px 4px rgba(0,0,0,0.5) !important;
-        width: 44px !important;
-        height: 44px !important;
-        margin: 0 !important;
-        top: 0 !important;
-        left: 0 !important;
-        position: relative !important;
-        transition: all 0.2s ease !important;
-    }
+.main-buttons-container .widget-button .icon.ADDON_MANAGER {
+    background-image: none !important;
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
+    border: 2px solid #333 !important;
+    border-radius: 4px !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 2px 4px rgba(0,0,0,0.5) !important;
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    position: relative !important;
+    transition: all 0.2s ease !important;
+    overflow: hidden !important;
+}
     
     .main-buttons-container .widget-button .icon.ADDON_MANAGER::before {
         content: '' !important;
