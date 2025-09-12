@@ -86,15 +86,18 @@
     let startY = 0;
     let initialX = 0;
     let initialY = 0;
+    let clickCount = 0;
+    let clickAudio = null;
 
-    // Klucz do zapisywania w localStorage
-    const STORAGE_KEY = 'kwak-duck-position';
+    // Klucze do zapisywania w localStorage
+    const STORAGE_KEY_POSITION = 'kwak-duck-position';
+    const STORAGE_KEY_CLICKS = 'kwak-duck-clicks';
 
     // Funkcje do zapisywania/wczytywania pozycji
     function savePosition(x, y) {
         try {
             const position = { x: x, y: y };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(position));
+            localStorage.setItem(STORAGE_KEY_POSITION, JSON.stringify(position));
         } catch (e) {
             console.warn('Nie można zapisać pozycji kaczki:', e);
         }
@@ -102,7 +105,7 @@
 
     function loadPosition() {
         try {
-            const saved = localStorage.getItem(STORAGE_KEY);
+            const saved = localStorage.getItem(STORAGE_KEY_POSITION);
             if (saved) {
                 return JSON.parse(saved);
             }
@@ -111,6 +114,27 @@
         }
         // Domyślna pozycja (prawy górny róg)
         return { x: window.innerWidth - 70, y: 20 };
+    }
+
+    // Funkcje do zapisywania/wczytywania licznika kliknięć
+    function saveClickCount(count) {
+        try {
+            localStorage.setItem(STORAGE_KEY_CLICKS, count.toString());
+        } catch (e) {
+            console.warn('Nie można zapisać licznika kliknięć:', e);
+        }
+    }
+
+    function loadClickCount() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY_CLICKS);
+            if (saved) {
+                return parseInt(saved, 10);
+            }
+        } catch (e) {
+            console.warn('Nie można wczytać licznika kliknięć:', e);
+        }
+        return 0;
     }
 
     // Sprawdź czy pozycja jest w granicach ekranu
@@ -124,6 +148,23 @@
         };
     }
 
+    // Stwórz audio element
+    function createAudio() {
+        clickAudio = new Audio('https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/sounds/quackclick.mp3');
+        clickAudio.volume = 0.5;
+        clickAudio.preload = 'auto';
+    }
+
+    // Odtwórz dźwięk kliknięcia
+    function playClickSound() {
+        if (clickAudio) {
+            clickAudio.currentTime = 0;
+            clickAudio.play().catch(e => {
+                console.warn('Nie można odtworzyć dźwięku:', e);
+            });
+        }
+    }
+
     // Stwórz kaczkę
     function createDuck() {
         if (duck) return;
@@ -131,9 +172,10 @@
         duck = document.createElement('div');
         duck.className = 'kwak-duck';
 
-        // Wczytaj zapisaną pozycję
+        // Wczytaj zapisaną pozycję i licznik
         const savedPosition = loadPosition();
         const validPosition = validatePosition(savedPosition);
+        clickCount = loadClickCount();
 
         // Ustaw pozycję kaczki
         duck.style.left = validPosition.x + 'px';
@@ -150,6 +192,9 @@
         // Event listeners
         duck.addEventListener('mousedown', startDrag);
         duck.addEventListener('click', handleClick);
+
+        // Stwórz audio
+        createAudio();
     }
 
     // Start przeciągania
@@ -221,10 +266,23 @@
         }
     }
 
-    // Kliknięcie - odtwarza video tylko przy prawdziwym kliknięciu
+    // Kliknięcie - odtwarza dźwięk i liczy kliknięcia
     function handleClick(e) {
         if (!hasDragged) {
-            playVideo();
+            // Odtwórz dźwięk
+            playClickSound();
+
+            // Zwiększ licznik
+            clickCount++;
+            saveClickCount(clickCount);
+
+            // Sprawdź czy osiągnięto 10 kliknięć
+            if (clickCount >= 10) {
+                playVideo();
+                // Resetuj licznik
+                clickCount = 0;
+                saveClickCount(clickCount);
+            }
         }
         hasDragged = false;
     }
@@ -253,9 +311,6 @@
 
         // Auto-zamknięcie po skończeniu
         video.onended = closeVideo;
-
-        // Kliknięcie w video = zamknij
-        video.onclick = closeVideo;
 
         // ESC = zamknij
         const escHandler = (e) => {
