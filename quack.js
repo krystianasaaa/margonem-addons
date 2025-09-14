@@ -1,14 +1,14 @@
 (function() {
     'use strict';
 
-    // CSS Styles
+    // CSS Styles - NAPRAWIONY KURSOR
     const css = `
         .kwak-duck {
             position: fixed;
             width: 50px;
             height: 50px;
             z-index: 999999;
-            cursor: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/main/videos/ikonka2.png'), auto;
+            cursor: pointer;
             border-radius: 50%;
             user-select: none;
             transition: transform 0.2s ease;
@@ -16,11 +16,11 @@
 
         .kwak-duck:hover {
             transform: scale(1.1);
-            cursor: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/main/videos/ikonka2.png'), auto;
+            cursor: grab;
         }
 
         .kwak-duck.kwak-dragging {
-            cursor: url('https://raw.githubusercontent.com/krystianasaaa/margonem-addons/main/videos/ikonka2.png'), grabbing;
+            cursor: grabbing;
         }
 
         .kwak-duck-img {
