@@ -748,9 +748,8 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
     gameWindow.id = 'hero-detection-window';
     gameWindow.style.cssText = `
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 200px;
+        left: 240px;
         background: linear-gradient(180deg, #4a3c5e 0%, #3d2f4f 50%, #2f1f3f 100%);
         border: 2px solid #6b5b7b;
         border-radius: 8px;
@@ -782,7 +781,7 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
             align-items: center;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
         ">
-            <span style="flex: 1; text-align: center;">Wykryto rzadkiego NPC!</span>
+            <span style="flex: 1; text-align: center;">Heros!</span>
             <button style="
                 background: none; 
                 border: none; 
