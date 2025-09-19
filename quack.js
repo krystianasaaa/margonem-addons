@@ -71,6 +71,117 @@
         .kwak-close:hover {
             background: rgba(255,0,0,0.8);
         }
+
+        .kwak-settings-panel {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 20px;
+            z-index: 1000000;
+            color: white;
+            font-family: Arial, sans-serif;
+            min-width: 250px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            cursor: move;
+        }
+
+        .kwak-settings-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #ffd700;
+            cursor: move;
+        }
+
+        .kwak-volume-control {
+            margin-bottom: 15px;
+        }
+
+        .kwak-volume-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .kwak-volume-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .kwak-volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+        }
+
+        .kwak-volume-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+            border: none;
+        }
+
+        .kwak-volume-value {
+            text-align: center;
+            font-size: 12px;
+            color: #ffd700;
+            margin-top: 5px;
+        }
+
+        .kwak-settings-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .kwak-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .kwak-btn-save {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .kwak-btn-save:hover {
+            background: #45a049;
+        }
+
+        .kwak-btn-cancel {
+            background: #f44336;
+            color: white;
+        }
+
+        .kwak-btn-cancel:hover {
+            background: #da190b;
+        }
+
+        .kwak-click-counter {
+            font-size: 11px;
+            color: #ccc;
+            text-align: center;
+            margin-top: 10px;
+        }
     `;
 
     // Dodaj CSS
@@ -88,10 +199,20 @@
     let initialY = 0;
     let clickCount = 0;
     let clickAudio = null;
+    let videoVolume = 0.7; // Domyślna głośność video
+
+    // Zmienne dla przeciągania panelu ustawień
+    let settingsPanel = null;
+    let isPanelDragging = false;
+    let panelStartX = 0;
+    let panelStartY = 0;
+    let panelInitialX = 0;
+    let panelInitialY = 0;
 
     // Klucze do zapisywania w localStorage
     const STORAGE_KEY_POSITION = 'kwak-duck-position';
     const STORAGE_KEY_CLICKS = 'kwak-duck-clicks';
+    const STORAGE_KEY_VOLUME = 'kwak-duck-volume';
 
     // Funkcje do zapisywania/wczytywania pozycji
     function savePosition(x, y) {
@@ -137,6 +258,27 @@
         return 0;
     }
 
+    // Funkcje do zapisywania/wczytywania głośności
+    function saveVolume(volume) {
+        try {
+            localStorage.setItem(STORAGE_KEY_VOLUME, volume.toString());
+        } catch (e) {
+            console.warn('Nie można zapisać głośności:', e);
+        }
+    }
+
+    function loadVolume() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY_VOLUME);
+            if (saved) {
+                return parseFloat(saved);
+            }
+        } catch (e) {
+            console.warn('Nie można wczytać głośności:', e);
+        }
+        return 0.7; // Domyślna głośność
+    }
+
     // Sprawdź czy pozycja jest w granicach ekranu
     function validatePosition(pos) {
         const maxX = window.innerWidth - 50;
@@ -165,6 +307,144 @@
         }
     }
 
+    // Pokaż panel ustawień
+    function showSettingsPanel() {
+        // Usuń istniejący panel jeśli istnieje
+        const existingPanel = document.querySelector('.kwak-settings-panel');
+        if (existingPanel) {
+            existingPanel.remove();
+            return;
+        }
+
+        settingsPanel = document.createElement('div');
+        settingsPanel.className = 'kwak-settings-panel';
+
+        // Pozycjonuj panel względem kaczki
+        const duckRect = duck.getBoundingClientRect();
+        let panelX = duckRect.right + 10;
+        let panelY = duckRect.top;
+
+        // Sprawdź czy panel zmieści się na ekranie
+        if (panelX + 250 > window.innerWidth) {
+            panelX = duckRect.left - 260;
+        }
+        if (panelY + 200 > window.innerHeight) {
+            panelY = window.innerHeight - 200;
+        }
+
+        settingsPanel.style.left = panelX + 'px';
+        settingsPanel.style.top = panelY + 'px';
+
+        settingsPanel.innerHTML = `
+            <div class="kwak-settings-title">🦆 - Settings</div>
+            <div class="kwak-volume-control">
+                <label class="kwak-volume-label">Głośność filmiku:</label>
+                <input type="range" class="kwak-volume-slider" min="0" max="1" step="0.1" value="${videoVolume}">
+                <div class="kwak-volume-value">${Math.round(videoVolume * 100)}%</div>
+            </div>
+            <div class="kwak-click-counter">
+                Kliknięcia do filmiku: ${clickCount}/10
+            </div>
+            <div class="kwak-settings-buttons">
+                <button class="kwak-btn kwak-btn-save">Zapisz</button>
+                <button class="kwak-btn kwak-btn-cancel">Anuluj</button>
+            </div>
+        `;
+
+        document.body.appendChild(settingsPanel);
+
+        // Event listeners dla panelu
+        const volumeSlider = settingsPanel.querySelector('.kwak-volume-slider');
+        const volumeValue = settingsPanel.querySelector('.kwak-volume-value');
+        const saveBtn = settingsPanel.querySelector('.kwak-btn-save');
+        const cancelBtn = settingsPanel.querySelector('.kwak-btn-cancel');
+        const titleBar = settingsPanel.querySelector('.kwak-settings-title');
+
+        // Aktualizuj wartość głośności w czasie rzeczywistym
+        volumeSlider.addEventListener('input', function() {
+            const volume = parseFloat(this.value);
+            volumeValue.textContent = Math.round(volume * 100) + '%';
+        });
+
+        // Zapisz ustawienia
+        saveBtn.addEventListener('click', function() {
+            videoVolume = parseFloat(volumeSlider.value);
+            saveVolume(videoVolume);
+            settingsPanel.remove();
+            settingsPanel = null;
+        });
+
+        // Anuluj zmiany
+        cancelBtn.addEventListener('click', function() {
+            settingsPanel.remove();
+            settingsPanel = null;
+        });
+
+        // Przeciąganie panelu
+        titleBar.addEventListener('mousedown', startPanelDrag);
+        settingsPanel.addEventListener('mousedown', startPanelDrag);
+
+        // Zamknij panel po kliknięciu poza nim
+        setTimeout(() => {
+            document.addEventListener('click', function closePanel(e) {
+                if (settingsPanel && !settingsPanel.contains(e.target) && !duck.contains(e.target)) {
+                    settingsPanel.remove();
+                    settingsPanel = null;
+                    document.removeEventListener('click', closePanel);
+                }
+            });
+        }, 100);
+    }
+
+    // Funkcje przeciągania panelu ustawień
+    function startPanelDrag(e) {
+        if (e.target.classList.contains('kwak-volume-slider') ||
+            e.target.classList.contains('kwak-btn') ||
+            e.target.tagName === 'BUTTON') {
+            return; // Nie przeciągaj gdy klikamy na kontrolki
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        isPanelDragging = true;
+
+        panelStartX = e.clientX;
+        panelStartY = e.clientY;
+
+        const rect = settingsPanel.getBoundingClientRect();
+        panelInitialX = rect.left;
+        panelInitialY = rect.top;
+
+        document.addEventListener('mousemove', dragPanel);
+        document.addEventListener('mouseup', stopPanelDrag);
+    }
+
+    function dragPanel(e) {
+        if (!isPanelDragging || !settingsPanel) return;
+
+        e.preventDefault();
+
+        const moveX = e.clientX - panelStartX;
+        const moveY = e.clientY - panelStartY;
+
+        let newX = panelInitialX + moveX;
+        let newY = panelInitialY + moveY;
+
+        // Ograniczenia ekranu dla panelu
+        newX = Math.max(0, Math.min(window.innerWidth - 250, newX));
+        newY = Math.max(0, Math.min(window.innerHeight - 200, newY));
+
+        settingsPanel.style.left = newX + 'px';
+        settingsPanel.style.top = newY + 'px';
+    }
+
+    function stopPanelDrag() {
+        isPanelDragging = false;
+        document.removeEventListener('mousemove', dragPanel);
+        document.removeEventListener('mouseup', stopPanelDrag);
+    }
+
     // Stwórz kaczkę
     function createDuck() {
         if (duck) return;
@@ -172,10 +452,11 @@
         duck = document.createElement('div');
         duck.className = 'kwak-duck';
 
-        // Wczytaj zapisaną pozycję i licznik
+        // Wczytaj zapisane ustawienia
         const savedPosition = loadPosition();
         const validPosition = validatePosition(savedPosition);
         clickCount = loadClickCount();
+        videoVolume = loadVolume();
 
         // Ustaw pozycję kaczki
         duck.style.left = validPosition.x + 'px';
@@ -192,6 +473,7 @@
         // Event listeners
         duck.addEventListener('mousedown', startDrag);
         duck.addEventListener('click', handleClick);
+        duck.addEventListener('contextmenu', handleRightClick);
 
         // Stwórz audio
         createAudio();
@@ -199,6 +481,9 @@
 
     // Start przeciągania
     function startDrag(e) {
+        // Tylko lewy przycisk myszy dla przeciągania
+        if (e.button !== 0) return;
+
         e.preventDefault();
 
         isDragging = true;
@@ -266,9 +551,11 @@
         }
     }
 
-    // Kliknięcie - odtwarza dźwięk i liczy kliknięcia
+    // Kliknięcie lewym przyciskiem - kwakanie + licznik
     function handleClick(e) {
-        if (!hasDragged) {
+        e.preventDefault();
+
+        if (!hasDragged && e.button === 0) { // Lewy przycisk myszy
             // Odtwórz dźwięk
             playClickSound();
 
@@ -283,6 +570,16 @@
                 clickCount = 0;
                 saveClickCount(clickCount);
             }
+        }
+        hasDragged = false;
+    }
+
+    // Obsługa prawego przycisku myszy - ustawienia
+    function handleRightClick(e) {
+        e.preventDefault();
+
+        if (!hasDragged) {
+            showSettingsPanel();
         }
         hasDragged = false;
     }
@@ -307,7 +604,7 @@
         video.className = 'kwak-video';
         video.src = 'https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/videos/Duck%20Quack%20remix.mp4';
         video.autoplay = true;
-        video.volume = 0.7;
+        video.volume = videoVolume; // Użyj zapisanej głośności
 
         // Auto-zamknięcie po skończeniu
         video.onended = closeVideo;
@@ -346,6 +643,12 @@
             duck.style.left = validPosition.x + 'px';
             duck.style.top = validPosition.y + 'px';
             savePosition(validPosition.x, validPosition.y);
+        }
+
+        // Zamknij panel ustawień jeśli jest otwarty
+        const panel = document.querySelector('.kwak-settings-panel');
+        if (panel) {
+            panel.remove();
         }
     }
 
