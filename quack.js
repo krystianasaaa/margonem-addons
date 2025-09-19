@@ -371,7 +371,7 @@
         settingsPanel.style.top = panelY + 'px';
 
         settingsPanel.innerHTML = `
-            <div class="kwak-settings-title">🦆 Ustawienia Kaczki</div>
+            <div class="kwak-settings-title">🦆 Settings</div>
             <div class="kwak-volume-control">
                 <label class="kwak-volume-label">Głośność filmiku:</label>
                 <input type="range" class="kwak-volume-slider" min="0" max="1" step="0.05" value="${videoVolume}">
