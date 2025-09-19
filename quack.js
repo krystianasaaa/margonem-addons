@@ -97,14 +97,14 @@
             border-bottom: 1px solid #4f545c;
         }
 
-        .kwak-volume-control {
+        .kwak-volume-control, .kwak-autoplay-control {
             margin-bottom: 12px;
             background: #2f3136;
             padding: 10px;
             border-radius: 6px;
         }
 
-        .kwak-volume-label {
+        .kwak-volume-label, .kwak-autoplay-label {
             display: block;
             margin-bottom: 8px;
             font-size: 11px;
@@ -112,6 +112,87 @@
             color: #b9bbbe;
             text-transform: uppercase;
             letter-spacing: 0.02em;
+        }
+
+        .kwak-autoplay-checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .kwak-autoplay-checkbox-container:hover {
+            background-color: rgba(79, 84, 92, 0.3);
+        }
+
+        .kwak-autoplay-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #72767d;
+            border-radius: 4px;
+            background: #2f3136;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            outline: none;
+        }
+
+        .kwak-autoplay-checkbox:hover {
+            border-color: #5865f2;
+            transform: scale(1.05);
+        }
+
+        .kwak-autoplay-checkbox:checked {
+            background: linear-gradient(135deg, #5865f2, #4752c4);
+            border-color: #5865f2;
+            transform: scale(1.05);
+        }
+
+        .kwak-autoplay-checkbox:checked::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            width: 4px;
+            height: 8px;
+            border: solid #ffffff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            animation: checkmark-appear 0.2s ease-in-out;
+        }
+
+        @keyframes checkmark-appear {
+            0% {
+                opacity: 0;
+                transform: rotate(45deg) scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: rotate(45deg) scale(1);
+            }
+        }
+
+        .kwak-autoplay-checkbox:focus {
+            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3);
+        }
+
+        .kwak-autoplay-text {
+            font-size: 12px;
+            color: #dcddde;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .kwak-autoplay-checkbox-container:hover .kwak-autoplay-text {
+            color: #ffffff;
         }
 
         .kwak-volume-slider {
@@ -234,7 +315,7 @@
     let clickCount = 0;
     let clickAudio = null;
     let videoVolume = 0.7; // Domyślna głośność video
-    let lastSoundPercent = -1; // Dla śledzenia dźwięku co 5%
+    let autoPlayEnabled = true; // Czy włączyć filmik po 10 kliknięciach
 
     // Zmienne dla przeciągania panelu ustawień
     let settingsPanel = null;
@@ -248,6 +329,7 @@
     const STORAGE_KEY_POSITION = 'kwak-duck-position';
     const STORAGE_KEY_CLICKS = 'kwak-duck-clicks';
     const STORAGE_KEY_VOLUME = 'kwak-duck-volume';
+    const STORAGE_KEY_AUTOPLAY = 'kwak-duck-autoplay';
 
     // Funkcje do zapisywania/wczytywania pozycji
     function savePosition(x, y) {
@@ -314,6 +396,27 @@
         return 0.7; // Domyślna głośność
     }
 
+    // Funkcje do zapisywania/wczytywania autoplay
+    function saveAutoPlay(enabled) {
+        try {
+            localStorage.setItem(STORAGE_KEY_AUTOPLAY, enabled.toString());
+        } catch (e) {
+            console.warn('Nie można zapisać ustawienia autoplay:', e);
+        }
+    }
+
+    function loadAutoPlay() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY_AUTOPLAY);
+            if (saved) {
+                return saved === 'true';
+            }
+        } catch (e) {
+            console.warn('Nie można wczytać ustawienia autoplay:', e);
+        }
+        return true; // Domyślnie włączone
+    }
+
     // Sprawdź czy pozycja jest w granicach ekranu
     function validatePosition(pos) {
         const maxX = window.innerWidth - 50;
@@ -363,8 +466,8 @@
         if (panelX + 240 > window.innerWidth) {
             panelX = duckRect.left - 250;
         }
-        if (panelY + 160 > window.innerHeight) {
-            panelY = window.innerHeight - 160;
+        if (panelY + 190 > window.innerHeight) {
+            panelY = window.innerHeight - 190;
         }
 
         settingsPanel.style.left = panelX + 'px';
@@ -377,8 +480,15 @@
                 <input type="range" class="kwak-volume-slider" min="0" max="1" step="0.05" value="${videoVolume}">
                 <div class="kwak-volume-value">${Math.round(videoVolume * 100)}%</div>
             </div>
+            <div class="kwak-autoplay-control">
+                <label class="kwak-autoplay-label">Automatyczne odtwarzanie:</label>
+                <div class="kwak-autoplay-checkbox-container">
+                    <input type="checkbox" class="kwak-autoplay-checkbox" ${autoPlayEnabled ? 'checked' : ''}>
+                    <span class="kwak-autoplay-text">Włącz filmik po 10 kliknięciach</span>
+                </div>
+            </div>
             <div class="kwak-click-counter">
-                Kliknięcia do filmiku: ${clickCount}/10
+                Kliknięcia do filmiku: ${autoPlayEnabled ? clickCount + '/10' : clickCount}
             </div>
             <div class="kwak-settings-buttons">
                 <button class="kwak-btn kwak-btn-save">Zapisz</button>
@@ -391,12 +501,12 @@
         // Event listeners dla panelu
         const volumeSlider = settingsPanel.querySelector('.kwak-volume-slider');
         const volumeValue = settingsPanel.querySelector('.kwak-volume-value');
+        const autoPlayCheckbox = settingsPanel.querySelector('.kwak-autoplay-checkbox');
+        const autoPlayText = settingsPanel.querySelector('.kwak-autoplay-text');
+        const clickCounter = settingsPanel.querySelector('.kwak-click-counter');
         const saveBtn = settingsPanel.querySelector('.kwak-btn-save');
         const cancelBtn = settingsPanel.querySelector('.kwak-btn-cancel');
         const titleBar = settingsPanel.querySelector('.kwak-settings-title');
-
-        // Inicjalizuj lastSoundPercent
-        lastSoundPercent = Math.round(videoVolume * 100);
 
         // Aktualizuj wartość głośności w czasie rzeczywistym
         volumeSlider.addEventListener('input', function() {
@@ -404,10 +514,24 @@
             volumeValue.textContent = Math.round(volume * 100) + '%';
         });
 
+        // Obsługa checkboxa autoplay
+        autoPlayCheckbox.addEventListener('change', function() {
+            const isEnabled = this.checked;
+            clickCounter.textContent = `Kliknięcia do filmiku: ${isEnabled ? clickCount + '/10' : clickCount}`;
+        });
+
+        // Kliknięcie w tekst też zmienia checkbox
+        autoPlayText.addEventListener('click', function() {
+            autoPlayCheckbox.checked = !autoPlayCheckbox.checked;
+            autoPlayCheckbox.dispatchEvent(new Event('change'));
+        });
+
         // Zapisz ustawienia
         saveBtn.addEventListener('click', function() {
             videoVolume = parseFloat(volumeSlider.value);
+            autoPlayEnabled = autoPlayCheckbox.checked;
             saveVolume(videoVolume);
+            saveAutoPlay(autoPlayEnabled);
             settingsPanel.remove();
             settingsPanel = null;
         });
@@ -462,7 +586,7 @@
 
         // Ograniczenia ekranu dla panelu
         newX = Math.max(0, Math.min(window.innerWidth - 240, newX));
-        newY = Math.max(0, Math.min(window.innerHeight - 160, newY));
+        newY = Math.max(0, Math.min(window.innerHeight - 190, newY));
 
         settingsPanel.style.left = newX + 'px';
         settingsPanel.style.top = newY + 'px';
@@ -486,6 +610,7 @@
         const validPosition = validatePosition(savedPosition);
         clickCount = loadClickCount();
         videoVolume = loadVolume();
+        autoPlayEnabled = loadAutoPlay();
 
         // Ustaw pozycję kaczki
         duck.style.left = validPosition.x + 'px';
@@ -592,8 +717,8 @@
             clickCount++;
             saveClickCount(clickCount);
 
-            // Sprawdź czy osiągnięto 10 kliknięć
-            if (clickCount >= 10) {
+            // Sprawdź czy osiągnięto 10 kliknięć i czy autoplay jest włączony
+            if (clickCount >= 10 && autoPlayEnabled) {
                 playVideo();
                 // Resetuj licznik
                 clickCount = 0;
