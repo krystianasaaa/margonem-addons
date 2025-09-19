@@ -74,113 +74,147 @@
 
         .kwak-settings-panel {
             position: fixed;
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #ffd700;
-            border-radius: 10px;
-            padding: 20px;
+            background: #36393f;
+            border: 1px solid #4f545c;
+            border-radius: 6px;
+            padding: 15px;
             z-index: 1000000;
-            color: white;
-            font-family: Arial, sans-serif;
-            min-width: 250px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            color: #dcddde;
+            font-family: Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            width: 240px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             cursor: move;
         }
 
         .kwak-settings-title {
             font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
             text-align: center;
-            color: #ffd700;
+            color: #ffffff;
             cursor: move;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #4f545c;
         }
 
         .kwak-volume-control {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            background: #2f3136;
+            padding: 10px;
+            border-radius: 6px;
         }
 
         .kwak-volume-label {
             display: block;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #b9bbbe;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
 
         .kwak-volume-slider {
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: #333;
+            background: #4f545c;
             outline: none;
             -webkit-appearance: none;
             cursor: pointer;
+            margin-bottom: 6px;
         }
 
         .kwak-volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: #ffd700;
+            background: #5865f2;
             cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.1s;
+        }
+
+        .kwak-volume-slider::-webkit-slider-thumb:hover {
+            background: #4752c4;
         }
 
         .kwak-volume-slider::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: #ffd700;
+            background: #5865f2;
             cursor: pointer;
             border: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .kwak-volume-slider::-moz-range-track {
+            background: #4f545c;
+            height: 6px;
+            border-radius: 3px;
         }
 
         .kwak-volume-value {
             text-align: center;
             font-size: 12px;
-            color: #ffd700;
-            margin-top: 5px;
+            color: #5865f2;
+            font-weight: 600;
+            margin-top: 4px;
         }
 
         .kwak-settings-buttons {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 8px;
+            margin-top: 12px;
         }
 
         .kwak-btn {
-            padding: 8px 15px;
+            flex: 1;
+            padding: 8px 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
-            font-weight: bold;
-            transition: background-color 0.2s;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .kwak-btn:hover {
+            transform: translateY(-1px);
         }
 
         .kwak-btn-save {
-            background: #4CAF50;
-            color: white;
+            background: #43a047;
+            color: #ffffff;
         }
 
         .kwak-btn-save:hover {
-            background: #45a049;
+            background: #4caf50;
         }
 
         .kwak-btn-cancel {
-            background: #f44336;
-            color: white;
+            background: #5865f2;
+            color: #ffffff;
         }
 
         .kwak-btn-cancel:hover {
-            background: #da190b;
+            background: #4752c4;
         }
 
         .kwak-click-counter {
             font-size: 11px;
-            color: #ccc;
+            color: #72767d;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 8px;
+            padding: 6px;
+            background: #2f3136;
+            border-radius: 4px;
         }
     `;
 
@@ -200,6 +234,7 @@
     let clickCount = 0;
     let clickAudio = null;
     let videoVolume = 0.7; // Domyślna głośność video
+    let lastSoundPercent = -1; // Dla śledzenia dźwięku co 5%
 
     // Zmienne dla przeciągania panelu ustawień
     let settingsPanel = null;
@@ -325,21 +360,21 @@
         let panelY = duckRect.top;
 
         // Sprawdź czy panel zmieści się na ekranie
-        if (panelX + 250 > window.innerWidth) {
-            panelX = duckRect.left - 260;
+        if (panelX + 240 > window.innerWidth) {
+            panelX = duckRect.left - 250;
         }
-        if (panelY + 200 > window.innerHeight) {
-            panelY = window.innerHeight - 200;
+        if (panelY + 160 > window.innerHeight) {
+            panelY = window.innerHeight - 160;
         }
 
         settingsPanel.style.left = panelX + 'px';
         settingsPanel.style.top = panelY + 'px';
 
         settingsPanel.innerHTML = `
-            <div class="kwak-settings-title">🦆 - Settings</div>
+            <div class="kwak-settings-title">🦆 Ustawienia Kaczki</div>
             <div class="kwak-volume-control">
                 <label class="kwak-volume-label">Głośność filmiku:</label>
-                <input type="range" class="kwak-volume-slider" min="0" max="1" step="0.1" value="${videoVolume}">
+                <input type="range" class="kwak-volume-slider" min="0" max="1" step="0.05" value="${videoVolume}">
                 <div class="kwak-volume-value">${Math.round(videoVolume * 100)}%</div>
             </div>
             <div class="kwak-click-counter">
@@ -359,6 +394,9 @@
         const saveBtn = settingsPanel.querySelector('.kwak-btn-save');
         const cancelBtn = settingsPanel.querySelector('.kwak-btn-cancel');
         const titleBar = settingsPanel.querySelector('.kwak-settings-title');
+
+        // Inicjalizuj lastSoundPercent
+        lastSoundPercent = Math.round(videoVolume * 100);
 
         // Aktualizuj wartość głośności w czasie rzeczywistym
         volumeSlider.addEventListener('input', function() {
@@ -384,16 +422,7 @@
         titleBar.addEventListener('mousedown', startPanelDrag);
         settingsPanel.addEventListener('mousedown', startPanelDrag);
 
-        // Zamknij panel po kliknięciu poza nim
-        setTimeout(() => {
-            document.addEventListener('click', function closePanel(e) {
-                if (settingsPanel && !settingsPanel.contains(e.target) && !duck.contains(e.target)) {
-                    settingsPanel.remove();
-                    settingsPanel = null;
-                    document.removeEventListener('click', closePanel);
-                }
-            });
-        }, 100);
+        // USUNIĘTE: Auto-zamykanie panelu po kliknięciu poza nim
     }
 
     // Funkcje przeciągania panelu ustawień
@@ -432,8 +461,8 @@
         let newY = panelInitialY + moveY;
 
         // Ograniczenia ekranu dla panelu
-        newX = Math.max(0, Math.min(window.innerWidth - 250, newX));
-        newY = Math.max(0, Math.min(window.innerHeight - 200, newY));
+        newX = Math.max(0, Math.min(window.innerWidth - 240, newX));
+        newY = Math.max(0, Math.min(window.innerHeight - 160, newY));
 
         settingsPanel.style.left = newX + 'px';
         settingsPanel.style.top = newY + 'px';
@@ -646,9 +675,9 @@
         }
 
         // Zamknij panel ustawień jeśli jest otwarty
-        const panel = document.querySelector('.kwak-settings-panel');
-        if (panel) {
-            panel.remove();
+        if (settingsPanel) {
+            settingsPanel.remove();
+            settingsPanel = null;
         }
     }
 
