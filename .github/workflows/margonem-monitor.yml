@@ -3,7 +3,7 @@ name: margonem-monitor
 
 on:
   schedule:
-    # Uruchamiaj co minutę
+    # Uruchamiaj co minutę test
     - cron: '* * * * *'
   workflow_dispatch: # Możliwość ręcznego uruchomienia
 
