@@ -242,22 +242,4 @@ checkPlayers().then(() => {
 }).catch((error) => {
     console.error('Krytyczny błąd:', error);
     process.exit(1);
-});// monitor.js
-const fs = require('fs');
-const path = require('path');
-
-// Funkcja do pobierania z użyciem fetch (Node.js 18+)
-async function fetchData(url) {
-    const fetch = (await import('node-fetch')).default;
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-}
-
-// Konfiguracja
-const CONFIG = {
-    worldName: process.env.WORLD_NAME || 'dream',
-    playerThreshold: parseInt(process.env.PLAYER_THRESHOLD) || 7,
-    discordWebhookUrl: process.
+});
