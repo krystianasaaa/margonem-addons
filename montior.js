@@ -1,4 +1,4 @@
-// monitor.js test
+// monitor.js
 const fs = require('fs');
 const path = require('path');
 
@@ -17,7 +17,19 @@ const CONFIG = {
     worldName: process.env.WORLD_NAME || 'dream',
     playerThreshold: parseInt(process.env.PLAYER_THRESHOLD) || 7,
     discordWebhookUrl: 'https://discord.com/api/webhooks/1419060465803198494/jnxvyyAIXm3yJAQhScQQMrR_0AQHS4QTAyChV8ZNNTiM2V1DwB56tkT6e0l9OQgS5UI1',
-    clanNames: process.env.CLAN_NAMES ? process.env.CLAN_NAMES.split(',').map(name => name.trim()) : []
+    // Lista zescrapowanych graczy z klanów
+    targetPlayers: {
+        "conceited": "Ordinary Friends",
+        "eirien": "Ordinary Friends",
+        "xaventus": "Ordinary Friends",
+        "sentyment": "Ordinary Friends",
+        "unexpected": "Ordinary Friends",
+        "prejudiced": "Ordinary Friends",
+        "lord raval": "Ordinary Friends",
+        "raval": "Ordinary Friends",
+        // Dodaj tutaj więcej graczy których chcesz monitorować
+        // "nazwaGracza": "NazwaKlanu"
+    }
 };
 
 // Lista tytanów (skopiowana z oryginalnego skryptu)
@@ -82,7 +94,7 @@ function setLastNotificationData(data) {
 }
 
 // Funkcja wysyłania na Discord
-async function sendDiscordNotification(titanName, clanPlayers) {
+async function sendDiscordNotification(titanName, targetPlayers) {
     if (!CONFIG.discordWebhookUrl) {
         console.error('Brak Discord Webhook URL');
         return false;
@@ -92,19 +104,19 @@ async function sendDiscordNotification(titanName, clanPlayers) {
     const timestamp = new Date().toLocaleString('pl-PL');
 
     // Sortuj graczy według poziomu malejąco
-    const sortedPlayers = clanPlayers.sort((a, b) => b.l - a.l);
+    const sortedPlayers = targetPlayers.sort((a, b) => b.l - a.l);
 
     const playersList = sortedPlayers.map(p => {
-        const clanTag = p.guild_tag ? `[${p.guild_tag}]` : '';
-        return `🗡️ **${p.n}** ${clanTag} - LvL ${p.l}`;
+        const clanName = CONFIG.targetPlayers[p.n.toLowerCase()] || 'Unknown';
+        return `🗡️ **${p.n}** [${clanName}] - LvL ${p.l}`;
     }).join('\n');
 
     const embed = {
-        title: `🚨 ALARM! ${titanEmoji} ${titanName} - ${clanPlayers.length} graczy z klanów online!`,
-        description: `Na przedziale **${titanName}** jest aktualnie **${clanPlayers.length} graczy** z monitorowanych klanów (próg: ${CONFIG.playerThreshold})\n\n${playersList}`,
+        title: `🚨 ALARM! ${titanEmoji} ${titanName} - ${targetPlayers.length} graczy z listy online!`,
+        description: `Na przedziale **${titanName}** jest aktualnie **${targetPlayers.length} graczy** z listy targetowej (próg: ${CONFIG.playerThreshold})\n\n${playersList}`,
         color: 0xff6b35,
         footer: {
-            text: `Margonem Clan Monitor - ${CONFIG.worldName} • ${timestamp}`
+            text: `Margonem Target Players Monitor - ${CONFIG.worldName} • ${timestamp}`
         }
     };
 
@@ -131,8 +143,8 @@ async function sendDiscordNotification(titanName, clanPlayers) {
 async function checkPlayers() {
     console.log(`[${new Date().toISOString()}] Sprawdzanie graczy online...`);
     
-    if (CONFIG.clanNames.length === 0) {
-        console.error('Brak konfiguracji nazw klanów (CLAN_NAMES)');
+    if (Object.keys(CONFIG.targetPlayers).length === 0) {
+        console.error('Brak konfiguracji listy targetowych graczy');
         return;
     }
 
@@ -149,20 +161,23 @@ async function checkPlayers() {
 
         console.log(`Znaleziono ${players.length} graczy online`);
 
-        // Filtruj graczy z określonych klanów
-        const clanPlayers = players.filter(player => {
-            if (!player.guild_tag) return false;
-            return CONFIG.clanNames.some(clanName => 
-                player.guild_tag.toLowerCase().includes(clanName.toLowerCase()) ||
-                clanName.toLowerCase().includes(player.guild_tag.toLowerCase())
-            );
+        // Filtruj tylko zescrapowanych graczy z listy targetPlayers
+        const targetPlayersOnline = players.filter(player => {
+            return CONFIG.targetPlayers.hasOwnProperty(player.n.toLowerCase());
         });
 
-        console.log(`Graczy z monitorowanych klanów: ${clanPlayers.length}`);
+        console.log(`Graczy z listy targetowych online: ${targetPlayersOnline.length}`);
+        
+        if (targetPlayersOnline.length > 0) {
+            console.log('Znalezieni gracze:', targetPlayersOnline.map(p => {
+                const clanName = CONFIG.targetPlayers[p.n.toLowerCase()];
+                return `${p.n} [${clanName}] (${p.l})`;
+            }).join(', '));
+        }
 
         // Grupuj graczy według tytanów
         const titanGroups = {};
-        clanPlayers.forEach(player => {
+        targetPlayersOnline.forEach(player => {
             const titanName = getTitanName(player.l);
             if (titanName !== '-') {
                 if (!titanGroups[titanName]) {
@@ -179,7 +194,7 @@ async function checkPlayers() {
         for (const [titanName, titanPlayers] of Object.entries(titanGroups)) {
             const currentCount = titanPlayers.length;
             
-            console.log(`${titanName}: ${currentCount} graczy z klanów`);
+            console.log(`${titanName}: ${currentCount} graczy z listy targetowej`);
 
             if (currentCount >= CONFIG.playerThreshold) {
                 const now = Date.now();
@@ -187,7 +202,7 @@ async function checkPlayers() {
 
                 // Wyślij powiadomienie jeśli nie wysłaliśmy w ciągu ostatnich 10 minut
                 if (!lastNotification || (now - lastNotification.time) > 10 * 60 * 1000) {
-                    console.log(`Wysyłanie powiadomienia dla ${titanName} (${currentCount} graczy)`);
+                    console.log(`Wysyłanie powiadomienia dla ${titanName} (${currentCount} graczy z listy)`);
                     
                     const success = await sendDiscordNotification(titanName, titanPlayers);
 
