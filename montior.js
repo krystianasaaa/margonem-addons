@@ -16,7 +16,7 @@ async function fetchData(url) {
 const CONFIG = {
     worldName: process.env.WORLD_NAME || 'dream',
     playerThreshold: parseInt(process.env.PLAYER_THRESHOLD) || 7,
-    discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL,
+    discordWebhookUrl: 'https://discord.com/api/webhooks/1419060465803198494/jnxvyyAIXm3yJAQhScQQMrR_0AQHS4QTAyChV8ZNNTiM2V1DwB56tkT6e0l9OQgS5UI1',
     clanNames: process.env.CLAN_NAMES ? process.env.CLAN_NAMES.split(',').map(name => name.trim()) : []
 };
 
@@ -187,7 +187,47 @@ async function checkPlayers() {
 
                 // Wyślij powiadomienie jeśli nie wysłaliśmy w ciągu ostatnich 10 minut
                 if (!lastNotification || (now - lastNotification.time) > 10 * 60 * 1000) {
-                    console.log(`Wys// monitor.js
+                    console.log(`Wysyłanie powiadomienia dla ${titanName} (${currentCount} graczy)`);
+                    
+                    const success = await sendDiscordNotification(titanName, titanPlayers);
+
+                    if (success) {
+                        lastNotificationData[titanName] = {
+                            time: now,
+                            count: currentCount
+                        };
+                        hasNewNotifications = true;
+                        console.log(`✅ Powiadomienie dla ${titanName} wysłane pomyślnie`);
+                    } else {
+                        console.error(`❌ Błąd wysyłania powiadomienia dla ${titanName}`);
+                    }
+                } else {
+                    const timeLeft = Math.ceil((10 * 60 * 1000 - (now - lastNotification.time)) / 60000);
+                    console.log(`⏳ Ostatnie powiadomienie dla ${titanName} było za niedawno (${timeLeft} min do kolejnego)`);
+                }
+            }
+        }
+
+        // Zapisz dane powiadomień jeśli były zmiany
+        if (hasNewNotifications) {
+            setLastNotificationData(lastNotificationData);
+        }
+
+        console.log('✅ Sprawdzanie zakończone pomyślnie');
+
+    } catch (error) {
+        console.error('❌ Błąd podczas sprawdzania graczy:', error);
+    }
+}
+
+// Uruchom główną funkcję
+checkPlayers().then(() => {
+    console.log('Monitoring zakończony');
+    process.exit(0);
+}).catch((error) => {
+    console.error('Krytyczny błąd:', error);
+    process.exit(1);
+});// monitor.js
 const fs = require('fs');
 const path = require('path');
 
