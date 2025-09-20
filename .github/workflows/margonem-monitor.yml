@@ -1,9 +1,9 @@
 # .github/workflows/margonem-monitor.yml
-name: margonem-monitor
+name: Margonem Clan Monitor
 
 on:
   schedule:
-    # Uruchamiaj co minutę test
+    # Uruchamiaj co minutę
     - cron: '* * * * *'
   workflow_dispatch: # Możliwość ręcznego uruchomienia
 
@@ -25,12 +25,27 @@ jobs:
         npm init -y
         npm install node-fetch
     
+    - name: Debug - List files
+      run: |
+        echo "Files in current directory:"
+        ls -la
+        echo "Content of monitor.js:"
+        if [ -f "monitor.js" ]; then
+          echo "monitor.js exists"
+          head -10 monitor.js
+        else
+          echo "monitor.js does not exist"
+        fi
+    
     - name: Run monitoring script
       env:
-        CLAN_NAMES: ${{ secrets.CLAN_NAMES }}
         PLAYER_THRESHOLD: ${{ vars.PLAYER_THRESHOLD || '7' }}
         WORLD_NAME: ${{ vars.WORLD_NAME || 'dream' }}
-      run: node monitor.js
+      run: |
+        echo "Current directory contents:"
+        ls -la
+        echo "Starting monitor script..."
+        node monitor.js
     
     - name: Update last check data
       run: |
