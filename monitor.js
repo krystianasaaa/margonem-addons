@@ -2,14 +2,38 @@
 const fs = require('fs');
 const path = require('path');
 
-// Funkcja do pobierania z użyciem fetch (Node.js 18+)
-async function fetchData(url) {
+// Funkcja do pobierania z użyciem fetch (Node.js 18+) z retry
+async function fetchData(url, retries = 3) {
     const fetch = (await import('node-fetch')).default;
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    
+    for (let i = 0; i < retries; i++) {
+        try {
+            console.log(`Próba ${i + 1}/${retries}: ${url}`);
+            
+            const response = await fetch(url, {
+                timeout: 30000, // 30 sekund timeout
+                headers: {
+                    'User-Agent': 'Margonem-Monitor/1.0'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+            
+        } catch (error) {
+            console.error(`Błąd w próbie ${i + 1}:`, error.message);
+            
+            if (i === retries - 1) {
+                throw error; // Ostatnia próba - rzuć błąd
+            }
+            
+            // Czekaj przed kolejną próbą
+            await new Promise(resolve => setTimeout(resolve, (i + 1) * 2000));
+        }
     }
-    return response.json();
 }
 
 // Konfiguracja
