@@ -1,5 +1,5 @@
 # .github/workflows/margonem-monitor.yml
-name: Margonem Clan Monitor
+name: margonem-monitor
 
 on:
   schedule:
@@ -27,7 +27,6 @@ jobs:
     
     - name: Run monitoring script
       env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         CLAN_NAMES: ${{ secrets.CLAN_NAMES }}
         PLAYER_THRESHOLD: ${{ vars.PLAYER_THRESHOLD || '7' }}
         WORLD_NAME: ${{ vars.WORLD_NAME || 'dream' }}
