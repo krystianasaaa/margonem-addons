@@ -287,16 +287,6 @@
         .kwak-btn-cancel:hover {
             background: #4752c4;
         }
-
-        .kwak-click-counter {
-            font-size: 11px;
-            color: #72767d;
-            text-align: center;
-            margin-top: 8px;
-            padding: 6px;
-            background: #2f3136;
-            border-radius: 4px;
-        }
     `;
 
     // Dodaj CSS
@@ -487,9 +477,6 @@
                     <span class="kwak-autoplay-text">Włącz filmik po 10 kliknięciach</span>
                 </div>
             </div>
-            <div class="kwak-click-counter">
-                Kliknięcia do filmiku: ${autoPlayEnabled ? clickCount + '/10' : clickCount}
-            </div>
             <div class="kwak-settings-buttons">
                 <button class="kwak-btn kwak-btn-save">Zapisz</button>
                 <button class="kwak-btn kwak-btn-cancel">Anuluj</button>
@@ -503,7 +490,6 @@
         const volumeValue = settingsPanel.querySelector('.kwak-volume-value');
         const autoPlayCheckbox = settingsPanel.querySelector('.kwak-autoplay-checkbox');
         const autoPlayText = settingsPanel.querySelector('.kwak-autoplay-text');
-        const clickCounter = settingsPanel.querySelector('.kwak-click-counter');
         const saveBtn = settingsPanel.querySelector('.kwak-btn-save');
         const cancelBtn = settingsPanel.querySelector('.kwak-btn-cancel');
         const titleBar = settingsPanel.querySelector('.kwak-settings-title');
@@ -514,16 +500,9 @@
             volumeValue.textContent = Math.round(volume * 100) + '%';
         });
 
-        // Obsługa checkboxa autoplay
-        autoPlayCheckbox.addEventListener('change', function() {
-            const isEnabled = this.checked;
-            clickCounter.textContent = `Kliknięcia do filmiku: ${isEnabled ? clickCount + '/10' : clickCount}`;
-        });
-
         // Kliknięcie w tekst też zmienia checkbox
         autoPlayText.addEventListener('click', function() {
             autoPlayCheckbox.checked = !autoPlayCheckbox.checked;
-            autoPlayCheckbox.dispatchEvent(new Event('change'));
         });
 
         // Zapisz ustawienia
@@ -545,8 +524,6 @@
         // Przeciąganie panelu
         titleBar.addEventListener('mousedown', startPanelDrag);
         settingsPanel.addEventListener('mousedown', startPanelDrag);
-
-        // USUNIĘTE: Auto-zamykanie panelu po kliknięciu poza nim
     }
 
     // Funkcje przeciągania panelu ustawień
