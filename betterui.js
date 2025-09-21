@@ -68,6 +68,7 @@ function updateBonusNames() {
             'Podczas ataku unik przeciwnika jest mniejszy o': 'Obniżka uniku o',
             'Obniża szybkość ataku przeciwnika o': 'Obniżka SA o',
             'Pancerz': 'Panc',
+            'pancerza'; 'panca',
             'punktów życia podczas walki': 'pkt hp podczas walki',
             'Odporność': 'Odpy',
             'Moc ciosu krytycznego fizycznego': 'SKF',
