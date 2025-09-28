@@ -48,63 +48,46 @@
         } catch (e) {}
     }
 
-    // Funkcja do rozpoznawania powiadomień systemowych w centrum ekranu
+    // Funkcja do rozpoznawania powiadomień systemowych
     function isGameNotification(element) {
         const style = element.style.cssText || '';
         const text = element.textContent || '';
         const className = element.className || '';
         
-        // WYKLUCZ wszystko co nie powinno być stylowane
+        // WYKLUCZ tylko najważniejsze elementy
         if (
-            // Czat i wiadomości
-            className.includes('chat') ||
-            className.includes('mmp-chatbox') ||
-            element.closest('[class*="chat"]') ||
-            element.closest('.mmp-chatbox-content') ||
-            element.id.includes('chat') ||
-            
-            // Tooltips i interfejs
-            className.includes('tooltip') ||
-            className.includes('tip') ||
-            className.includes('menu') ||
-            className.includes('button') ||
-            className.includes('input') ||
-            className.includes('select') ||
-            
             // Panel ustawień
             element.closest('#kwak-notification-styler-settings-panel') ||
+            element.id === 'kwak-notification-styler-settings-panel' ||
             
-            // Elementy UI gry
-            element.closest('.mmp-window') ||
-            element.closest('[class*="interface"]') ||
-            element.closest('[class*="ui-"]')
+            // Elementy czatu (tylko te najbardziej oczywiste)
+            className.includes('mmp-chatbox') ||
+            element.closest('.mmp-chatbox-content') ||
+            
+            // Tooltips tylko z konkretnymi klasami
+            className.includes('item-tip') ||
+            className.includes('mmp-tooltip')
         ) {
             return false;
         }
         
-        // WŁĄCZ tylko powiadomienia systemowe
+        // WŁĄCZ szerzej - wszystkie elementy z tekstem powiadomień
         const isNotification = (
-            // Ma tekst i nie jest za długi (powiadomienia są krótkie)
-            text.length > 5 && text.length < 150 &&
+            // Ma jakiś tekst
+            text.length > 3 &&
             
-            // Jest pozycjonowane w centrum lub ma odpowiednie style
-            (style.includes('position: fixed') || style.includes('position: absolute')) &&
-            
-            // Ma odpowiednie frazowania powiadomień
+            // Ma frazowania powiadomień LUB jest wycentrowany
             (text.includes('Wysłano') || 
              text.includes('Otrzymano') || 
              text.includes('Dodano') ||
              text.includes('Usunięto') ||
-             text.includes('Zaktualizowano') ||
-             text.includes('Błąd') ||
-             text.includes('Sukces') ||
-             text.includes('Info') ||
-             text.includes('Uwaga') ||
              text.includes('zaproszenie') ||
-             text.includes('połączenie') ||
+             text.includes('do ') ||
              className.includes('notification') ||
              className.includes('alert') ||
-             className.includes('message'))
+             className.includes('message') ||
+             style.includes('center') ||
+             style.includes('middle'))
         );
         
         return isNotification;
