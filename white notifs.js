@@ -35,9 +35,7 @@
     function saveConfig() {
         try {
             window.localStorage.setItem('notificationStyler_config', JSON.stringify(config));
-        } catch (e) {
-            console.warn('Nie można zapisać konfiguracji');
-        }
+        } catch (e) {}
     }
 
     function loadConfig() {
@@ -47,86 +45,151 @@
                 const savedConfig = JSON.parse(saved);
                 config = { ...config, ...savedConfig };
             }
-        } catch (e) {
-            console.warn('Nie można wczytać konfiguracji');
-        }
+        } catch (e) {}
     }
 
-    // Funkcja generująca CSS
-    function generateCSS() {
-        if (!config.enabled) return '';
+    // Funkcja do rozpoznawania powiadomień systemowych w centrum ekranu
+    function isGameNotification(element) {
+        const style = element.style.cssText || '';
+        const text = element.textContent || '';
+        const className = element.className || '';
         
-        return `
-            /* Stylowanie powiadomień systemowych - bez czatu */
-            .notification:not([class*="chat"]):not([id*="chat"]),
-            .alert:not([class*="chat"]):not([id*="chat"]),
-            .system-message,
-            .game-message,
-            .info-message,
-            .tip,
-            .tooltip,
-            .mmp-window .notification:not([class*="chat"]):not([id*="chat"]),
-            [class*="notification"]:not([class*="chat"]):not([id*="chat"]),
-            [class*="alert"]:not([class*="chat"]):not([id*="chat"]),
-            [id*="notification"]:not([class*="chat"]):not([id*="chat"]),
-            [id*="alert"]:not([class*="chat"]):not([id*="chat"]) {
-                color: ${config.color} !important;
-                font-size: ${config.fontSize}px !important;
-                font-family: ${fontPresets[config.fontFamily] || 'Arial, sans-serif'} !important;
-            }
-
-            /* Wykluczenie elementów czatu */
-            .chat-message,
-            .mmp-chatbox-content .message,
-            #chat .message,
-            [class*="chat"] .message,
-            [id*="chat"] .message {
-                /* Nie styluj wiadomości czatu */
-            }
-        `;
-    }
-
-    // Funkcja dodająca/aktualizująca CSS
-    function updateCSS() {
-        let style = document.getElementById('margonem-notification-styler');
-        if (!style) {
-            style = document.createElement('style');
-            style.id = 'margonem-notification-styler';
-            document.head.appendChild(style);
+        // WYKLUCZ wszystko co nie powinno być stylowane
+        if (
+            // Czat i wiadomości
+            className.includes('chat') ||
+            className.includes('mmp-chatbox') ||
+            element.closest('[class*="chat"]') ||
+            element.closest('.mmp-chatbox-content') ||
+            element.id.includes('chat') ||
+            
+            // Tooltips i interfejs
+            className.includes('tooltip') ||
+            className.includes('tip') ||
+            className.includes('menu') ||
+            className.includes('button') ||
+            className.includes('input') ||
+            className.includes('select') ||
+            
+            // Panel ustawień
+            element.closest('#kwak-notification-styler-settings-panel') ||
+            
+            // Elementy UI gry
+            element.closest('.mmp-window') ||
+            element.closest('[class*="interface"]') ||
+            element.closest('[class*="ui-"]')
+        ) {
+            return false;
         }
-        style.textContent = generateCSS();
+        
+        // WŁĄCZ tylko powiadomienia systemowe
+        const isNotification = (
+            // Ma tekst i nie jest za długi (powiadomienia są krótkie)
+            text.length > 5 && text.length < 150 &&
+            
+            // Jest pozycjonowane w centrum lub ma odpowiednie style
+            (style.includes('position: fixed') || style.includes('position: absolute')) &&
+            
+            // Ma odpowiednie frazowania powiadomień
+            (text.includes('Wysłano') || 
+             text.includes('Otrzymano') || 
+             text.includes('Dodano') ||
+             text.includes('Usunięto') ||
+             text.includes('Zaktualizowano') ||
+             text.includes('Błąd') ||
+             text.includes('Sukces') ||
+             text.includes('Info') ||
+             text.includes('Uwaga') ||
+             text.includes('zaproszenie') ||
+             text.includes('połączenie') ||
+             className.includes('notification') ||
+             className.includes('alert') ||
+             className.includes('message'))
+        );
+        
+        return isNotification;
     }
 
-    // Funkcja wysyłająca testowe powiadomienie
+    // Funkcja stylizująca element
+    function applyNotificationStyle(element) {
+        if (!config.enabled || !isGameNotification(element)) return;
+        
+        element.style.setProperty('color', config.color, 'important');
+        element.style.setProperty('font-size', config.fontSize + 'px', 'important');
+        element.style.setProperty('font-family', fontPresets[config.fontFamily] || 'Arial, sans-serif', 'important');
+    }
+
+    // Observer obserwujący tylko nowe elementy
+    function setupObserver() {
+        const observer = new MutationObserver((mutations) => {
+            if (!config.enabled) return;
+
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        // Sprawdź bezpośrednio dodany element
+                        setTimeout(() => {
+                            applyNotificationStyle(node);
+                            
+                            // Sprawdź dzieci tylko jeśli to nie są elementy interfejsu
+                            if (!node.closest('.mmp-window') && !node.closest('[class*="ui-"]')) {
+                                const potentialNotifications = node.querySelectorAll('*');
+                                potentialNotifications.forEach(child => {
+                                    applyNotificationStyle(child);
+                                });
+                            }
+                        }, 50);
+                    }
+                });
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    // Funkcja wysyłająca testowe powiadomienie identyczne z grą
     function sendTestNotification() {
-        // Stwórz tymczasowe powiadomienie testowe
         const testNotif = document.createElement('div');
-        testNotif.className = 'notification test-notification';
-        testNotif.innerHTML = 'To jest przykładowe powiadomienie!';
+        testNotif.textContent = 'Wysłano zaproszenie do testUser.';
+        
+        // Style identyczne z powiadomieniami Margonem
         testNotif.style.cssText = `
             position: fixed;
-            top: 50px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #444;
+            left: 50%;
+            top: 40%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #666;
             border-radius: 4px;
-            padding: 10px;
-            z-index: 9999;
-            min-width: 200px;
+            padding: 10px 20px;
+            z-index: 999999;
             text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
         `;
         
         document.body.appendChild(testNotif);
         
+        // Zastosuj nasze style
+        applyNotificationStyle(testNotif);
+        
         // Usuń po 3 sekundach
         setTimeout(() => {
-            if (testNotif.parentNode) {
-                testNotif.parentNode.removeChild(testNotif);
-            }
+            testNotif.style.opacity = '0';
+            testNotif.style.transition = 'opacity 0.3s';
+            setTimeout(() => {
+                if (testNotif.parentNode) {
+                    testNotif.parentNode.removeChild(testNotif);
+                }
+            }, 300);
         }, 3000);
     }
 
-    // Funkcja integracji z Addon Managerem
+    // Integracja z Addon Managerem
     function integrateWithAddonManager() {
         const checkForManager = setInterval(() => {
             const addonContainer = document.getElementById('addon-white_notifs');
@@ -144,9 +207,7 @@
             }
         }, 500);
 
-        setTimeout(() => {
-            clearInterval(checkForManager);
-        }, 20000);
+        setTimeout(() => clearInterval(checkForManager), 20000);
     }
 
     function addSettingsButton(container) {
@@ -170,7 +231,6 @@
         settingsBtn.onmouseout = () => settingsBtn.style.opacity = '0.7';
 
         helpIcon.insertAdjacentElement('afterend', settingsBtn);
-
         createSettingsPanel();
 
         settingsBtn.addEventListener('click', (e) => {
@@ -243,7 +303,7 @@
                     <div style="margin-bottom: 15px;">
                         <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
                         <select id="font-family-select" style="width: 100%; padding: 6px; background: #333; color: #ccc; border: 1px solid #666; border-radius: 4px;">
-                            ${Object.entries(fontPresets).map(([name, family]) => `
+                            ${Object.entries(fontPresets).map(([name]) => `
                                 <option value="${name}" ${config.fontFamily === name ? 'selected' : ''}>${name}</option>
                             `).join('')}
                         </select>
@@ -272,13 +332,11 @@
                     width: 44px;
                     height: 24px;
                 }
-
                 .kwak-toggle-switch input {
                     opacity: 0;
                     width: 0;
                     height: 0;
                 }
-
                 .kwak-toggle-switch .slider {
                     position: absolute;
                     cursor: pointer;
@@ -291,7 +349,6 @@
                     border-radius: 24px;
                     border: 1px solid #666;
                 }
-
                 .kwak-toggle-switch .slider:before {
                     position: absolute;
                     content: "";
@@ -303,12 +360,10 @@
                     transition: 0.3s;
                     border-radius: 50%;
                 }
-
                 .kwak-toggle-switch input:checked + .slider {
                     background-color: #4CAF50;
                     border-color: #4CAF50;
                 }
-
                 .kwak-toggle-switch input:checked + .slider:before {
                     transform: translateX(20px);
                 }
@@ -318,48 +373,10 @@
 
         document.body.appendChild(panel);
 
-        // Funkcjonalność przeciągania
-        let isDragging = false;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
-
-        const header = panel.querySelector('#notification-styler-panel-header');
-        
-        header.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            const rect = panel.getBoundingClientRect();
-            dragOffsetX = e.clientX - rect.left;
-            dragOffsetY = e.clientY - rect.top;
-            e.preventDefault();
-            
-            header.style.background = '#444';
-            panel.style.cursor = 'grabbing';
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            
-            const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
-            const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
-            
-            panel.style.left = `${x}px`;
-            panel.style.top = `${y}px`;
-            panel.style.transform = 'none';
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                header.style.background = '#333';
-                panel.style.cursor = 'default';
-            }
-        });
-
         // Event listenery
         panel.querySelector('#enabled-toggle').addEventListener('change', (e) => {
             e.stopPropagation();
             config.enabled = e.target.checked;
-            updateCSS();
             saveConfig();
         });
 
@@ -370,7 +387,6 @@
             const size = parseInt(e.target.value);
             config.fontSize = size;
             fontSizeValue.textContent = size + 'px';
-            updateCSS();
             saveConfig();
         });
 
@@ -379,16 +395,10 @@
             option.addEventListener('click', (e) => {
                 const color = e.target.dataset.color;
                 config.color = color;
-                
-                // Aktualizuj custom color picker
                 panel.querySelector('#custom-color').value = color;
-                
-                // Aktualizuj obramowania
                 panel.querySelectorAll('.color-option').forEach(opt => {
                     opt.style.border = `2px solid ${opt.dataset.color === color ? '#fff' : '#666'}`;
                 });
-                
-                updateCSS();
                 saveConfig();
             });
         });
@@ -396,20 +406,15 @@
         // Custom color picker
         panel.querySelector('#custom-color').addEventListener('change', (e) => {
             config.color = e.target.value;
-            
-            // Usuń obramowania z preset
             panel.querySelectorAll('.color-option').forEach(opt => {
                 opt.style.border = '2px solid #666';
             });
-            
-            updateCSS();
             saveConfig();
         });
 
         // Font family
         panel.querySelector('#font-family-select').addEventListener('change', (e) => {
             config.fontFamily = e.target.value;
-            updateCSS();
             saveConfig();
         });
 
@@ -435,90 +440,11 @@
         }
     }
 
-    // Funkcja stylizująca istniejące elementy
-    function styleExistingNotifications() {
-        if (!config.enabled) return;
-
-        const selectors = [
-            '.notification:not([class*="chat"]):not([id*="chat"])',
-            '.alert:not([class*="chat"]):not([id*="chat"])',
-            '.system-message',
-            '.game-message',
-            '.info-message',
-            '.tip',
-            '.tooltip'
-        ];
-
-        selectors.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                // Sprawdź czy to nie jest element czatu
-                const isChat = element.closest('[class*="chat"]') || 
-                              element.closest('[id*="chat"]') || 
-                              element.classList.toString().includes('chat') ||
-                              element.id.includes('chat');
-                
-                if (!isChat) {
-                    element.style.color = config.color;
-                    element.style.fontSize = config.fontSize + 'px';
-                    element.style.fontFamily = fontPresets[config.fontFamily] || 'Arial, sans-serif';
-                }
-            });
-        });
-    }
-
-    // Observer do monitorowania zmian
-    function setupObserver() {
-        const observer = new MutationObserver((mutations) => {
-            if (!config.enabled) return;
-
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.nodeType === Node.ELEMENT_NODE) {
-                            const isNotification = node.classList && (
-                                node.classList.contains('notification') ||
-                                node.classList.contains('alert') ||
-                                node.classList.contains('system-message') ||
-                                node.classList.contains('game-message') ||
-                                node.classList.contains('info-message') ||
-                                node.classList.contains('tip') ||
-                                node.classList.contains('tooltip')
-                            );
-
-                            // Sprawdź czy to nie jest czat
-                            const isChat = node.closest('[class*="chat"]') || 
-                                          node.closest('[id*="chat"]') || 
-                                          node.classList.toString().includes('chat') ||
-                                          node.id.includes('chat');
-
-                            if (isNotification && !isChat) {
-                                setTimeout(() => styleExistingNotifications(), 100);
-                            }
-                        }
-                    });
-                }
-            });
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['class']
-        });
-    }
-
     // Inicjalizacja
     function init() {
         loadConfig();
-        updateCSS();
-        styleExistingNotifications();
         setupObserver();
         integrateWithAddonManager();
-
-        // Backup styling co kilka sekund
-        setInterval(styleExistingNotifications, 3000);
     }
 
     // Uruchom po załadowaniu DOM
