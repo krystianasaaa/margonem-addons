@@ -132,7 +132,4 @@
         init();
     }
 
-    // Dodatkowa funkcja uruchamiana co kilka sekund jako backup
-    setInterval(styleNotifications, 3000);
-
 })();
