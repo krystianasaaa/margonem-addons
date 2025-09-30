@@ -1,3 +1,14 @@
+// ==UserScript==
+// @name         Message Styler
+// @namespace    http://tampermonkey.net/
+// @version      2025-09-30
+// @description  Stylowanie wiadomości w grze
+// @author       You
+// @match        https://dream.margonem.pl/
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=margonem.pl
+// @grant        none
+// ==/UserScript==
+
 (function() {
     'use strict';
 
@@ -64,8 +75,7 @@
 
         if (config.chat.enabled) {
             css += `
-                .one-message-wrapper,
-                .one-message-wrapper * {
+                .one-message-wrapper {
                     font-size: ${config.chat.fontSize}px !important;
                     font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
                 }
@@ -200,7 +210,7 @@
                     <div>
                         <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
                         <select id="chat-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
-                            ${Object.entries(fontPresets).map(([name]) =>
+                            ${Object.entries(fontPresets).map(([name]) => 
                                 `<option value="${name}" ${config.chat.fontFamily === name ? 'selected' : ''}>${name}</option>`
                             ).join('')}
                         </select>
@@ -229,7 +239,7 @@
                     <div>
                         <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Kolor tekstu:</label>
                         <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;">
-                            ${Object.entries(colorPresets).map(([name, color]) =>
+                            ${Object.entries(colorPresets).map(([name, color]) => 
                                 `<div class="color-option" data-color="${color}"
                                     style="width: 30px; height: 30px; background: ${color}; border: 2px solid ${config.bigMessages.color === color ? '#fff' : '#666'};
                                     border-radius: 4px; cursor: pointer;" title="${name}"></div>`
