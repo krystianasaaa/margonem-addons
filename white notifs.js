@@ -1,14 +1,3 @@
-// ==UserScript==
-// @name         Message Styler
-// @namespace    http://tampermonkey.net/
-// @version      2025-09-30
-// @description  Stylowanie wiadomości w grze
-// @author       You
-// @match        https://dream.margonem.pl/
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=margonem.pl
-// @grant        none
-// ==/UserScript==
-
 (function() {
     'use strict';
 
