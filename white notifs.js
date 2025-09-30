@@ -5,7 +5,7 @@
     let config = {
         chat: {
             enabled: true,
-            fontSize: 18,
+            fontSize: 11,
             fontFamily: 'Arial'
         },
         bigMessages: {
