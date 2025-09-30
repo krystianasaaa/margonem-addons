@@ -11,7 +11,8 @@
         bigMessages: {
             enabled: true,
             fontSize: 11,
-            color: '#ffffff'
+            color: '#ffffff',
+            fontFamily: 'Arial'
         }
     };
 
@@ -77,12 +78,14 @@
                 [class*="big-message"] {
                     color: ${config.bigMessages.color} !important;
                     font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
                 }
 
                 .big-messages *,
                 [class*="big-message"] * {
                     color: ${config.bigMessages.color} !important;
                     font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
                 }
             `;
         }
@@ -104,7 +107,7 @@
     // Funkcja integracji z Addon Managerem
     function integrateWithAddonManager() {
         const checkForManager = setInterval(() => {
-            const addonContainer = document.getElementById('addon-aaaaaaaaa');
+            const addonContainer = document.getElementById('addon-notif_styler');
             if (!addonContainer) return;
 
             if (addonContainer.querySelector('#message-styler-settings-btn')) {
@@ -153,6 +156,15 @@
         });
     }
 
+    // Funkcja testowa Big Message
+    function showTestBigMessage() {
+        if (typeof message === 'function') {
+            message('tike chuj');
+        } else {
+            console.log('Funkcja message() nie jest dostępna w grze');
+        }
+    }
+
     function createSettingsPanel() {
         const panel = document.createElement('div');
         panel.id = 'message-styler-settings-panel';
@@ -174,13 +186,13 @@
 
         panel.innerHTML = `
             <div id="message-styler-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 0; text-align: center; font-weight: bold; padding: 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
-                Message Styler - Ustawienia
+                Chat&Notifs Styler - Settings
             </div>
             <div style="padding: 15px;">
                 <!-- SEKCJA CZATU -->
                 <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Wiadomości czatu</span>
+                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Chat</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="chat-enabled-toggle" ${config.chat.enabled ? 'checked' : ''}>
                             <span class="slider"></span>
@@ -199,7 +211,7 @@
                     <div>
                         <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
                         <select id="chat-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
-                            ${Object.entries(fontPresets).map(([name]) => 
+                            ${Object.entries(fontPresets).map(([name]) =>
                                 `<option value="${name}" ${config.chat.fontFamily === name ? 'selected' : ''}>${name}</option>`
                             ).join('')}
                         </select>
@@ -209,7 +221,7 @@
                 <!-- SEKCJA BIG MESSAGES -->
                 <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Big Messages</span>
+                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Powiadomienia</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="big-enabled-toggle" ${config.bigMessages.enabled ? 'checked' : ''}>
                             <span class="slider"></span>
@@ -225,10 +237,19 @@
                         </div>
                     </div>
 
-                    <div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
+                        <select id="big-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
+                            ${Object.entries(fontPresets).map(([name]) =>
+                                `<option value="${name}" ${config.bigMessages.fontFamily === name ? 'selected' : ''}>${name}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 12px;">
                         <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Kolor tekstu:</label>
                         <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;">
-                            ${Object.entries(colorPresets).map(([name, color]) => 
+                            ${Object.entries(colorPresets).map(([name, color]) =>
                                 `<div class="color-option" data-color="${color}"
                                     style="width: 30px; height: 30px; background: ${color}; border: 2px solid ${config.bigMessages.color === color ? '#fff' : '#666'};
                                     border-radius: 4px; cursor: pointer;" title="${name}"></div>`
@@ -237,6 +258,11 @@
                         <input type="color" id="big-custom-color" value="${config.bigMessages.color}"
                             style="width: 100%; height: 30px; border: 1px solid #666; background: #2a2a2a; border-radius: 4px;">
                     </div>
+
+                    <!-- PRZYCISK TESTOWY -->
+                    <button id="test-big-message" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                        Test
+                    </button>
                 </div>
 
                 <!-- PRZYCISKI -->
@@ -371,6 +397,12 @@
             saveConfig();
         });
 
+        panel.querySelector('#big-font-family-select').addEventListener('change', (e) => {
+            config.bigMessages.fontFamily = e.target.value;
+            updateCSS();
+            saveConfig();
+        });
+
         // Obsługa kolorów preset
         panel.querySelectorAll('.color-option').forEach(option => {
             option.addEventListener('click', (e) => {
@@ -393,6 +425,13 @@
             });
             updateCSS();
             saveConfig();
+        });
+
+        // Przycisk testowy
+        panel.querySelector('#test-big-message').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            showTestBigMessage();
         });
 
         // Close button
