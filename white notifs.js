@@ -16,14 +16,23 @@
         }
     };
 
-    // Lista dostępnych czcionek
+    // Rozszerzona lista dostępnych czcionek
     const fontPresets = {
         'Arial': 'Arial, sans-serif',
-        'Times': 'Times New Roman, serif',
-        'Courier': 'Courier New, monospace',
+        'Times New Roman': 'Times New Roman, serif',
+        'Courier New': 'Courier New, monospace',
         'Verdana': 'Verdana, sans-serif',
         'Georgia': 'Georgia, serif',
-        'Comic Sans': 'Comic Sans MS, cursive'
+        'Comic Sans MS': 'Comic Sans MS, cursive',
+        'Trebuchet MS': 'Trebuchet MS, sans-serif',
+        'Impact': 'Impact, fantasy',
+        'Palatino': 'Palatino Linotype, serif',
+        'Tahoma': 'Tahoma, sans-serif',
+        'Lucida Console': 'Lucida Console, monospace',
+        'Garamond': 'Garamond, serif',
+        'Bookman': 'Bookman Old Style, serif',
+        'Arial Black': 'Arial Black, sans-serif',
+        'Brush Script': 'Brush Script MT, cursive'
     };
 
     // Lista dostępnych kolorów
@@ -41,7 +50,9 @@
 
     function saveConfig() {
         try {
-            window.localStorage.setItem('messageStyler_config', JSON.stringify(config));
+            const jsonConfig = JSON.stringify(config);
+            // Zapisz w zmiennej tymczasowej zamiast localStorage
+            window._messageStylerConfig = jsonConfig;
         } catch (e) {
             console.warn('Nie można zapisać konfiguracji');
         }
@@ -49,7 +60,8 @@
 
     function loadConfig() {
         try {
-            const saved = window.localStorage.getItem('messageStyler_config');
+            // Wczytaj z zmiennej tymczasowej
+            const saved = window._messageStylerConfig;
             if (saved) {
                 const savedConfig = JSON.parse(saved);
                 config = { ...config, ...savedConfig };
@@ -81,8 +93,8 @@
                     font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
                 }
 
-                .big-messages *,
-                [class*="big-message"] * {
+                .big-messages *:not(img):not(svg):not([class*="item"]):not([class*="icon"]):not([class*="loot"]):not(canvas),
+                [class*="big-message"] *:not(img):not(svg):not([class*="item"]):not([class*="icon"]):not([class*="loot"]):not(canvas) {
                     color: ${config.bigMessages.color} !important;
                     font-size: ${config.bigMessages.fontSize}px !important;
                     font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
@@ -159,7 +171,7 @@
     // Funkcja testowa Big Message
     function showTestBigMessage() {
         if (typeof message === 'function') {
-            message('tike chuj');
+            message('Test powiadomienia');
         } else {
             console.log('Funkcja message() nie jest dostępna w grze');
         }
@@ -180,8 +192,11 @@
             z-index: 10000;
             display: none;
             min-width: 360px;
+            max-width: 400px;
             font-family: Arial, sans-serif;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            max-height: 80vh;
+            overflow-y: auto;
         `;
 
         panel.innerHTML = `
