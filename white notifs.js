@@ -107,8 +107,7 @@
         'Wide Latin': 'Wide Latin, fantasy'
     };
 
-    // Lista dostępnych kolorów
-    const colorPresets = {
+const colorPresets = {
         'Biały': '#ffffff',
         'Żółty': '#ffff00',
         'Czerwony': '#ff0000',
@@ -142,6 +141,7 @@
     }
 
     // Funkcja generująca CSS
+// Funkcja generująca CSS
     function generateCSS() {
         let css = '';
 
@@ -157,40 +157,57 @@
         }
 
         if (config.bigMessages.enabled) {
-            const textColor = config.bigMessages.rgbEffect ? 'transparent' : config.bigMessages.color;
-            const backgroundClip = config.bigMessages.rgbEffect ? 'background-clip: text; -webkit-background-clip: text;' : '';
-            const backgroundImage = config.bigMessages.rgbEffect ? 'background-image: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3); background-size: 200% 100%;' : '';
-            
-            css += `
-                @keyframes rgb-wave {
-                    0% { background-position: 0% 50%; }
-                    100% { background-position: 200% 50%; }
-                }
+            if (config.bigMessages.rgbEffect) {
+                css += `
+                    @keyframes rgb-wave {
+                        0% { background-position: 0% 50%; }
+                        100% { background-position: 400% 50%; }
+                    }
 
-                .big-messages,
-                [class*="big-message"] {
-                    color: ${textColor} !important;
-                    font-size: ${config.bigMessages.fontSize}px !important;
-                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    ${backgroundImage}
-                    ${backgroundClip}
-                    ${config.bigMessages.rgbEffect ? 'animation: rgb-wave 3s linear infinite;' : ''}
-                }
+                    .big-messages,
+                    [class*="big-message"] {
+                        font-size: ${config.bigMessages.fontSize}px !important;
+                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    }
 
-                .big-messages *:not([style*="color"]),
-                [class*="big-message"] *:not([style*="color"]) {
-                    color: ${textColor} !important;
-                    font-size: ${config.bigMessages.fontSize}px !important;
-                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    ${backgroundImage}
-                    ${backgroundClip}
-                    ${config.bigMessages.rgbEffect ? 'animation: rgb-wave 3s linear infinite;' : ''}
-                }
-            `;
+                    .big-messages *:not([style*="color"]),
+                    [class*="big-message"] *:not([style*="color"]) {
+                        background-image: linear-gradient(90deg, #ff4444, #ffaa44, #ffff44, #44ff44, #44ddff, #8844ff, #ff44ff) !important;
+                        background-size: 400% 100% !important;
+                        -webkit-background-clip: text !important;
+                        background-clip: text !important;
+                        -webkit-text-fill-color: transparent !important;
+                        color: transparent !important;
+                        animation: rgb-wave 3s linear infinite !important;
+                        font-size: ${config.bigMessages.fontSize}px !important;
+                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    }
+                `;
+            } else {
+                css += `
+                    .big-messages,
+                    [class*="big-message"] {
+                        color: ${config.bigMessages.color} !important;
+                        font-size: ${config.bigMessages.fontSize}px !important;
+                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    }
+
+                    .big-messages *:not([style*="color"]):not(i):not(span),
+                    [class*="big-message"] *:not([style*="color"]):not(i):not(span) {
+                        color: ${config.bigMessages.color} !important;
+                        font-size: ${config.bigMessages.fontSize}px !important;
+                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    }
+                `;
+            }
         }
 
         return css;
@@ -382,17 +399,6 @@
                             style="width: 100%; height: 30px; border: 1px solid #666; background: #2a2a2a; border-radius: 4px;">
                     </div>
 
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 8px; background: #2a2a2a; border-radius: 4px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 16px;">🌈</span>
-                            <label style="color: #ccc; font-size: 12px;">Efekt RGB (Tęczowy):</label>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="big-rgb-toggle" ${config.bigMessages.rgbEffect ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 12px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
@@ -405,6 +411,13 @@
                             <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
                             <label class="checkbox-container">
                                 <input type="checkbox" id="big-bold-toggle" ${config.bigMessages.bold ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px;">🌈</span>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="big-rgb-toggle" ${config.bigMessages.rgbEffect ? 'checked' : ''}>
                                 <span class="checkmark"></span>
                             </label>
                         </div>
@@ -471,7 +484,7 @@
                 .toggle-switch input:checked + .slider:before {
                     transform: translateX(20px);
                 }
-                
+
                 .checkbox-container {
                     display: inline-block;
                     position: relative;
