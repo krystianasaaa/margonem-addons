@@ -6,17 +6,21 @@
         chat: {
             enabled: true,
             fontSize: 11,
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            italic: false,
+            bold: false
         },
         bigMessages: {
             enabled: true,
             fontSize: 11,
             color: '#ffffff',
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            italic: false,
+            bold: false
         }
     };
 
-    // Rozszerzona lista dostępnych czcionek
+    // Ogromna lista dostępnych czcionek (60+ opcji dla MMORPG)
     const fontPresets = {
         'Arial': 'Arial, sans-serif',
         'Times New Roman': 'Times New Roman, serif',
@@ -32,7 +36,74 @@
         'Garamond': 'Garamond, serif',
         'Bookman': 'Bookman Old Style, serif',
         'Arial Black': 'Arial Black, sans-serif',
-        'Brush Script': 'Brush Script MT, cursive'
+        'Brush Script': 'Brush Script MT, cursive',
+        'Papyrus': 'Papyrus, fantasy',
+        'Copperplate': 'Copperplate Gothic, fantasy',
+        'Lucida Handwriting': 'Lucida Handwriting, cursive',
+        'Chiller': 'Chiller, fantasy',
+        'Old English': 'Old English Text MT, serif',
+        'Blackadder': 'Blackadder ITC, fantasy',
+        'Segoe UI': 'Segoe UI, sans-serif',
+        'Calibri': 'Calibri, sans-serif',
+        'Century Gothic': 'Century Gothic, sans-serif',
+        'Franklin Gothic': 'Franklin Gothic Medium, sans-serif',
+        'Book Antiqua': 'Book Antiqua, serif',
+        'Baskerville': 'Baskerville Old Face, serif',
+        'Consolas': 'Consolas, monospace',
+        'Bradley Hand': 'Bradley Hand ITC, cursive',
+        'Algerian': 'Algerian, fantasy',
+        'Bodoni': 'Bodoni MT, serif',
+        'Britannic': 'Britannic Bold, sans-serif',
+        'Broadway': 'Broadway, fantasy',
+        'Cambria': 'Cambria, serif',
+        'Candara': 'Candara, sans-serif',
+        'Castellar': 'Castellar, fantasy',
+        'Centaur': 'Centaur, serif',
+        'Colonna': 'Colonna MT, fantasy',
+        'Cooper': 'Cooper Black, fantasy',
+        'Corbel': 'Corbel, sans-serif',
+        'Curlz': 'Curlz MT, cursive',
+        'Didot': 'Didot, serif',
+        'Elephant': 'Elephant, fantasy',
+        'Engravers': 'Engravers MT, serif',
+        'Felix': 'Felix Titling, fantasy',
+        'Footlight': 'Footlight MT Light, serif',
+        'Forte': 'Forte, cursive',
+        'Freestyle': 'Freestyle Script, cursive',
+        'French Script': 'French Script MT, cursive',
+        'Gabriola': 'Gabriola, cursive',
+        'Gill Sans': 'Gill Sans MT, sans-serif',
+        'Goudy': 'Goudy Old Style, serif',
+        'Haettenschweiler': 'Haettenschweiler, fantasy',
+        'Harrington': 'Harrington, cursive',
+        'High Tower': 'High Tower Text, serif',
+        'Jokerman': 'Jokerman, fantasy',
+        'Juice': 'Juice ITC, cursive',
+        'Kunstler': 'Kunstler Script, cursive',
+        'Lucida Bright': 'Lucida Bright, serif',
+        'Lucida Sans': 'Lucida Sans, sans-serif',
+        'Magneto': 'Magneto, fantasy',
+        'Maiandra': 'Maiandra GD, fantasy',
+        'Matura': 'Matura MT Script Capitals, cursive',
+        'Mistral': 'Mistral, cursive',
+        'Modern': 'Modern No. 20, serif',
+        'Monotype Corsiva': 'Monotype Corsiva, cursive',
+        'Niagara': 'Niagara Solid, fantasy',
+        'OCR A': 'OCR A Extended, monospace',
+        'Onyx': 'Onyx, fantasy',
+        'Perpetua': 'Perpetua, serif',
+        'Playbill': 'Playbill, fantasy',
+        'Poor Richard': 'Poor Richard, serif',
+        'Ravie': 'Ravie, fantasy',
+        'Rockwell': 'Rockwell, serif',
+        'Script': 'Script MT Bold, cursive',
+        'Showcard': 'Showcard Gothic, fantasy',
+        'Snap': 'Snap ITC, fantasy',
+        'Stencil': 'Stencil, fantasy',
+        'Tempus Sans': 'Tempus Sans ITC, sans-serif',
+        'Vivaldi': 'Vivaldi, cursive',
+        'Vladimir': 'Vladimir Script, cursive',
+        'Wide Latin': 'Wide Latin, fantasy'
     };
 
     // Lista dostępnych kolorów
@@ -51,7 +122,6 @@
     function saveConfig() {
         try {
             const jsonConfig = JSON.stringify(config);
-            // Zapisz w zmiennej tymczasowej zamiast localStorage
             window._messageStylerConfig = jsonConfig;
         } catch (e) {
             console.warn('Nie można zapisać konfiguracji');
@@ -60,7 +130,6 @@
 
     function loadConfig() {
         try {
-            // Wczytaj z zmiennej tymczasowej
             const saved = window._messageStylerConfig;
             if (saved) {
                 const savedConfig = JSON.parse(saved);
@@ -80,6 +149,8 @@
                 .one-message-wrapper {
                     font-size: ${config.chat.fontSize}px !important;
                     font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
                 }
             `;
         }
@@ -91,6 +162,8 @@
                     color: ${config.bigMessages.color} !important;
                     font-size: ${config.bigMessages.fontSize}px !important;
                     font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
                 }
 
                 .big-messages *:not([style*="color"]),
@@ -98,6 +171,8 @@
                     color: ${config.bigMessages.color} !important;
                     font-size: ${config.bigMessages.fontSize}px !important;
                     font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
                 }
             `;
         }
@@ -223,13 +298,30 @@
                         </div>
                     </div>
 
-                    <div>
+                    <div style="margin-bottom: 12px;">
                         <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
                         <select id="chat-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
                             ${Object.entries(fontPresets).map(([name]) =>
                                 `<option value="${name}" ${config.chat.fontFamily === name ? 'selected' : ''}>${name}</option>`
                             ).join('')}
                         </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chat-italic-toggle" ${config.chat.italic ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chat-bold-toggle" ${config.chat.bold ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -274,6 +366,23 @@
                             style="width: 100%; height: 30px; border: 1px solid #666; background: #2a2a2a; border-radius: 4px;">
                     </div>
 
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="big-italic-toggle" ${config.bigMessages.italic ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="big-bold-toggle" ${config.bigMessages.bold ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- PRZYCISK TESTOWY -->
                     <button id="test-big-message" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
                         Test
@@ -289,7 +398,7 @@
             </div>
         `;
 
-        // Dodaj style przełączników
+        // Dodaj style przełączników i checkboxów
         if (!document.getElementById('message-styler-toggle-styles')) {
             const style = document.createElement('style');
             style.id = 'message-styler-toggle-styles';
@@ -334,6 +443,52 @@
                 }
                 .toggle-switch input:checked + .slider:before {
                     transform: translateX(20px);
+                }
+                
+                .checkbox-container {
+                    display: inline-block;
+                    position: relative;
+                    cursor: pointer;
+                    user-select: none;
+                }
+                .checkbox-container input {
+                    position: absolute;
+                    opacity: 0;
+                    cursor: pointer;
+                    height: 0;
+                    width: 0;
+                }
+                .checkbox-container .checkmark {
+                    display: inline-block;
+                    height: 20px;
+                    width: 20px;
+                    background-color: #555;
+                    border: 1px solid #666;
+                    border-radius: 4px;
+                    transition: all 0.3s;
+                    position: relative;
+                }
+                .checkbox-container:hover .checkmark {
+                    background-color: #666;
+                }
+                .checkbox-container input:checked ~ .checkmark {
+                    background-color: #4CAF50;
+                    border-color: #4CAF50;
+                }
+                .checkbox-container .checkmark:after {
+                    content: "";
+                    position: absolute;
+                    display: none;
+                    left: 7px;
+                    top: 3px;
+                    width: 5px;
+                    height: 10px;
+                    border: solid white;
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
+                }
+                .checkbox-container input:checked ~ .checkmark:after {
+                    display: block;
                 }
             `;
             document.head.appendChild(style);
@@ -395,6 +550,18 @@
             saveConfig();
         });
 
+        panel.querySelector('#chat-italic-toggle').addEventListener('change', (e) => {
+            config.chat.italic = e.target.checked;
+            updateCSS();
+            saveConfig();
+        });
+
+        panel.querySelector('#chat-bold-toggle').addEventListener('change', (e) => {
+            config.chat.bold = e.target.checked;
+            updateCSS();
+            saveConfig();
+        });
+
         // Event listeners - BIG MESSAGES
         panel.querySelector('#big-enabled-toggle').addEventListener('change', (e) => {
             config.bigMessages.enabled = e.target.checked;
@@ -414,6 +581,18 @@
 
         panel.querySelector('#big-font-family-select').addEventListener('change', (e) => {
             config.bigMessages.fontFamily = e.target.value;
+            updateCSS();
+            saveConfig();
+        });
+
+        panel.querySelector('#big-italic-toggle').addEventListener('change', (e) => {
+            config.bigMessages.italic = e.target.checked;
+            updateCSS();
+            saveConfig();
+        });
+
+        panel.querySelector('#big-bold-toggle').addEventListener('change', (e) => {
+            config.bigMessages.bold = e.target.checked;
             updateCSS();
             saveConfig();
         });
