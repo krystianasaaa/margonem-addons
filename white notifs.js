@@ -122,21 +122,21 @@
     function saveConfig() {
         try {
             const jsonConfig = JSON.stringify(config);
-            window._messageStylerConfig = jsonConfig;
+            localStorage.setItem('messageStylerConfig', jsonConfig);
         } catch (e) {
-            console.warn('Nie można zapisać konfiguracji');
+            console.error('Błąd zapisu konfiguracji:', e);
         }
     }
 
     function loadConfig() {
         try {
-            const saved = window._messageStylerConfig;
+            const saved = localStorage.getItem('messageStylerConfig');
             if (saved) {
                 const savedConfig = JSON.parse(saved);
                 config = { ...config, ...savedConfig };
             }
         } catch (e) {
-            console.warn('Nie można wczytać konfiguracji');
+            console.error('Błąd wczytywania konfiguracji:', e);
         }
     }
 
