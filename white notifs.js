@@ -16,7 +16,8 @@
             color: '#ffffff',
             fontFamily: 'Arial',
             italic: false,
-            bold: false
+            bold: false,
+            rgbEffect: false
         }
     };
 
@@ -156,23 +157,38 @@
         }
 
         if (config.bigMessages.enabled) {
+            const textColor = config.bigMessages.rgbEffect ? 'transparent' : config.bigMessages.color;
+            const backgroundClip = config.bigMessages.rgbEffect ? 'background-clip: text; -webkit-background-clip: text;' : '';
+            const backgroundImage = config.bigMessages.rgbEffect ? 'background-image: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3); background-size: 200% 100%;' : '';
+            
             css += `
+                @keyframes rgb-wave {
+                    0% { background-position: 0% 50%; }
+                    100% { background-position: 200% 50%; }
+                }
+
                 .big-messages,
                 [class*="big-message"] {
-                    color: ${config.bigMessages.color} !important;
+                    color: ${textColor} !important;
                     font-size: ${config.bigMessages.fontSize}px !important;
                     font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
                     font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
                     font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    ${backgroundImage}
+                    ${backgroundClip}
+                    ${config.bigMessages.rgbEffect ? 'animation: rgb-wave 3s linear infinite;' : ''}
                 }
 
                 .big-messages *:not([style*="color"]),
                 [class*="big-message"] *:not([style*="color"]) {
-                    color: ${config.bigMessages.color} !important;
+                    color: ${textColor} !important;
                     font-size: ${config.bigMessages.fontSize}px !important;
                     font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
                     font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
                     font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    ${backgroundImage}
+                    ${backgroundClip}
+                    ${config.bigMessages.rgbEffect ? 'animation: rgb-wave 3s linear infinite;' : ''}
                 }
             `;
         }
@@ -364,6 +380,17 @@
                         </div>
                         <input type="color" id="big-custom-color" value="${config.bigMessages.color}"
                             style="width: 100%; height: 30px; border: 1px solid #666; background: #2a2a2a; border-radius: 4px;">
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 8px; background: #2a2a2a; border-radius: 4px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px;">🌈</span>
+                            <label style="color: #ccc; font-size: 12px;">Efekt RGB (Tęczowy):</label>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="big-rgb-toggle" ${config.bigMessages.rgbEffect ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
                     </div>
 
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 12px;">
@@ -617,6 +644,13 @@
             panel.querySelectorAll('.color-option').forEach(opt => {
                 opt.style.border = '2px solid #666';
             });
+            updateCSS();
+            saveConfig();
+        });
+
+        // RGB Effect toggle
+        panel.querySelector('#big-rgb-toggle').addEventListener('change', (e) => {
+            config.bigMessages.rgbEffect = e.target.checked;
             updateCSS();
             saveConfig();
         });
