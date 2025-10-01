@@ -764,6 +764,37 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
         user-select: none;
     `;
 
+    // Pobierz ikonę NPC
+    let npcIcon = '';
+    try {
+        if (heroData.npcData) {
+            const npcData = heroData.npcData;
+            if (npcData && npcData.d && npcData.d.icon) {
+                npcIcon = npcData.d.icon;
+            } else if (npcData && npcData[1] && npcData[1].d && npcData[1].d.icon) {
+                npcIcon = npcData[1].d.icon;
+            } else if (npcData && npcData.icon) {
+                npcIcon = npcData.icon;
+            }
+        }
+    } catch (error) {
+        console.error('Błąd pobierania ikony NPC:', error);
+    }
+
+    // Dodaj prefiks dla NI
+    let addToThumbnail = '';
+    const getCookie = (name) => {
+        const regex = new RegExp(`(^| )${name}=([^;]+)`);
+        const match = document.cookie.match(regex);
+        return match ? match[2] : null;
+    };
+    
+    if (getCookie('interface') === 'ni') {
+        addToThumbnail = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
+    }
+
+    const npcImageUrl = npcIcon ? (addToThumbnail + npcIcon) : '';
+
     gameWindow.innerHTML = `
         <div id="hero-window-header" style="
             background: linear-gradient(180deg, #6b4f7a 0%, #5a3e69 100%);
@@ -800,6 +831,27 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
         </div>
 
         <div style="padding: 20px 15px 15px 15px;">
+            <!-- Hero Image -->
+            ${npcImageUrl ? `
+            <div style="
+                text-align: center; 
+                margin-bottom: 15px;
+                padding: 10px;
+                background: linear-gradient(180deg, rgba(107,91,123,0.3) 0%, rgba(62,46,79,0.3) 100%);
+                border: 1px solid rgba(107,91,123,0.5);
+                border-radius: 6px;
+            ">
+                <img src="${npcImageUrl}" alt="${heroName}" style="
+                    max-width: 80px;
+                    max-height: 80px;
+                    image-rendering: pixelated;
+                    image-rendering: -moz-crisp-edges;
+                    image-rendering: crisp-edges;
+                    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+                " onerror="this.parentElement.style.display='none'">
+            </div>
+            ` : ''}
+
             <!-- Hero Name and Level -->
             <div style="
                 text-align: center; 
@@ -900,7 +952,7 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
 
     document.body.appendChild(gameWindow);
 
-    // Funkcjonalność przeciągania
+    // Reszta kodu pozostaje bez zmian (event listenery, przeciąganie, itp.)
     let isDragging = false;
     let dragOffsetX = 0;
     let dragOffsetY = 0;
@@ -930,7 +982,6 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
         }
     });
 
-    // Event listeners dla przycisków
     gameWindow.querySelector('#hero-window-close').onclick = () => {
         document.body.removeChild(gameWindow);
     };
@@ -942,7 +993,6 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
     gameWindow.querySelector('#hero-send-btn').onclick = async () => {
         const customMessage = gameWindow.querySelector('#hero-custom-message').value.trim();
 
-        // Wyślij webhook z custom message
         const success = await sendHeroRespawnNotificationWithMessage(heroName, heroLevel, {
             ...heroData,
             customMessage: customMessage
@@ -951,7 +1001,6 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
         if (success) {
             addToNotificationLog(heroName, heroLevel);
 
-            // Mini komunikat sukcesu
             const successMsg = document.createElement('div');
             successMsg.style.cssText = `
                 position: fixed; top: 20px; right: 20px;
@@ -966,7 +1015,6 @@ function showHeroDetectionWindow(heroName, heroLevel, heroData = {}) {
             document.body.appendChild(successMsg);
             setTimeout(() => successMsg.remove(), 3000);
         } else {
-            // Mini komunikat błędu
             const errorMsg = document.createElement('div');
             errorMsg.style.cssText = `
                 position: fixed; top: 20px; right: 20px;
