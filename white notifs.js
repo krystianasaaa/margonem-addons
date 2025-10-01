@@ -93,8 +93,8 @@
                     font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
                 }
 
-                .big-messages *:not(img):not(svg):not([class*="item"]):not([class*="icon"]):not([class*="loot"]):not(canvas),
-                [class*="big-message"] *:not(img):not(svg):not([class*="item"]):not([class*="icon"]):not([class*="loot"]):not(canvas) {
+                .big-messages *:not([style*="color"]),
+                [class*="big-message"] *:not([style*="color"]) {
                     color: ${config.bigMessages.color} !important;
                     font-size: ${config.bigMessages.fontSize}px !important;
                     font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
