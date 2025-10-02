@@ -277,7 +277,7 @@ function generateCSS() {
     // Funkcja testowa Big Message
     function showTestBigMessage() {
         if (typeof message === 'function') {
-            message('Test powiadomienia');
+            message('Test ');
         } else {
             console.log('Funkcja message() nie jest dostępna w grze');
         }
@@ -359,7 +359,7 @@ function generateCSS() {
                 <!-- SEKCJA BIG MESSAGES -->
                 <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Powiadomieniaaa</span>
+                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Powiadomienia</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="big-enabled-toggle" ${config.bigMessages.enabled ? 'checked' : ''}>
                             <span class="slider"></span>
