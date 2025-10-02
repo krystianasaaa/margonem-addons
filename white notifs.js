@@ -140,78 +140,76 @@ const colorPresets = {
         }
     }
 
-    // Funkcja generująca CSS
-// Funkcja generująca CSS
-    function generateCSS() {
-        let css = '';
+function generateCSS() {
+    let css = '';
 
-        if (config.chat.enabled) {
+    if (config.chat.enabled) {
+        css += `
+            .one-message-wrapper {
+                font-size: ${config.chat.fontSize}px !important;
+                font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
+                font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
+                font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
+            }
+        `;
+    }
+
+    if (config.bigMessages.enabled) {
+        if (config.bigMessages.rgbEffect) {
             css += `
-                .one-message-wrapper {
-                    font-size: ${config.chat.fontSize}px !important;
-                    font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
-                    font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
-                    font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
+                @keyframes rgb-wave {
+                    0% { background-position: 0% 50%; }
+                    100% { background-position: 400% 50%; }
+                }
+
+                .big-messages,
+                [class*="big-message"] {
+                    font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                }
+
+                .big-messages *:not([style*="color"]):not(span[style]),
+                [class*="big-message"] *:not([style*="color"]):not(span[style]) {
+                    background-image: linear-gradient(90deg, #ff4444, #ffaa44, #ffff44, #44ff44, #44ddff, #8844ff, #ff44ff) !important;
+                    background-size: 400% 100% !important;
+                    -webkit-background-clip: text !important;
+                    background-clip: text !important;
+                    -webkit-text-fill-color: transparent !important;
+                    color: transparent !important;
+                    animation: rgb-wave 3s linear infinite !important;
+                    font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                }
+            `;
+        } else {
+            css += `
+                .big-messages,
+                [class*="big-message"] {
+                    color: ${config.bigMessages.color} !important;
+                    font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                }
+
+                .big-messages *:not([style*="color"]):not(i):not(span),
+                [class*="big-message"] *:not([style*="color"]):not(i):not(span) {
+                    color: ${config.bigMessages.color} !important;
+                    font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
                 }
             `;
         }
-
-        if (config.bigMessages.enabled) {
-            if (config.bigMessages.rgbEffect) {
-                css += `
-                    @keyframes rgb-wave {
-                        0% { background-position: 0% 50%; }
-                        100% { background-position: 400% 50%; }
-                    }
-
-                    .big-messages,
-                    [class*="big-message"] {
-                        font-size: ${config.bigMessages.fontSize}px !important;
-                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    }
-
-                    .big-messages *:not([style*="color"]),
-                    [class*="big-message"] *:not([style*="color"]) {
-                        background-image: linear-gradient(90deg, #ff4444, #ffaa44, #ffff44, #44ff44, #44ddff, #8844ff, #ff44ff) !important;
-                        background-size: 400% 100% !important;
-                        -webkit-background-clip: text !important;
-                        background-clip: text !important;
-                        -webkit-text-fill-color: transparent !important;
-                        color: transparent !important;
-                        animation: rgb-wave 3s linear infinite !important;
-                        font-size: ${config.bigMessages.fontSize}px !important;
-                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    }
-                `;
-            } else {
-                css += `
-                    .big-messages,
-                    [class*="big-message"] {
-                        color: ${config.bigMessages.color} !important;
-                        font-size: ${config.bigMessages.fontSize}px !important;
-                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    }
-
-                    .big-messages *:not([style*="color"]):not(i):not(span),
-                    [class*="big-message"] *:not([style*="color"]):not(i):not(span) {
-                        color: ${config.bigMessages.color} !important;
-                        font-size: ${config.bigMessages.fontSize}px !important;
-                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    }
-                `;
-            }
-        }
-
-        return css;
     }
+
+    return css;
+}
 
     // Funkcja dodająca/aktualizująca CSS
     function updateCSS() {
