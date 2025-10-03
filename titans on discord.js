@@ -1030,7 +1030,6 @@ async function checkTitanRespawns() {
                     if (!lastDetectedTitans.has(titanKey)) {
                         const notificationKey = `${finalTitanName}_${finalTitanLevel}`;
                         const lastSent = config.sentTitans[notificationKey] || 0;
-                        const lastSent = sentTitans[notificationKey] || 0;
                         const now = Date.now();
 
                         if (now - lastSent > COOLDOWN_TIME) {
