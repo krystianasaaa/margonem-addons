@@ -11,15 +11,20 @@ window.addEventListener('error', function(e) {
     }
 });
 let config = {
-    enabled: localStorage.getItem('titanNotifierEnabled') !== 'false',
-    webhookUrl: localStorage.getItem('titanNotifierWebhook') || '',
-    roleIds: JSON.parse(localStorage.getItem('titanNotifierRoleIds') || '{}')
+    enabled: true,
+    webhookUrl: '',
+    roleIds: {},
+    alarmVolume: 50,
+    buttonPosition: null,
+    panelPosition: null,
+    sentTitans: {},
+    notificationLog: []
 };
 
+let titanCheckInterval = null;
+
 function saveConfig() {
-    localStorage.setItem('titanNotifierEnabled', config.enabled.toString());
-    localStorage.setItem('titanNotifierWebhook', config.webhookUrl);
-    localStorage.setItem('titanNotifierRoleIds', JSON.stringify(config.roleIds));
+    
     updateButtonAppearance();
 }
 
@@ -46,7 +51,7 @@ const COOLDOWN_TIME = 5 * 60 * 1000;
 function playTitanAlarmSound() {
     try {
         const audio = new Audio('https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/sounds/Alarm%20Sound%20Effect.mp3');
-        const volume = parseInt(localStorage.getItem('titanAlarmVolume') || '50');
+        const volume = config.alarmVolume;
         audio.volume = volume / 100;
         audio.play().catch(error => {
             console.error('Nie można odtworzyć dźwięku alarmu:', error);
@@ -475,21 +480,18 @@ function setTitanRoleIds(roleIds) {
 }
 
 function getNotificationLog() {
-    return JSON.parse(localStorage.getItem('titanNotifierLog') || '[]');
+    return config.notificationLog;
 }
 
 function addToNotificationLog(titanName, titanLevel) {
-    const log = getNotificationLog();
     const newEntry = {
         time: new Date().toLocaleString('pl-PL'),
         titan: titanName,
         level: titanLevel
     };
 
-    log.unshift(newEntry);
-    if (log.length > 15) log.splice(15);
-
-    localStorage.setItem('titanNotifierLog', JSON.stringify(log));
+    config.notificationLog.unshift(newEntry);
+    if (config.notificationLog.length > 15) config.notificationLog.splice(15);
 }
 
 function updateButtonAppearance() {
@@ -644,7 +646,7 @@ function makeDraggable(element) {
         element.style.top = `${y}px`;
         element.style.right = 'auto';
 
-        localStorage.setItem('titanNotifierButtonPosition', JSON.stringify({x, y}));
+        config.buttonPosition = {x, y};
     });
 
     document.addEventListener('mouseup', () => {
@@ -782,9 +784,9 @@ function createSettingsPanel() {
 
             <div style="margin-bottom: 15px;">
                 <span style="color: #ccc; font-size: 12px; display: block; margin-bottom: 5px;">Głośność alarmu dźwiękowego:</span>
-                <input type="range" id="titan-alarm-volume" min="0" max="100" value="${localStorage.getItem('titanAlarmVolume') || '50'}" 
+                <input type="range" id="titan-alarm-volume" min="0" max="100" value="${config.alarmVolume}" 
                        style="width: 100%; cursor: pointer;">
-                <div style="color: #888; font-size: 10px; text-align: center; margin-top: 3px;" id="volume-display">${localStorage.getItem('titanAlarmVolume') || '50'}%</div>
+                <div style="color: #888; font-size: 10px; text-align: center; margin-top: 3px;" id="volume-display">${config.alarmVolume}%</div>
             </div>
 
             <div style="color: #ccc; font-size: 11px; margin-bottom: 10px;">
@@ -799,9 +801,9 @@ function createSettingsPanel() {
 
             <div style="margin-bottom: 15px;">
                 <span style="color: #ccc; font-size: 12px; display: block; margin-bottom: 5px;">Głośność alarmu dźwiękowego:</span>
-                <input type="range" id="titan-alarm-volume" min="0" max="100" value="${localStorage.getItem('titanAlarmVolume') || '50'}" 
+                <input type="range" id="titan-alarm-volume" min="0" max="100" value="${config.alarmVolume}" 
                        style="width: 100%; cursor: pointer;">
-                <div style="color: #888; font-size: 10px; text-align: center; margin-top: 3px;" id="volume-display">${localStorage.getItem('titanAlarmVolume') || '50'}%</div>
+                <div style="color: #888; font-size: 10px; text-align: center; margin-top: 3px;" id="volume-display">${config.alarmVolume}%</div>
             </div>
 
             <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
@@ -854,7 +856,7 @@ function createSettingsPanel() {
         panel.style.top = `${y}px`;
         panel.style.transform = 'none';
         
-        localStorage.setItem('titansSettingsPanelPosition', JSON.stringify({x, y}));
+        config.panelPosition = {x, y};
     });
 
     document.addEventListener('mouseup', () => {
@@ -865,7 +867,7 @@ function createSettingsPanel() {
         }
     });
 
-    const savedPosition = JSON.parse(localStorage.getItem('titansSettingsPanelPosition') || 'null');
+    const savedPosition = config.panelPosition;
     if (savedPosition) {
         panel.style.left = `${savedPosition.x}px`;
         panel.style.top = `${savedPosition.y}px`;
@@ -927,9 +929,7 @@ function createSettingsPanel() {
         });
         config.roleIds = newRoleIds;
         
-        // Zapisz głośność alarmu
-        const volumeValue = panel.querySelector('#titan-alarm-volume').value;
-        localStorage.setItem('titanAlarmVolume', volumeValue);
+config.alarmVolume = parseInt(panel.querySelector('#titan-alarm-volume').value);
         
         saveConfig();
         toggleSettingsPanel();
@@ -1029,7 +1029,7 @@ async function checkTitanRespawns() {
 
                     if (!lastDetectedTitans.has(titanKey)) {
                         const notificationKey = `${finalTitanName}_${finalTitanLevel}`;
-                        const sentTitans = JSON.parse(localStorage.getItem('titanNotifierSentTitans') || '{}');
+                        const lastSent = config.sentTitans[notificationKey] || 0;
                         const lastSent = sentTitans[notificationKey] || 0;
                         const now = Date.now();
 
@@ -1048,7 +1048,7 @@ async function checkTitanRespawns() {
                             const success = await sendTitanRespawnNotification(finalTitanName, finalTitanLevel, additionalData);
                             if (success) {
                                 addToNotificationLog(finalTitanName, finalTitanLevel);
-                                sentTitans[notificationKey] = now;
+                                config.sentTitans[notificationKey] = now;
                                 localStorage.setItem('titanNotifierSentTitans', JSON.stringify(sentTitans));
                             }
                         }
