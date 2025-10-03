@@ -3,7 +3,7 @@
 
     const worldName = "dream";
     const MIN_PLAYERS_THRESHOLD = 8;
-    const GUILD_JSON_URL = "https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/guilds/guilds.json";
+    const GUILD_JSON_URL = "https://raw.githubusercontent.com/krystianasaaa/margonem-addons/main/guilds/guilds.json";
     
     let currentPlayersData = null;
     let checkPlayersTimeout = null;
