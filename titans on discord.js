@@ -25,7 +25,7 @@ function saveConfig() {
 const predefinedWorldRoles = {
     "Dream": {
         "Dziewicza Orlica": "1247119737641762857",
-        "Zabójczy Królik": "1247119736777736232",
+        "Zabójczy Królik": "1247119736777736232", 
         "Renegat Baulus": "1247119735540420638",
         "Piekielny Arcymag": "1247119733916962886",
         "Versus Zoons": "1247119725734133790",
@@ -37,6 +37,12 @@ const predefinedWorldRoles = {
         "Tanroth": "1247116703704547339"
     }
 };
+
+    // Śledzenie wykrytych tytanów
+    let lastDetectedTitans = new Set();
+const COOLDOWN_TIME = 5 * 60 * 1000;
+let titanCheckInterval = null;
+
     const styles = `
         #titan-notifier-button {
             position: fixed;
@@ -578,6 +584,110 @@ function getCurrentPlayerName() {
         return 'Nieznany gracz';
     }
 }
+
+    // Funkcja sprawdzająca respawn tytanów
+// Funkcja sprawdzająca respawn tytanów - KOMPLETNA WERSJA
+async function checkTitanRespawns() {
+    if (!isNotifierEnabled()) return;
+
+    try {
+        if (typeof Engine === 'undefined' || !Engine.npcs) return;
+        let npcs = [];
+
+        // Próbuj różne metody dostępu do NPC-ów
+        if (Engine.npcs.check && typeof Engine.npcs.check === 'function') {
+            try {
+                const npcCheck = Engine.npcs.check();
+                if (npcCheck && typeof npcCheck === 'object') {
+                    npcs = Object.entries(npcCheck);
+                }
+            } catch (e) {}
+        }
+
+        if (npcs.length === 0 && Engine.npcs.list) {
+            try {
+                npcs = Object.entries(Engine.npcs.list);
+            } catch (e) {}
+        }
+
+        if (npcs.length === 0 && Engine.map && Engine.map.npcs) {
+            try {
+                npcs = Object.entries(Engine.map.npcs);
+            } catch (e) {}
+        }
+
+        const currentTitans = new Set();
+
+        // Przejrzyj wszystkich NPC-ów
+        for (const [npcId, npcData] of npcs) {
+            try {
+                let titanName = null;
+                let titanLevel = null;
+                let titanWt = null;
+
+                // Różne struktury danych w zależności od metody
+                if (npcData && npcData.d) {
+                    const titanData = npcData.d;
+                    titanName = titanData.nick || titanData.name;
+                    titanLevel = titanData.lvl || titanData.elasticLevel;
+                    titanWt = titanData.wt;
+                } else if (npcData && npcData[1] && npcData[1].d) {
+                    const titanData = npcData[1].d;
+                    titanName = titanData.nick || titanData.name;
+                    titanLevel = titanData.lvl || titanData.wt;
+                    titanWt = titanData.wt;
+                } else if (npcData && typeof npcData === 'object') {
+                    titanName = npcData.nick || npcData.name;
+                    titanLevel = npcData.lvl || npcData.elasticLevel || npcData.wt;
+                    titanWt = npcData.wt;
+                }
+
+                // Sprawdź czy to tytan (wt > 99)
+                if (titanWt && titanWt > 99) {
+                    const finalTitanName = titanName || 'Nieznany Tytan';
+                    const finalTitanLevel = titanLevel || titanWt;
+                    const titanKey = `${npcId}_${finalTitanName}_${finalTitanLevel}`;
+
+                    currentTitans.add(titanKey);
+
+                    // TUTAJ JEST CAŁY KOD KTÓRY BYŁ POZA FUNKCJĄ:
+                    if (!lastDetectedTitans.has(titanKey)) {
+                        const notificationKey = `${finalTitanName}_${finalTitanLevel}`;
+                        const sentTitans = JSON.parse(localStorage.getItem('titanNotifierSentTitans') || '{}');
+                        const lastSent = sentTitans[notificationKey] || 0;
+                        const now = Date.now();
+
+                        if (now - lastSent > COOLDOWN_TIME) {
+                            const additionalData = {
+                                mapName: getCurrentMapName(),
+                                finderName: getCurrentPlayerName(),
+                                npcData: npcData
+                            };
+
+                            // TERAZ await JEST WEWNĄTRZ FUNKCJI async - TO JEST OK!
+                            const success = await sendTitanRespawnNotification(finalTitanName, finalTitanLevel, additionalData);
+                            if (success) {
+                                addToNotificationLog(finalTitanName, finalTitanLevel);
+                                sentTitans[notificationKey] = now;
+                                localStorage.setItem('titanNotifierSentTitans', JSON.stringify(sentTitans));
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error(`Błąd przy przetwarzaniu NPC ${npcId}:`, error);
+            }
+        }
+
+        // Zaktualizuj listę wykrytych tytanów
+        lastDetectedTitans = currentTitans;
+
+    } catch (error) {
+        console.error('Błąd w głównym bloku try:', error);
+    }
+} // <- TUTAJ KOŃCZY SIĘ FUNKCJA async
+
     // Funkcja przeciągania przycisku
     function makeDraggable(element) {
         let isDragging = false;
@@ -656,27 +766,27 @@ function getCurrentPlayerName() {
 }
 function loadPredefinedSettings() {
     const worldName = window.location.hostname.split('.')[0] || 'Unknown';
-
+    
     if (predefinedWorldRoles[worldName]) {
         const worldRoles = predefinedWorldRoles[worldName];
         const dreamWebhook = "https://discord.com/api/webhooks/1399066320716431471/sqljwt0IrBr0KsWl8-PvR3QDuK9Xhq8JYqE0AfrAgpPlRi2COrrOgYNwCqo9FpUQYfqq";
-
+        
         config.webhookUrl = dreamWebhook;
         config.roleIds = { ...worldRoles };
         config.enabled = true;
-
+        
         saveConfig();
-
+        
         // Odśwież panel ustawień jeśli jest otwarty
         const panel = document.getElementById('titans-on-discord-settings-panel');
         if (panel && panel.style.display === 'block') {
             toggleSettingsPanel();
             setTimeout(() => toggleSettingsPanel(), 100);
         }
-
+        
         return true;
     }
-
+    
     return false;
 }
 
@@ -776,14 +886,14 @@ function createSettingsPanel() {
     let dragOffsetY = 0;
 
     const header = panel.querySelector('#titans-panel-header');
-
+    
     header.addEventListener('mousedown', (e) => {
         isDragging = true;
         const rect = panel.getBoundingClientRect();
         dragOffsetX = e.clientX - rect.left;
         dragOffsetY = e.clientY - rect.top;
         e.preventDefault();
-
+        
         // Visual feedback
         header.style.background = '#444';
         panel.style.cursor = 'grabbing';
@@ -791,14 +901,14 @@ function createSettingsPanel() {
 
     document.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-
+        
         const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
         const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
-
+        
         panel.style.left = `${x}px`;
         panel.style.top = `${y}px`;
         panel.style.transform = 'none';
-
+        
         // Zapisz pozycję
         localStorage.setItem('titansSettingsPanelPosition', JSON.stringify({x, y}));
     });
@@ -826,7 +936,7 @@ function createSettingsPanel() {
         loadBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const selectedWorld = worldSelector.value;
-
+            
             if (!selectedWorld) {
                 loadBtn.style.background = '#dc3545';
                 loadBtn.textContent = '⚠️ Wybierz świat!';
@@ -836,23 +946,23 @@ function createSettingsPanel() {
                 }, 2000);
                 return;
             }
-
+            
             if (predefinedWorldRoles[selectedWorld]) {
                 const worldRoles = predefinedWorldRoles[selectedWorld];
                 const dreamWebhook = "https://discord.com/api/webhooks/1399066320716431471/sqljwt0IrBr0KsWl8-PvR3QDuK9Xhq8JYqE0AfrAgpPlRi2COrrOgYNwCqo9FpUQYfqq";
-
+                
                 config.webhookUrl = dreamWebhook;
                 config.roleIds = { ...worldRoles };
                 config.enabled = true;
                 saveConfig();
-
+                
                 // Odśwież wartości w panelu
                 panel.querySelector('#titan-webhook').value = config.webhookUrl;
                 panel.querySelectorAll('input[data-titan]').forEach(input => {
                     const titanName = input.getAttribute('data-titan');
                     input.value = config.roleIds[titanName] || '';
                 });
-
+                
                 // Komunikat sukcesu
                 loadBtn.style.background = '#28a745';
                 loadBtn.textContent = '✅ Załadowano!';
@@ -868,7 +978,7 @@ function createSettingsPanel() {
         e.preventDefault();
         config.enabled = true;
         config.webhookUrl = panel.querySelector('#titan-webhook').value.trim();
-
+        
         const newRoleIds = {};
         panel.querySelectorAll('input[data-titan]').forEach(input => {
             const titanName = input.getAttribute('data-titan');
@@ -876,7 +986,7 @@ function createSettingsPanel() {
             if (roleId) newRoleIds[titanName] = roleId;
         });
         config.roleIds = newRoleIds;
-
+        
         saveConfig();
         toggleSettingsPanel();
     });
@@ -914,274 +1024,32 @@ function integrateWithAddonManager() {
     // Zatrzymaj po 20 sekundach jeśli nie znajdzie managera
     setTimeout(() => clearInterval(checkForManager), 20000);
 }
-function showTitanDetectionWindow(titanName, titanLevel, titanData = {}) {
-    if (document.getElementById('titan-detection-window')) return;
-
-    const gameWindow = document.createElement('div');
-    gameWindow.id = 'titan-detection-window';
-    gameWindow.style.cssText = `
-        position: fixed;
-        top: 200px;
-        left: 240px;
-        background: #1a1a1a;
-        border: 2px solid #2a2a2a;
-        border-radius: 8px;
-        padding: 0;
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        width: 200px;
-        font-family: Arial, sans-serif;
-        color: #fff;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.8);
-        user-select: none;
-    `;
-
-    let npcIcon = '';
-    try {
-        if (titanData.npcData) {
-            const npcData = titanData.npcData;
-            if (npcData && npcData.d && npcData.d.icon) {
-                npcIcon = npcData.d.icon;
-            } else if (npcData && npcData[1] && npcData[1].d && npcData[1].d.icon) {
-                npcIcon = npcData[1].d.icon;
-            } else if (npcData && npcData.icon) {
-                npcIcon = npcData.icon;
-            }
-        }
-    } catch (error) {
-        console.error('Błąd pobierania ikony NPC:', error);
-    }
-
-    let addToThumbnail = '';
-    const getCookie = (name) => {
-        const regex = new RegExp(`(^| )${name}=([^;]+)`);
-        const match = document.cookie.match(regex);
-        return match ? match[2] : null;
-    };
-
-    if (getCookie('interface') === 'ni') {
-        addToThumbnail = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
-    }
-
-    const npcImageUrl = npcIcon ? (addToThumbnail + npcIcon) : '';
-
-    gameWindow.innerHTML = `
-        <div id="titan-window-header" style="
-            background: #1a1a1a;
-            color: #fff;
-            font-size: 13px;
-            text-align: center;
-            font-weight: bold;
-            padding: 10px 12px;
-            border-bottom: 1px solid #333;
-            border-radius: 8px 8px 0 0;
-            cursor: move;
-            user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s;
-        ">
-            <span style="flex: 1; text-align: center;">Tytan!</span>
-            <button style="
-                background: none;
-                border: none;
-                color: #ddd;
-                font-size: 18px;
-                cursor: pointer;
-                width: 20px;
-                height: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-                font-weight: bold;
-                line-height: 1;
-            " id="titan-window-close" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ddd'">×</button>
-        </div>
-
-        <div style="padding: 15px; background: #1a1a1a;">
-            <div style="text-align: center; margin-bottom: 12px;">
-                <div style="
-                    font-size: 16px;
-                    color: #9d4edd;
-                    font-weight: bold;
-                    text-shadow: 0 0 10px rgba(157,78,221,0.5);
-                    margin-bottom: 4px;
-                ">
-                    ${titanName}
-                </div>
-                <div style="
-                    font-size: 12px;
-                    color: #aaa;
-                ">
-                    (${titanLevel} lvl)
-                </div>
-            </div>
-
-            ${npcImageUrl ? `
-            <div style="text-align: center; margin-bottom: 12px;">
-                <img src="${npcImageUrl}" alt="${titanName}" style="
-                    max-width: 64px;
-                    max-height: 64px;
-                    image-rendering: pixelated;
-                    image-rendering: -moz-crisp-edges;
-                    image-rendering: crisp-edges;
-                    filter: drop-shadow(0 0 8px rgba(157,78,221,0.3));
-                " onerror="this.parentElement.style.display='none'">
-            </div>
-            ` : ''}
-
-            <div style="
-                text-align: center;
-                color: #28a745;
-                font-size: 11px;
-                font-weight: bold;
-                padding: 8px;
-                background: rgba(40, 167, 69, 0.1);
-                border: 1px solid #28a745;
-                border-radius: 4px;
-            ">
-                ✓ Powiadomienie wysłane!
-            </div>
-        </div>
-
-        <div style="
-            border-top: 1px solid #000;
-            border-radius: 0 0 8px 8px;
-            overflow: hidden;
-        ">
-            <button id="titan-close-btn" style="
-                width: 100%;
-                padding: 10px;
-                background: #2a2a2a;
-                color: #aaa;
-                border: none;
-                cursor: pointer;
-                font-size: 11px;
-                font-weight: bold;
-                transition: all 0.2s;
-            " onmouseover="this.style.background='#333'" onmouseout="this.style.background='#2a2a2a'">
-                Zamknij
-            </button>
-        </div>
-    `;
-
-    document.body.appendChild(gameWindow);
-
-    let isDragging = false;
-    let dragOffsetX = 0;
-    let dragOffsetY = 0;
-
-    const header = gameWindow.querySelector('#titan-window-header');
-    header.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        dragOffsetX = e.clientX - gameWindow.getBoundingClientRect().left;
-        dragOffsetY = e.clientY - gameWindow.getBoundingClientRect().top;
-        e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - gameWindow.offsetWidth);
-        const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - gameWindow.offsetHeight);
-        gameWindow.style.left = `${x}px`;
-        gameWindow.style.top = `${y}px`;
-        gameWindow.style.transform = 'none';
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-        }
-    });
-
-    gameWindow.querySelector('#titan-window-close').onclick = () => {
-        document.body.removeChild(gameWindow);
-    };
-
-    gameWindow.querySelector('#titan-close-btn').onclick = () => {
-        document.body.removeChild(gameWindow);
-    };
-
-    // Auto-zamknięcie po 5 sekundach
-    setTimeout(() => {
-        if (document.body.contains(gameWindow)) {
-            document.body.removeChild(gameWindow);
-        }
-    }, 5000);
-}
-
-function startTitanDetection() {
-    function getCookie(name) {
-        const regex = new RegExp(`(^| )${name}=([^;]+)`);
-        const match = document.cookie.match(regex);
-        if (match) {
-            return match[2];
-        }
-    }
-
-    // Sprawdź czy Engine jest gotowy
-    if (!window.Engine?.npcs?.check) {
-        setTimeout(startTitanDetection, 50);
-        return;
-    }
-
-    // Dodaj callback na nowe NPCe
-    window.API.addCallbackToEvent('newNpc', async function(npc) {
-        if (!isNotifierEnabled()) return;
-
-        const titanWt = npc.d.wt;
-        const titanName = npc.d.nick || npc.d.name || 'Nieznany Tytan';
-        const titanLevel = npc.d.lvl || npc.d.elasticLevel || titanWt;
-
-        // Sprawdź czy to tytan (wt > 99)
-        if (titanWt && titanWt > 99) {
-            const notificationKey = `${titanName}_${titanLevel}`;
-            const sentTitans = JSON.parse(localStorage.getItem('titanNotifierSentTitans') || '{}');
-            const lastSent = sentTitans[notificationKey] || 0;
-            const now = Date.now();
-
-            if (now - lastSent > COOLDOWN_TIME) {
-                const additionalData = {
-                    mapName: getCurrentMapName(),
-                    finderName: getCurrentPlayerName(),
-                    npcData: npc.d
-                };
-
-const success = await sendTitanRespawnNotification(titanName, titanLevel, additionalData);
-if (success) {
-    addToNotificationLog(titanName, titanLevel);
-    sentTitans[notificationKey] = now;
-    localStorage.setItem('titanNotifierSentTitans', JSON.stringify(sentTitans));
-
-    // Pokaż okno powiadomienia
-    showTitanDetectionWindow(titanName, titanLevel, additionalData);
-}
-            }
-        }
-    });
-}
 
 function init() {
     const existingButton = document.getElementById('titan-notifier-button');
     if (existingButton) {
         existingButton.remove();
     }
-
+    
+    if (titanCheckInterval) {
+        clearInterval(titanCheckInterval);
+    }
+    
     // Dodaj style
     const styleSheet = document.createElement('style');
     styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
-
+    
+    // Rozpocznij sprawdzanie respawnów co 10 sekund
+    titanCheckInterval = setInterval(checkTitanRespawns, 10000);
+    
     // ZMIEŃ TĘ LINIĘ - dodaj try/catch:
     try {
         integrateWithAddonManager();
     } catch (error) {
         console.warn('Addon manager integration failed:', error);
     }
-
+    
 }
 
 
