@@ -8,7 +8,6 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @connect      github.com
 // @icon        https://raw.githubusercontent.com/krystianasaaa/margonem-addons/b939ec05fdd03f6f973cef7a931659c224596bde/ikonka.png
 // @run-at       document-body
 // @updateURL    https://krystianasaaa.github.io/margonem-addons/loader.user.js
