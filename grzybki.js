@@ -24,12 +24,14 @@
 
     let config = {
         enabled: localStorage.getItem('specialMobsEnabled') !== 'false',
-        webhookUrl: localStorage.getItem('specialMobsWebhook') || ''
+        webhookUrl: localStorage.getItem('specialMobsWebhook') || '',
+        roleId: localStorage.getItem('specialMobsRoleId') || ''
     };
 
     function saveConfig() {
         localStorage.setItem('specialMobsEnabled', config.enabled.toString());
         localStorage.setItem('specialMobsWebhook', config.webhookUrl);
+        localStorage.setItem('specialMobsRoleId', config.roleId);
     }
 
     const styles = `
@@ -217,23 +219,6 @@
         .special-btn-secondary:hover {
             background: #555;
         }
-
-        .special-tracked-mobs {
-            background: rgba(230,126,34,0.1);
-            border: 1px solid #e67e22;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-        }
-
-        .special-mob-item {
-            padding: 8px;
-            margin: 5px 0;
-            background: rgba(0,0,0,0.2);
-            border-radius: 6px;
-            color: #e67e22;
-            font-size: 13px;
-        }
     `;
 
     function getCurrentMapName() {
@@ -283,6 +268,16 @@
         const mapName = mobData.mapName || getCurrentMapName();
         const finderName = mobData.finderName || getCurrentPlayerName();
 
+        let rolePing = '';
+        if (config.roleId) {
+            if (config.roleId.toLowerCase() === 'everyone') {
+                rolePing = '@everyone';
+            } else {
+                const roleIdsList = config.roleId.split(',').map(id => id.trim()).filter(id => id);
+                rolePing = roleIdsList.map(id => `<@&${id}>`).join(' ');
+            }
+        }
+
         const embed = {
             title: `GRZYBB!`,
             description: `**${mobName}** ${mobLevel ? `(Lvl ${mobLevel})` : ''}\n\n` +
@@ -303,7 +298,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    content: '@everyone',
+                    content: rolePing,
                     embeds: [embed]
                 })
             });
@@ -512,7 +507,7 @@
 
         panel.innerHTML = `
             <div id="special-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
-                Special Mobs Notifier - Ustawienia
+                Mushrooms Abusers - Settings
             </div>
 
             <div style="padding: 15px; max-height: calc(80vh - 60px); overflow-y: auto;">
@@ -521,11 +516,10 @@
                     <input type="text" id="special-webhook" style="width: 100%; padding: 5px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;" value="${config.webhookUrl}" placeholder="https://discord.com/api/webhooks/...">
                 </div>
 
-                <div class="special-tracked-mobs">
-                    <div style="color: #ccc; font-size: 12px; margin-bottom: 10px; font-weight: bold;">Wykrywane moby:</div>
-                    ${TRACKED_MOBS.map(mob => `
-                        <div class="special-mob-item">• ${mob}</div>
-                    `).join('')}
+                <div style="margin-bottom: 15px;">
+                    <span style="color: #ccc; font-size: 12px; display: block; margin-bottom: 5px;">ID Roli Discord (lub 'everyone'):</span>
+                    <input type="text" id="special-role-id" style="width: 100%; padding: 5px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;" value="${config.roleId}" placeholder="123456789012345678 lub everyone">
+                    <div style="color: #888; font-size: 10px; margin-top: 5px;">Wpisz ID roli lub 'everyone' aby pingować wszystkich.</div>
                 </div>
 
                 <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
@@ -571,6 +565,7 @@
             e.preventDefault();
             config.enabled = true;
             config.webhookUrl = panel.querySelector('#special-webhook').value.trim();
+            config.roleId = panel.querySelector('#special-role-id').value.trim();
             saveConfig();
             toggleSettingsPanel();
         });
@@ -618,21 +613,18 @@
         });
     }
 
-function integrateWithAddonManager() {
+    function integrateWithAddonManager() {
         const checkForManager = setInterval(() => {
-            // Sprawdź oba możliwe ID
             const addonContainer = document.getElementById('addon-mushrooms_abusers') || 
                                  document.getElementById('addon-special_mobs_notifier');
             
             if (!addonContainer) return;
 
-            // Sprawdź czy przycisk już istnieje
             if (addonContainer.querySelector('#special-mobs-settings-btn')) {
                 clearInterval(checkForManager);
                 return;
             }
 
-            // Szukaj kontenera na nazwę addonu
             let addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
             if (addonNameContainer) {
                 addManagerSettingsButton(addonNameContainer);
@@ -640,7 +632,6 @@ function integrateWithAddonManager() {
             }
         }, 500);
 
-        // Zatrzymaj sprawdzanie po 20 sekundach
         setTimeout(() => clearInterval(checkForManager), 20000);
     }
 
