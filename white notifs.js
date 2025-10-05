@@ -145,7 +145,7 @@ function generateCSS() {
 
     if (config.chat.enabled) {
         css += `
-            .one-message-wrapper {
+            .fading-message-wrapper, .one-message-wrapper {
                 font-size: ${config.chat.fontSize}px !important;
                 font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
                 font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
