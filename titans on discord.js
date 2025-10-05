@@ -14,7 +14,8 @@ let config = {
     enabled: localStorage.getItem('titanNotifierEnabled') !== 'false',
     webhookUrl: localStorage.getItem('titanNotifierWebhook') || '',
     roleIds: JSON.parse(localStorage.getItem('titanNotifierRoleIds') || '{}'),
-    soundEnabled: localStorage.getItem('titanNotifierSoundEnabled') !== 'false'
+    soundEnabled: localStorage.getItem('titanNotifierSoundEnabled') !== 'false',
+    customSoundUrl: localStorage.getItem('titanNotifierCustomSound') || ''
 };
 
 function saveConfig() {
@@ -22,6 +23,7 @@ function saveConfig() {
     localStorage.setItem('titanNotifierWebhook', config.webhookUrl);
     localStorage.setItem('titanNotifierRoleIds', JSON.stringify(config.roleIds));
     localStorage.setItem('titanNotifierSoundEnabled', config.soundEnabled.toString());
+    localStorage.setItem('titanNotifierCustomSound', config.customSoundUrl);
 }
 const predefinedWorldRoles = {
     "Dream": {
@@ -486,7 +488,11 @@ function playTitanAlarm() {
     if (!isSoundEnabled()) return;
 
     try {
-        const audio = new Audio('https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/sounds/Alarm%20Sound%20Effect.mp3');
+        
+        const soundUrl = config.customSoundUrl || 
+            'https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/sounds/Alarm%20Sound%20Effect.mp3';
+        
+        const audio = new Audio(soundUrl);
         audio.play().catch(error => {
             console.error('Błąd odtwarzania dźwięku alarmu:', error);
         });
@@ -810,12 +816,21 @@ function createSettingsPanel() {
                 <input type="text" id="titan-webhook" style="width: 100%; padding: 5px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px;" value="${config.webhookUrl}" placeholder="https://discord.com/api/webhooks/...">
             </div>
 <div style="margin-bottom: 15px; padding: 12px; background: rgba(157,78,221,0.1); border: 1px solid #7b2cbf; border-radius: 6px;">
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
         <label style="color: #a8dadc; font-size: 12px;">Dźwięk alarmu:</label>
         <label class="titan-checkbox-container">
             <input type="checkbox" id="titan-sound-enabled" ${config.soundEnabled ? 'checked' : ''}>
             <span class="titan-checkmark"></span>
         </label>
+    </div>
+    
+    <div style="margin-top: 10px;">
+        <span style="color: #ccc; font-size: 11px; display: block; margin-bottom: 5px;">URL własnego dźwięku (opcjonalnie):</span>
+        <input type="text" id="titan-custom-sound" style="width: 100%; padding: 5px; background: #555; color: #fff; border: 1px solid #666; border-radius: 3px; font-size: 11px; margin-bottom: 5px;" value="${config.customSoundUrl}" placeholder="https://example.com/sound.mp3">
+        <button id="test-sound-btn" style="width: 100%; padding: 6px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+            🔊 Testuj Dźwięk
+        </button>
+        <div style="color: #888; font-size: 10px; margin-top: 5px;">Wklej URL do pliku MP3. Pozostaw puste dla domyślnego alarmu.</div>
     </div>
 </div>
 
@@ -939,12 +954,30 @@ function createSettingsPanel() {
             }
         });
     }
+    
+    panel.querySelector('#test-sound-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        const customUrl = panel.querySelector('#titan-custom-sound').value.trim();
+        const testUrl = customUrl || 'https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/sounds/Alarm%20Sound%20Effect.mp3';
+        
+        try {
+            const audio = new Audio(testUrl);
+            audio.play().catch(error => {
+                alert('Błąd odtwarzania dźwięku! Sprawdź URL.');
+                console.error('Test audio error:', error);
+            });
+        } catch (error) {
+            alert('Błąd ładowania dźwięku! Sprawdź URL.');
+            console.error('Test audio creation error:', error);
+        }
+    });
 
-    panel.querySelector('#save-titans-settings').addEventListener('click', (e) => {
+panel.querySelector('#save-titans-settings').addEventListener('click', (e) => {
         e.preventDefault();
         config.enabled = true;
         config.webhookUrl = panel.querySelector('#titan-webhook').value.trim();
         config.soundEnabled = panel.querySelector('#titan-sound-enabled').checked;
+        config.customSoundUrl = panel.querySelector('#titan-custom-sound').value.trim(); // DODAJ TĘ LINIĘ
 
         const newRoleIds = {};
         panel.querySelectorAll('input[data-titan]').forEach(input => {
