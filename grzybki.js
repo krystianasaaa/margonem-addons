@@ -618,16 +618,21 @@
         });
     }
 
-    function integrateWithAddonManager() {
+function integrateWithAddonManager() {
         const checkForManager = setInterval(() => {
-            const addonContainer = document.getElementById('addon-special_mobs_notifier');
+            // Sprawdź oba możliwe ID
+            const addonContainer = document.getElementById('addon-mushrooms_abusers') || 
+                                 document.getElementById('addon-special_mobs_notifier');
+            
             if (!addonContainer) return;
 
+            // Sprawdź czy przycisk już istnieje
             if (addonContainer.querySelector('#special-mobs-settings-btn')) {
                 clearInterval(checkForManager);
                 return;
             }
 
+            // Szukaj kontenera na nazwę addonu
             let addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
             if (addonNameContainer) {
                 addManagerSettingsButton(addonNameContainer);
@@ -635,6 +640,7 @@
             }
         }, 500);
 
+        // Zatrzymaj sprawdzanie po 20 sekundach
         setTimeout(() => clearInterval(checkForManager), 20000);
     }
 
