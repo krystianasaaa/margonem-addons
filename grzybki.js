@@ -329,7 +329,7 @@
                         `**Mapa:** ${mapName}\n` +
                         `**Znalazł:** ${finderName}\n` +
                         `**Świat:** ${worldName}\n` +
-                        `**⏱️ Pozostały czas:** ${formatTime(timeLeft)}`,
+                        `**Pozostały czas:** ${formatTime(timeLeft)}`,
             color: 0xe67e22,
             footer: {
                 text: `Mushrooms Abusers - Kaczor Addons • ${timestamp}`
