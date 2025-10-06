@@ -511,7 +511,7 @@
                 timeLeftText = 'Jeszcze nie otwarty';
             }
 
-            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName}. Pozostały czas: ${timeLeftText}`;
+            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName} Pozostały czas: ${timeLeftText}`;
 
             try {
                 await navigator.clipboard.writeText(message);
