@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    
+
     if (window.specialMobsNotifierRunning) {
         return;
     }
@@ -43,6 +43,40 @@
         const secs = seconds % 60;
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
+
+    function getExpireTime(seconds) {
+        if (!seconds || seconds <= 0) return null;
+        const expireDate = new Date(Date.now() + seconds * 1000);
+        return expireDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatTimeWithExpire(seconds) {
+        if (!seconds || seconds <= 0) return '0:00';
+        const timeLeft = formatTime(seconds);
+        const expireTime = getExpireTime(seconds);
+        return expireTime ? `${timeLeft} (do ${expireTime})` : timeLeft;
+    }
+
+// Funkcja wysyłania wiadomości na czat klanowy
+function sendClanMessage(message) {
+    try {
+        // Sprawdź czy funkcja _g istnieje (główna funkcja komunikacyjna Margonem)
+        if (typeof _g === 'function') {
+            _g('chat&channel=clan', false, {
+                c: message
+            });
+            console.log('Wysłano wiadomość na klan:', message);
+            return true;
+        }
+
+        console.error('Funkcja _g nie jest dostępna');
+        return false;
+
+    } catch (error) {
+        console.error('Błąd wysyłania wiadomości na klan:', error);
+        return false;
+    }
+}
 
     const styles = `
         #special-mobs-button {
@@ -245,8 +279,23 @@
             opacity: 0.5;
         }
 
+        .special-btn-clan {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .special-btn-clan:hover {
+            background: #138496;
+        }
+
+        .special-btn-clan:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
         .special-timer-display {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             color: #ffc107;
             text-align: center;
@@ -256,6 +305,7 @@
             border-radius: 4px;
             margin-bottom: 12px;
             font-family: 'Courier New', monospace;
+            line-height: 1.4;
         }
 
         .special-timer-display.expired {
@@ -318,7 +368,14 @@
         const mapName = mobData.mapName || getCurrentMapName();
         const finderName = mobData.finderName || getCurrentPlayerName();
         const timeLeft = mobData.killSeconds;
-        const timeLeftText = timeLeft ? formatTime(timeLeft) : 'Jeszcze nie otwarty!';
+
+        let timeLeftText;
+        if (timeLeft) {
+            const expireTime = getExpireTime(timeLeft);
+            timeLeftText = `${formatTime(timeLeft)} (zniknie o ${expireTime})`;
+        } else {
+            timeLeftText = 'Jeszcze nie otwarty!';
+        }
 
         let rolePing = '';
         if (config.roleId) {
@@ -331,7 +388,7 @@
         }
 
         const embed = {
-            title: `🍄 GRZYB!`,
+            title: `GRZYB!`,
             description: `**${mobName}** ${mobLevel ? `(Lvl ${mobLevel})` : ''}\n\n` +
                         `**Mapa:** ${mapName}\n` +
                         `**Znalazł:** ${finderName}\n` +
@@ -364,7 +421,7 @@
 
     function showDetectionWindow(mobName, mobLevel, mobData = {}) {
         const windowId = 'special-mob-detection-window-' + Date.now();
-        
+
         const gameWindow = document.createElement('div');
         gameWindow.id = windowId;
         gameWindow.style.cssText = `
@@ -414,6 +471,13 @@
         const initialTime = mobData.killSeconds;
         const hasTimer = initialTime !== undefined && initialTime !== null;
 
+        let timerText;
+        if (hasTimer) {
+            timerText = formatTimeWithExpire(initialTime);
+        } else {
+            timerText = 'Jeszcze nie otwarty!';
+        }
+
         gameWindow.innerHTML = `
             <div id="special-window-header-${windowId}" style="
                 background: #1a1a1a;
@@ -430,7 +494,7 @@
                 justify-content: space-between;
                 align-items: center;
             ">
-                <span style="flex: 1; text-align: center;">🍄 GRZYB!</span>
+                <span style="flex: 1; text-align: center;">GRZYB!</span>
                 <button style="
                     background: none;
                     border: none;
@@ -474,7 +538,7 @@
                 ` : ''}
 
                 <div id="special-timer-${windowId}" class="special-timer-display ${!hasTimer ? 'not-opened' : ''}">
-                    ${hasTimer ? `⏱️ ${formatTime(initialTime)}` : 'Jeszcze nie otwarty!'}
+                    ${timerText}
                 </div>
 
                 <div id="special-send-status-${windowId}" style="
@@ -488,7 +552,7 @@
                     border-radius: 4px;
                     margin-bottom: 12px;
                 ">
-                    ⚠ Oczekuje na wysłanie
+                    Oczekuje na wysłanie
                 </div>
             </div>
 
@@ -505,13 +569,13 @@
                     transition: all 0.2s;
                     border-bottom-left-radius: 8px;
                 " onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">
-                     Wyślij na Discord
+                    Discord
                 </button>
-                <button id="special-close-btn-${windowId}" style="
+                <button id="special-clan-btn-${windowId}" style="
                     flex: 1;
                     padding: 10px;
-                    background: #2a2a2a;
-                    color: #aaa;
+                    background: #17a2b8;
+                    color: #fff;
                     border: none;
                     border-left: 1px solid #e67e22;
                     cursor: pointer;
@@ -519,8 +583,8 @@
                     font-weight: bold;
                     transition: all 0.2s;
                     border-bottom-right-radius: 8px;
-                " onmouseover="this.style.background='#333'" onmouseout="this.style.background='#2a2a2a'">
-                    Zamknij
+                " onmouseover="this.style.background='#138496'" onmouseout="this.style.background='#17a2b8'">
+                    Klan
                 </button>
             </div>
         `;
@@ -528,20 +592,20 @@
         document.body.appendChild(gameWindow);
 
         // Timer countdown only if timer exists
+        let currentTime = initialTime;
         if (hasTimer) {
-            let currentTime = initialTime;
             const timerElement = gameWindow.querySelector(`#special-timer-${windowId}`);
-            
+
             const timerInterval = setInterval(() => {
                 currentTime--;
                 if (currentTime <= 0) {
-                    timerElement.textContent = '⏱️ Wygasł!';
+                    timerElement.textContent = 'Wygasł!';
                     timerElement.classList.remove('not-opened');
                     timerElement.classList.add('expired');
                     clearInterval(timerInterval);
                     timerIntervals.delete(windowId);
                 } else {
-                    timerElement.textContent = `⏱️ ${formatTime(currentTime)}`;
+                    timerElement.textContent = formatTimeWithExpire(currentTime);
                 }
             }, 1000);
 
@@ -573,7 +637,7 @@
             isDragging = false;
         });
 
-        // Close buttons
+        // Close button
         const closeWindow = () => {
             const interval = timerIntervals.get(windowId);
             if (interval) {
@@ -586,42 +650,76 @@
         };
 
         gameWindow.querySelector(`#special-window-close-${windowId}`).onclick = closeWindow;
-        gameWindow.querySelector(`#special-close-btn-${windowId}`).onclick = closeWindow;
 
-        // Send button
+        // Discord Send button
         const sendBtn = gameWindow.querySelector(`#special-send-btn-${windowId}`);
         const statusDiv = gameWindow.querySelector(`#special-send-status-${windowId}`);
-        
+
         sendBtn.onclick = async () => {
             sendBtn.disabled = true;
             sendBtn.style.opacity = '0.5';
-            sendBtn.textContent = '⏳ Wysyłanie...';
-            
-            // Aktualne dane z timerem (jeśli istnieje)
+            sendBtn.textContent = 'Wysyłanie...';
+
             const currentMobData = {
                 ...mobData,
-                killSeconds: hasTimer ? (timerIntervals.has(windowId) ? mobData.killSeconds : 0) : undefined
+                killSeconds: hasTimer ? currentTime : undefined
             };
-            
+
             const success = await sendDiscordNotification(mobName, mobLevel, currentMobData);
-            
+
             if (success) {
                 statusDiv.style.background = 'rgba(40, 167, 69, 0.1)';
                 statusDiv.style.borderColor = '#28a745';
                 statusDiv.style.color = '#28a745';
-                statusDiv.textContent = '✓ Powiadomienie wysłane!';
-                sendBtn.textContent = '✓ Wysłano';
+                statusDiv.textContent = 'Powiadomienie wysłane!';
+                sendBtn.textContent = 'Wysłano';
                 sendBtn.style.background = '#666';
             } else {
                 statusDiv.style.background = 'rgba(220, 53, 69, 0.1)';
                 statusDiv.style.borderColor = '#dc3545';
                 statusDiv.style.color = '#dc3545';
-                statusDiv.textContent = '✗ Błąd wysyłania';
+                statusDiv.textContent = 'Błąd wysyłania';
                 sendBtn.disabled = false;
                 sendBtn.style.opacity = '1';
-                sendBtn.textContent = '🔄 Spróbuj ponownie';
+                sendBtn.textContent = 'Spróbuj ponownie';
                 sendBtn.onmouseover = () => sendBtn.style.background = '#218838';
                 sendBtn.onmouseout = () => sendBtn.style.background = '#28a745';
+            }
+        };
+
+        // Clan button
+        const clanBtn = gameWindow.querySelector(`#special-clan-btn-${windowId}`);
+
+        clanBtn.onclick = () => {
+            const mapName = mobData.mapName || getCurrentMapName();
+            const timeLeft = hasTimer ? currentTime : null;
+
+            let timeLeftText;
+            if (timeLeft) {
+                const expireTime = getExpireTime(timeLeft);
+                timeLeftText = `${formatTime(timeLeft)} (zniknie o ${expireTime})`;
+            } else {
+                timeLeftText = 'Jeszcze nie otwarty';
+            }
+
+            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName}. Pozostały czas: ${timeLeftText}`;
+
+            const success = sendClanMessage(message);
+
+            if (success) {
+                statusDiv.style.background = 'rgba(40, 167, 69, 0.1)';
+                statusDiv.style.borderColor = '#28a745';
+                statusDiv.style.color = '#28a745';
+                statusDiv.textContent = 'Wiadomość wysłana na klan!';
+                clanBtn.disabled = true;
+                clanBtn.style.opacity = '0.5';
+                clanBtn.textContent = 'Wysłano';
+                clanBtn.style.background = '#666';
+            } else {
+                statusDiv.style.background = 'rgba(220, 53, 69, 0.1)';
+                statusDiv.style.borderColor = '#dc3545';
+                statusDiv.style.color = '#dc3545';
+                statusDiv.textContent = 'Błąd - nie można wysłać na klan';
             }
         };
     }
@@ -757,9 +855,9 @@
 
     function integrateWithAddonManager() {
         const checkForManager = setInterval(() => {
-            const addonContainer = document.getElementById('addon-mushrooms_abusers') || 
+            const addonContainer = document.getElementById('addon-mushrooms_abusers') ||
                                  document.getElementById('addon-special_mobs_notifier');
-            
+
             if (!addonContainer) return;
 
             if (addonContainer.querySelector('#special-mobs-settings-btn')) {
@@ -787,11 +885,11 @@
             if (!config.enabled) return;
 
             const mobName = npc.d.nick || npc.d.name;
-            
+
             if (TRACKED_MOBS.includes(mobName)) {
                 const mobLevel = npc.d.lvl || npc.d.elasticLevel;
                 const killSeconds = npc.d.killSeconds;
-                
+
                 const additionalData = {
                     mapName: getCurrentMapName(),
                     finderName: getCurrentPlayerName(),
@@ -799,14 +897,12 @@
                     killSeconds: killSeconds
                 };
 
-                // Zapisz dane o mobie
                 lastDetectedMob = {
                     mobName,
                     mobLevel,
                     additionalData
                 };
 
-                // Pokaż okno z przyciskiem wysyłania i timerem
                 showDetectionWindow(mobName, mobLevel, additionalData);
             }
         });
