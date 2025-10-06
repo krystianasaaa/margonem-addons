@@ -397,7 +397,7 @@
                 justify-content: space-between;
                 align-items: center;
             ">
-                <span style="flex: 1; text-align: center;">GRZYB WYKRYTY!</span>
+                <span style="flex: 1; text-align: center;">GRZYB!</span>
                 <button style="
                     background: none;
                     border: none;
