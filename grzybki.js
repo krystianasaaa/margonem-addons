@@ -28,6 +28,9 @@
         roleId: localStorage.getItem('specialMobsRoleId') || ''
     };
 
+    // Przechowywanie danych o ostatnio wykrytym mobie
+    let lastDetectedMob = null;
+
     function saveConfig() {
         localStorage.setItem('specialMobsEnabled', config.enabled.toString());
         localStorage.setItem('specialMobsWebhook', config.webhookUrl);
@@ -219,6 +222,21 @@
         .special-btn-secondary:hover {
             background: #555;
         }
+
+        .special-btn-send {
+            background: #28a745;
+            color: white;
+        }
+
+        .special-btn-send:hover {
+            background: #218838;
+        }
+
+        .special-btn-send:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
     `;
 
     function getCurrentMapName() {
@@ -310,7 +328,11 @@
     }
 
     function showDetectionWindow(mobName, mobLevel, mobData = {}) {
-        if (document.getElementById('special-mob-detection-window')) return;
+        // Zamknij poprzednie okno jeśli istnieje
+        const existingWindow = document.getElementById('special-mob-detection-window');
+        if (existingWindow) {
+            existingWindow.remove();
+        }
 
         const gameWindow = document.createElement('div');
         gameWindow.id = 'special-mob-detection-window';
@@ -375,7 +397,7 @@
                 justify-content: space-between;
                 align-items: center;
             ">
-                <span style="flex: 1; text-align: center;">GRZYB!!!</span>
+                <span style="flex: 1; text-align: center;">GRZYB WYKRYTY!</span>
                 <button style="
                     background: none;
                     border: none;
@@ -418,31 +440,48 @@
                 </div>
                 ` : ''}
 
-                <div style="
+                <div id="special-send-status" style="
                     text-align: center;
-                    color: #28a745;
+                    color: #ffc107;
                     font-size: 11px;
                     font-weight: bold;
                     padding: 8px;
-                    background: rgba(40, 167, 69, 0.1);
-                    border: 1px solid #28a745;
+                    background: rgba(255, 193, 7, 0.1);
+                    border: 1px solid #ffc107;
                     border-radius: 4px;
+                    margin-bottom: 12px;
                 ">
-                    ✓ Powiadomienie wysłane!
+                    ⚠ Oczekuje na wysłanie
                 </div>
             </div>
 
-            <div style="border-top: 1px solid #e67e22; border-radius: 0 0 8px 8px; overflow: hidden;">
-                <button id="special-close-btn" style="
-                    width: 100%;
+            <div style="border-top: 1px solid #e67e22; display: flex;">
+                <button id="special-send-btn" style="
+                    flex: 1;
                     padding: 10px;
-                    background: #2a2a2a;
-                    color: #aaa;
+                    background: #28a745;
+                    color: #fff;
                     border: none;
                     cursor: pointer;
                     font-size: 11px;
                     font-weight: bold;
                     transition: all 0.2s;
+                    border-bottom-left-radius: 8px;
+                " onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">
+                    📤 Wyślij na Discord
+                </button>
+                <button id="special-close-btn" style="
+                    flex: 1;
+                    padding: 10px;
+                    background: #2a2a2a;
+                    color: #aaa;
+                    border: none;
+                    border-left: 1px solid #e67e22;
+                    cursor: pointer;
+                    font-size: 11px;
+                    font-weight: bold;
+                    transition: all 0.2s;
+                    border-bottom-right-radius: 8px;
                 " onmouseover="this.style.background='#333'" onmouseout="this.style.background='#2a2a2a'">
                     Zamknij
                 </button>
@@ -481,6 +520,37 @@
 
         gameWindow.querySelector('#special-close-btn').onclick = () => {
             document.body.removeChild(gameWindow);
+        };
+
+        // Obsługa przycisku wysyłania
+        const sendBtn = gameWindow.querySelector('#special-send-btn');
+        const statusDiv = gameWindow.querySelector('#special-send-status');
+        
+        sendBtn.onclick = async () => {
+            sendBtn.disabled = true;
+            sendBtn.style.opacity = '0.5';
+            sendBtn.textContent = '⏳ Wysyłanie...';
+            
+            const success = await sendDiscordNotification(mobName, mobLevel, mobData);
+            
+            if (success) {
+                statusDiv.style.background = 'rgba(40, 167, 69, 0.1)';
+                statusDiv.style.borderColor = '#28a745';
+                statusDiv.style.color = '#28a745';
+                statusDiv.textContent = '✓ Powiadomienie wysłane!';
+                sendBtn.textContent = '✓ Wysłano';
+                sendBtn.style.background = '#666';
+            } else {
+                statusDiv.style.background = 'rgba(220, 53, 69, 0.1)';
+                statusDiv.style.borderColor = '#dc3545';
+                statusDiv.style.color = '#dc3545';
+                statusDiv.textContent = '✗ Błąd wysyłania';
+                sendBtn.disabled = false;
+                sendBtn.style.opacity = '1';
+                sendBtn.textContent = '🔄 Spróbuj ponownie';
+                sendBtn.onmouseover = () => sendBtn.style.background = '#218838';
+                sendBtn.onmouseout = () => sendBtn.style.background = '#28a745';
+            }
         };
     }
 
@@ -654,10 +724,15 @@
                     npcData: npc.d
                 };
 
-                const success = await sendDiscordNotification(mobName, mobLevel, additionalData);
-                if (success) {
-                    showDetectionWindow(mobName, mobLevel, additionalData);
-                }
+                // Zapisz dane o mobie
+                lastDetectedMob = {
+                    mobName,
+                    mobLevel,
+                    additionalData
+                };
+
+                // Pokaż okno z przyciskiem wysyłania
+                showDetectionWindow(mobName, mobLevel, additionalData);
             }
         });
     }
