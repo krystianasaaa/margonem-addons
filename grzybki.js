@@ -339,7 +339,7 @@
                         `**Pozostały czas:** ${timeLeftText}`,
             color: 0xe67e22,
             footer: {
-                text: `Mushrooms Abusers - Kaczor Addons • ${timestamp}`
+                text: `Kaczor Addons - Mushrooms Abusers • ${timestamp}`
             },
             timestamp: new Date().toISOString()
         };
