@@ -388,7 +388,7 @@ function sendClanMessage(message) {
         }
 
         const embed = {
-            title: `GRZYB!`,
+            title: `🍄 GRZYB!`,
             description: `**${mobName}** ${mobLevel ? `(Lvl ${mobLevel})` : ''}\n\n` +
                         `**Mapa:** ${mapName}\n` +
                         `**Znalazł:** ${finderName}\n` +
