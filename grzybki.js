@@ -13,7 +13,6 @@
         }
     });
 
-    // Lista wykrywanych mobów
     const TRACKED_MOBS = [
         'Ogromna płomiennica tląca',
         'Ogromna dzwonkówka tarczowata',
@@ -57,269 +56,22 @@
         return expireTime ? `${timeLeft} (do ${expireTime})` : timeLeft;
     }
 
-// Funkcja wysyłania wiadomości na czat klanowy
-function sendClanMessage(message) {
-    try {
-        // Sprawdź czy funkcja _g istnieje (główna funkcja komunikacyjna Margonem)
-        if (typeof _g === 'function') {
-            _g('chat&channel=clan', false, {
-                c: message
-            });
-            console.log('Wysłano wiadomość na klan:', message);
-            return true;
+    function sendClanMessage(message) {
+        try {
+            if (typeof _g === 'function') {
+                _g('chat&channel=clan', false, {
+                    c: message
+                });
+                console.log('Wysłano wiadomość na klan:', message);
+                return true;
+            }
+            console.error('Funkcja _g nie jest dostępna');
+            return false;
+        } catch (error) {
+            console.error('Błąd wysyłania wiadomości na klan:', error);
+            return false;
         }
-
-        console.error('Funkcja _g nie jest dostępna');
-        return false;
-
-    } catch (error) {
-        console.error('Błąd wysyłania wiadomości na klan:', error);
-        return false;
     }
-}
-
-    const styles = `
-        #special-mobs-button {
-            position: fixed;
-            top: 20px;
-            right: 110px;
-            background: linear-gradient(135deg, #e67e22, #d35400);
-            border: 2px solid #d35400;
-            color: white;
-            padding: 8px;
-            border-radius: 50%;
-            cursor: move;
-            font-size: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-            z-index: 9999;
-            transition: all 0.2s;
-            user-select: none;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #special-mobs-button:hover {
-            transform: scale(1.05) rotate(15deg);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-        }
-
-        #special-mobs-button.disabled {
-            background: linear-gradient(135deg, #666, #888);
-            border-color: #666;
-            opacity: 0.7;
-        }
-
-        .special-mobs-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .special-mobs-dialog {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 2px solid #e67e22;
-            border-radius: 12px;
-            padding: 25px;
-            width: 500px;
-            max-width: 90vw;
-            max-height: 85vh;
-            color: #e8f4fd;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .special-mobs-dialog h3 {
-            margin-top: 0;
-            color: #e67e22;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .special-dialog-content {
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 15px;
-            margin-right: -15px;
-        }
-
-        .special-dialog-content::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        .special-dialog-content::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
-            border-radius: 6px;
-        }
-
-        .special-dialog-content::-webkit-scrollbar-thumb {
-            background: #e67e22;
-            border-radius: 6px;
-            border: 2px solid rgba(0,0,0,0.2);
-        }
-
-        .special-dialog-content::-webkit-scrollbar-thumb:hover {
-            background: #d35400;
-        }
-
-        .special-setting-group {
-            margin-bottom: 20px;
-        }
-
-        .special-setting-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #a8dadc;
-            font-size: 14px;
-        }
-
-        .special-setting-input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(230,126,34,0.2);
-            border: 1px solid #e67e22;
-            border-radius: 6px;
-            color: #e8f4fd;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
-        .special-setting-input:focus {
-            outline: none;
-            border-color: #d35400;
-            box-shadow: 0 0 10px rgba(230,126,34,0.3);
-        }
-
-        .special-setting-description {
-            font-size: 12px;
-            color: #a8dadc;
-            margin-top: 5px;
-            line-height: 1.4;
-        }
-
-        .special-status-info {
-            background: rgba(40, 167, 69, 0.1);
-            border: 1px solid #28a745;
-            border-radius: 6px;
-            padding: 12px;
-            margin: 15px 0;
-            flex-shrink: 0;
-        }
-
-        .special-status-info.warning {
-            background: rgba(255, 193, 7, 0.1);
-            border-color: #ffc107;
-            color: #ffc107;
-        }
-
-        .special-settings-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 25px;
-            flex-shrink: 0;
-        }
-
-        .special-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .special-btn-primary {
-            background: #e67e22;
-            color: white;
-        }
-
-        .special-btn-primary:hover {
-            background: #d35400;
-        }
-
-        .special-btn-secondary {
-            background: #666;
-            color: white;
-        }
-
-        .special-btn-secondary:hover {
-            background: #555;
-        }
-
-        .special-btn-send {
-            background: #28a745;
-            color: white;
-        }
-
-        .special-btn-send:hover {
-            background: #218838;
-        }
-
-        .special-btn-send:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .special-btn-clan {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .special-btn-clan:hover {
-            background: #138496;
-        }
-
-        .special-btn-clan:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .special-timer-display {
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffc107;
-            text-align: center;
-            padding: 8px;
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid #ffc107;
-            border-radius: 4px;
-            margin-bottom: 12px;
-            font-family: 'Courier New', monospace;
-            line-height: 1.4;
-        }
-
-        .special-timer-display.expired {
-            color: #dc3545;
-            border-color: #dc3545;
-            background: rgba(220, 53, 69, 0.1);
-        }
-
-        .special-timer-display.not-opened {
-            color: #17a2b8;
-            border-color: #17a2b8;
-            background: rgba(23, 162, 184, 0.1);
-        }
-    `;
 
     function getCurrentMapName() {
         try {
@@ -537,7 +289,19 @@ function sendClanMessage(message) {
                 </div>
                 ` : ''}
 
-                <div id="special-timer-${windowId}" class="special-timer-display ${!hasTimer ? 'not-opened' : ''}">
+                <div id="special-timer-${windowId}" style="
+                    font-size: 14px;
+                    font-weight: bold;
+                    color: ${!hasTimer ? '#17a2b8' : '#ffc107'};
+                    text-align: center;
+                    padding: 8px;
+                    background: ${!hasTimer ? 'rgba(23, 162, 184, 0.1)' : 'rgba(255, 193, 7, 0.1)'};
+                    border: 1px solid ${!hasTimer ? '#17a2b8' : '#ffc107'};
+                    border-radius: 4px;
+                    margin-bottom: 12px;
+                    font-family: 'Courier New', monospace;
+                    line-height: 1.4;
+                ">
                     ${timerText}
                 </div>
 
@@ -582,16 +346,29 @@ function sendClanMessage(message) {
                     font-size: 11px;
                     font-weight: bold;
                     transition: all 0.2s;
-                    border-bottom-right-radius: 8px;
                 " onmouseover="this.style.background='#138496'" onmouseout="this.style.background='#17a2b8'">
                     Klan
+                </button>
+                <button id="special-copy-btn-${windowId}" style="
+                    flex: 0.6;
+                    padding: 10px;
+                    background: #6c757d;
+                    color: #fff;
+                    border: none;
+                    border-left: 1px solid #e67e22;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: bold;
+                    transition: all 0.2s;
+                    border-bottom-right-radius: 8px;
+                " onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'" title="Kopiuj wiadomość">
+                    📋
                 </button>
             </div>
         `;
 
         document.body.appendChild(gameWindow);
 
-        // Timer countdown only if timer exists
         let currentTime = initialTime;
         if (hasTimer) {
             const timerElement = gameWindow.querySelector(`#special-timer-${windowId}`);
@@ -600,8 +377,9 @@ function sendClanMessage(message) {
                 currentTime--;
                 if (currentTime <= 0) {
                     timerElement.textContent = 'Wygasł!';
-                    timerElement.classList.remove('not-opened');
-                    timerElement.classList.add('expired');
+                    timerElement.style.color = '#dc3545';
+                    timerElement.style.borderColor = '#dc3545';
+                    timerElement.style.background = 'rgba(220, 53, 69, 0.1)';
                     clearInterval(timerInterval);
                     timerIntervals.delete(windowId);
                 } else {
@@ -612,7 +390,6 @@ function sendClanMessage(message) {
             timerIntervals.set(windowId, timerInterval);
         }
 
-        // Dragging functionality
         let isDragging = false;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
@@ -637,7 +414,6 @@ function sendClanMessage(message) {
             isDragging = false;
         });
 
-        // Close button
         const closeWindow = () => {
             const interval = timerIntervals.get(windowId);
             if (interval) {
@@ -651,7 +427,6 @@ function sendClanMessage(message) {
 
         gameWindow.querySelector(`#special-window-close-${windowId}`).onclick = closeWindow;
 
-        // Discord Send button
         const sendBtn = gameWindow.querySelector(`#special-send-btn-${windowId}`);
         const statusDiv = gameWindow.querySelector(`#special-send-status-${windowId}`);
 
@@ -687,7 +462,6 @@ function sendClanMessage(message) {
             }
         };
 
-        // Clan button
         const clanBtn = gameWindow.querySelector(`#special-clan-btn-${windowId}`);
 
         clanBtn.onclick = () => {
@@ -720,6 +494,46 @@ function sendClanMessage(message) {
                 statusDiv.style.borderColor = '#dc3545';
                 statusDiv.style.color = '#dc3545';
                 statusDiv.textContent = 'Błąd - nie można wysłać na klan';
+            }
+        };
+
+        const copyBtn = gameWindow.querySelector(`#special-copy-btn-${windowId}`);
+
+        copyBtn.onclick = async () => {
+            const mapName = mobData.mapName || getCurrentMapName();
+            const timeLeft = hasTimer ? currentTime : null;
+
+            let timeLeftText;
+            if (timeLeft) {
+                const expireTime = getExpireTime(timeLeft);
+                timeLeftText = `${formatTime(timeLeft)} (zniknie o ${expireTime})`;
+            } else {
+                timeLeftText = 'Jeszcze nie otwarty';
+            }
+
+            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName}. Pozostały czas: ${timeLeftText}`;
+
+            try {
+                await navigator.clipboard.writeText(message);
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✓';
+                copyBtn.style.background = '#28a745';
+
+                statusDiv.style.background = 'rgba(40, 167, 69, 0.1)';
+                statusDiv.style.borderColor = '#28a745';
+                statusDiv.style.color = '#28a745';
+                statusDiv.textContent = 'Skopiowano do schowka!';
+
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.style.background = '#6c757d';
+                }, 2000);
+            } catch (error) {
+                statusDiv.style.background = 'rgba(220, 53, 69, 0.1)';
+                statusDiv.style.borderColor = '#dc3545';
+                statusDiv.style.color = '#dc3545';
+                statusDiv.textContent = 'Błąd kopiowania';
+                console.error('Błąd kopiowania:', error);
             }
         };
     }
@@ -909,10 +723,6 @@ function sendClanMessage(message) {
     }
 
     function init() {
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
-        document.head.appendChild(styleSheet);
-
         try {
             integrateWithAddonManager();
         } catch (error) {
