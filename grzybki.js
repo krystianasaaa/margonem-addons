@@ -497,7 +497,7 @@
                     transition: all 0.2s;
                     border-bottom-left-radius: 8px;
                 " onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">
-                    📤 Wyślij na Discord
+                     Wyślij na Discord
                 </button>
                 <button id="special-close-btn-${windowId}" style="
                     flex: 1;
