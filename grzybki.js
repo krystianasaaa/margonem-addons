@@ -324,7 +324,7 @@
         }
 
         const embed = {
-            title: `🍄 GRZYB ZNALEZIONY!`,
+            title: `🍄 GRZYB!`,
             description: `**${mobName}** ${mobLevel ? `(Lvl ${mobLevel})` : ''}\n\n` +
                         `**Mapa:** ${mapName}\n` +
                         `**Znalazł:** ${finderName}\n` +
