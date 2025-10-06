@@ -263,6 +263,12 @@
             border-color: #dc3545;
             background: rgba(220, 53, 69, 0.1);
         }
+
+        .special-timer-display.not-opened {
+            color: #17a2b8;
+            border-color: #17a2b8;
+            background: rgba(23, 162, 184, 0.1);
+        }
     `;
 
     function getCurrentMapName() {
@@ -311,7 +317,8 @@
         const worldName = window.location.hostname.split('.')[0] || 'Nieznany';
         const mapName = mobData.mapName || getCurrentMapName();
         const finderName = mobData.finderName || getCurrentPlayerName();
-        const timeLeft = mobData.killSeconds || 0;
+        const timeLeft = mobData.killSeconds;
+        const timeLeftText = timeLeft ? formatTime(timeLeft) : 'Jeszcze nie otwarty!';
 
         let rolePing = '';
         if (config.roleId) {
@@ -329,7 +336,7 @@
                         `**Mapa:** ${mapName}\n` +
                         `**Znalazł:** ${finderName}\n` +
                         `**Świat:** ${worldName}\n` +
-                        `**Pozostały czas:** ${formatTime(timeLeft)}`,
+                        `**Pozostały czas:** ${timeLeftText}`,
             color: 0xe67e22,
             footer: {
                 text: `Mushrooms Abusers - Kaczor Addons • ${timestamp}`
@@ -404,7 +411,8 @@
         }
 
         const npcImageUrl = npcIcon ? (addToThumbnail + npcIcon) : '';
-        const initialTime = mobData.killSeconds || 0;
+        const initialTime = mobData.killSeconds;
+        const hasTimer = initialTime !== undefined && initialTime !== null;
 
         gameWindow.innerHTML = `
             <div id="special-window-header-${windowId}" style="
@@ -465,8 +473,8 @@
                 </div>
                 ` : ''}
 
-                <div id="special-timer-${windowId}" class="special-timer-display">
-                    ⏱️ ${formatTime(initialTime)}
+                <div id="special-timer-${windowId}" class="special-timer-display ${!hasTimer ? 'not-opened' : ''}">
+                    ${hasTimer ? `⏱️ ${formatTime(initialTime)}` : 'Jeszcze nie otwarty!'}
                 </div>
 
                 <div id="special-send-status-${windowId}" style="
@@ -519,23 +527,26 @@
 
         document.body.appendChild(gameWindow);
 
-        // Timer countdown
-        let currentTime = initialTime;
-        const timerElement = gameWindow.querySelector(`#special-timer-${windowId}`);
-        
-        const timerInterval = setInterval(() => {
-            currentTime--;
-            if (currentTime <= 0) {
-                timerElement.textContent = '⏱️ Wygasł!';
-                timerElement.classList.add('expired');
-                clearInterval(timerInterval);
-                timerIntervals.delete(windowId);
-            } else {
-                timerElement.textContent = `⏱️ ${formatTime(currentTime)}`;
-            }
-        }, 1000);
+        // Timer countdown only if timer exists
+        if (hasTimer) {
+            let currentTime = initialTime;
+            const timerElement = gameWindow.querySelector(`#special-timer-${windowId}`);
+            
+            const timerInterval = setInterval(() => {
+                currentTime--;
+                if (currentTime <= 0) {
+                    timerElement.textContent = '⏱️ Wygasł!';
+                    timerElement.classList.remove('not-opened');
+                    timerElement.classList.add('expired');
+                    clearInterval(timerInterval);
+                    timerIntervals.delete(windowId);
+                } else {
+                    timerElement.textContent = `⏱️ ${formatTime(currentTime)}`;
+                }
+            }, 1000);
 
-        timerIntervals.set(windowId, timerInterval);
+            timerIntervals.set(windowId, timerInterval);
+        }
 
         // Dragging functionality
         let isDragging = false;
@@ -586,10 +597,10 @@
             sendBtn.style.opacity = '0.5';
             sendBtn.textContent = '⏳ Wysyłanie...';
             
-            // Aktualne dane z timerem
+            // Aktualne dane z timerem (jeśli istnieje)
             const currentMobData = {
                 ...mobData,
-                killSeconds: currentTime
+                killSeconds: hasTimer ? (timerIntervals.has(windowId) ? mobData.killSeconds : 0) : undefined
             };
             
             const success = await sendDiscordNotification(mobName, mobLevel, currentMobData);
@@ -779,7 +790,7 @@
             
             if (TRACKED_MOBS.includes(mobName)) {
                 const mobLevel = npc.d.lvl || npc.d.elasticLevel;
-                const killSeconds = npc.d.killSeconds || 0;
+                const killSeconds = npc.d.killSeconds;
                 
                 const additionalData = {
                     mapName: getCurrentMapName(),
