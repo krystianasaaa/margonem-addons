@@ -28,13 +28,20 @@
         roleId: localStorage.getItem('specialMobsRoleId') || ''
     };
 
-    // Przechowywanie danych o ostatnio wykrytym mobie
     let lastDetectedMob = null;
+    let timerIntervals = new Map();
 
     function saveConfig() {
         localStorage.setItem('specialMobsEnabled', config.enabled.toString());
         localStorage.setItem('specialMobsWebhook', config.webhookUrl);
         localStorage.setItem('specialMobsRoleId', config.roleId);
+    }
+
+    function formatTime(seconds) {
+        if (!seconds || seconds <= 0) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
 
     const styles = `
@@ -237,6 +244,25 @@
             cursor: not-allowed;
             opacity: 0.5;
         }
+
+        .special-timer-display {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffc107;
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .special-timer-display.expired {
+            color: #dc3545;
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
     `;
 
     function getCurrentMapName() {
@@ -285,6 +311,7 @@
         const worldName = window.location.hostname.split('.')[0] || 'Nieznany';
         const mapName = mobData.mapName || getCurrentMapName();
         const finderName = mobData.finderName || getCurrentPlayerName();
+        const timeLeft = mobData.killSeconds || 0;
 
         let rolePing = '';
         if (config.roleId) {
@@ -297,14 +324,15 @@
         }
 
         const embed = {
-            title: `GRZYBB!`,
+            title: `🍄 GRZYB ZNALEZIONY!`,
             description: `**${mobName}** ${mobLevel ? `(Lvl ${mobLevel})` : ''}\n\n` +
                         `**Mapa:** ${mapName}\n` +
                         `**Znalazł:** ${finderName}\n` +
-                        `**Świat:** ${worldName}`,
+                        `**Świat:** ${worldName}\n` +
+                        `**⏱️ Pozostały czas:** ${formatTime(timeLeft)}`,
             color: 0xe67e22,
             footer: {
-                text: `Mushrooms Abusers - Kaczor Addons• ${timestamp}`
+                text: `Mushrooms Abusers - Kaczor Addons • ${timestamp}`
             },
             timestamp: new Date().toISOString()
         };
@@ -328,14 +356,10 @@
     }
 
     function showDetectionWindow(mobName, mobLevel, mobData = {}) {
-        // Zamknij poprzednie okno jeśli istnieje
-        const existingWindow = document.getElementById('special-mob-detection-window');
-        if (existingWindow) {
-            existingWindow.remove();
-        }
-
+        const windowId = 'special-mob-detection-window-' + Date.now();
+        
         const gameWindow = document.createElement('div');
-        gameWindow.id = 'special-mob-detection-window';
+        gameWindow.id = windowId;
         gameWindow.style.cssText = `
             position: fixed;
             top: 200px;
@@ -380,9 +404,10 @@
         }
 
         const npcImageUrl = npcIcon ? (addToThumbnail + npcIcon) : '';
+        const initialTime = mobData.killSeconds || 0;
 
         gameWindow.innerHTML = `
-            <div id="special-window-header" style="
+            <div id="special-window-header-${windowId}" style="
                 background: #1a1a1a;
                 color: #fff;
                 font-size: 13px;
@@ -397,7 +422,7 @@
                 justify-content: space-between;
                 align-items: center;
             ">
-                <span style="flex: 1; text-align: center;">GRZYB!</span>
+                <span style="flex: 1; text-align: center;">🍄 GRZYB!</span>
                 <button style="
                     background: none;
                     border: none;
@@ -412,7 +437,7 @@
                     flex-shrink: 0;
                     font-weight: bold;
                     line-height: 1;
-                " id="special-window-close" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ddd'">×</button>
+                " id="special-window-close-${windowId}" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ddd'">×</button>
             </div>
 
             <div style="padding: 15px; background: #1a1a1a;">
@@ -440,7 +465,11 @@
                 </div>
                 ` : ''}
 
-                <div id="special-send-status" style="
+                <div id="special-timer-${windowId}" class="special-timer-display">
+                    ⏱️ ${formatTime(initialTime)}
+                </div>
+
+                <div id="special-send-status-${windowId}" style="
                     text-align: center;
                     color: #ffc107;
                     font-size: 11px;
@@ -456,7 +485,7 @@
             </div>
 
             <div style="border-top: 1px solid #e67e22; display: flex;">
-                <button id="special-send-btn" style="
+                <button id="special-send-btn-${windowId}" style="
                     flex: 1;
                     padding: 10px;
                     background: #28a745;
@@ -470,7 +499,7 @@
                 " onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">
                     📤 Wyślij na Discord
                 </button>
-                <button id="special-close-btn" style="
+                <button id="special-close-btn-${windowId}" style="
                     flex: 1;
                     padding: 10px;
                     background: #2a2a2a;
@@ -490,11 +519,30 @@
 
         document.body.appendChild(gameWindow);
 
+        // Timer countdown
+        let currentTime = initialTime;
+        const timerElement = gameWindow.querySelector(`#special-timer-${windowId}`);
+        
+        const timerInterval = setInterval(() => {
+            currentTime--;
+            if (currentTime <= 0) {
+                timerElement.textContent = '⏱️ Wygasł!';
+                timerElement.classList.add('expired');
+                clearInterval(timerInterval);
+                timerIntervals.delete(windowId);
+            } else {
+                timerElement.textContent = `⏱️ ${formatTime(currentTime)}`;
+            }
+        }, 1000);
+
+        timerIntervals.set(windowId, timerInterval);
+
+        // Dragging functionality
         let isDragging = false;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
 
-        const header = gameWindow.querySelector('#special-window-header');
+        const header = gameWindow.querySelector(`#special-window-header-${windowId}`);
         header.addEventListener('mousedown', (e) => {
             isDragging = true;
             dragOffsetX = e.clientX - gameWindow.getBoundingClientRect().left;
@@ -514,24 +562,37 @@
             isDragging = false;
         });
 
-        gameWindow.querySelector('#special-window-close').onclick = () => {
-            document.body.removeChild(gameWindow);
+        // Close buttons
+        const closeWindow = () => {
+            const interval = timerIntervals.get(windowId);
+            if (interval) {
+                clearInterval(interval);
+                timerIntervals.delete(windowId);
+            }
+            if (gameWindow.parentNode) {
+                document.body.removeChild(gameWindow);
+            }
         };
 
-        gameWindow.querySelector('#special-close-btn').onclick = () => {
-            document.body.removeChild(gameWindow);
-        };
+        gameWindow.querySelector(`#special-window-close-${windowId}`).onclick = closeWindow;
+        gameWindow.querySelector(`#special-close-btn-${windowId}`).onclick = closeWindow;
 
-        // Obsługa przycisku wysyłania
-        const sendBtn = gameWindow.querySelector('#special-send-btn');
-        const statusDiv = gameWindow.querySelector('#special-send-status');
+        // Send button
+        const sendBtn = gameWindow.querySelector(`#special-send-btn-${windowId}`);
+        const statusDiv = gameWindow.querySelector(`#special-send-status-${windowId}`);
         
         sendBtn.onclick = async () => {
             sendBtn.disabled = true;
             sendBtn.style.opacity = '0.5';
             sendBtn.textContent = '⏳ Wysyłanie...';
             
-            const success = await sendDiscordNotification(mobName, mobLevel, mobData);
+            // Aktualne dane z timerem
+            const currentMobData = {
+                ...mobData,
+                killSeconds: currentTime
+            };
+            
+            const success = await sendDiscordNotification(mobName, mobLevel, currentMobData);
             
             if (success) {
                 statusDiv.style.background = 'rgba(40, 167, 69, 0.1)';
@@ -718,10 +779,13 @@
             
             if (TRACKED_MOBS.includes(mobName)) {
                 const mobLevel = npc.d.lvl || npc.d.elasticLevel;
+                const killSeconds = npc.d.killSeconds || 0;
+                
                 const additionalData = {
                     mapName: getCurrentMapName(),
                     finderName: getCurrentPlayerName(),
-                    npcData: npc.d
+                    npcData: npc.d,
+                    killSeconds: killSeconds
                 };
 
                 // Zapisz dane o mobie
@@ -731,7 +795,7 @@
                     additionalData
                 };
 
-                // Pokaż okno z przyciskiem wysyłania
+                // Pokaż okno z przyciskiem wysyłania i timerem
                 showDetectionWindow(mobName, mobLevel, additionalData);
             }
         });
