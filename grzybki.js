@@ -145,7 +145,7 @@
                         `**Mapa:** ${mapName}\n` +
                         `**Znalazł:** ${finderName}\n` +
                         `**Świat:** ${worldName}\n` +
-                        `**Pozostały czas:** ${timeLeftText}`,
+                        `** czas:** ${timeLeftText}`,
             color: 0xe67e22,
             footer: {
                 text: `Kaczor Addons - Mushrooms Abusers • ${timestamp}`
@@ -476,7 +476,7 @@
                 timeLeftText = 'Jeszcze nie otwarty';
             }
 
-            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName} Pozostały czas: ${timeLeftText}`;
+            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName}, Pozostały czas: ${timeLeftText}`;
 
             const success = sendClanMessage(message);
 
@@ -511,7 +511,7 @@
                 timeLeftText = 'Jeszcze nie otwarty';
             }
 
-            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName} Pozostały czas: ${timeLeftText}`;
+            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName}, Pozostały czas: ${timeLeftText}`;
 
             try {
                 await navigator.clipboard.writeText(message);
