@@ -111,65 +111,102 @@
         }
     }
 
-    async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
-        const webhookUrl = config.webhookUrl;
-        if (!webhookUrl || !config.enabled) return false;
+async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
+    const webhookUrl = config.webhookUrl;
+    if (!webhookUrl || !config.enabled) return false;
 
-        const timestamp = new Date().toLocaleString('pl-PL');
-        const worldName = window.location.hostname.split('.')[0] || 'Nieznany';
-        const mapName = mobData.mapName || getCurrentMapName();
-        const finderName = mobData.finderName || getCurrentPlayerName();
-        const timeLeft = mobData.killSeconds;
+    const timestamp = new Date().toLocaleString('pl-PL');
+    const worldName = window.location.hostname.split('.')[0] || 'Nieznany';
+    const mapName = mobData.mapName || getCurrentMapName();
+    const finderName = mobData.finderName || getCurrentPlayerName();
+    const timeLeft = mobData.killSeconds;
 
-        let timeLeftText;
-        if (timeLeft) {
-            const expireTime = getExpireTime(timeLeft);
-            timeLeftText = `${formatTime(timeLeft)} (zniknie o ${expireTime})`;
+    let timeLeftText;
+    if (timeLeft) {
+        const expireTime = getExpireTime(timeLeft);
+        timeLeftText = `${formatTime(timeLeft)} (zniknie o ${expireTime})`;
+    } else {
+        timeLeftText = 'Jeszcze nie otwarty!';
+    }
+
+    let rolePing = '';
+    if (config.roleId) {
+        if (config.roleId.toLowerCase() === 'everyone') {
+            rolePing = '@everyone';
         } else {
-            timeLeftText = 'Jeszcze nie otwarty!';
-        }
-
-        let rolePing = '';
-        if (config.roleId) {
-            if (config.roleId.toLowerCase() === 'everyone') {
-                rolePing = '@everyone';
-            } else {
-                const roleIdsList = config.roleId.split(',').map(id => id.trim()).filter(id => id);
-                rolePing = roleIdsList.map(id => `<@&${id}>`).join(' ');
-            }
-        }
-
-        const embed = {
-            title: `🍄 GRZYB!`,
-            description: `**${mobName}** ${mobLevel ? `(Lvl ${mobLevel})` : ''}\n\n` +
-                        `**Mapa:** ${mapName}\n` +
-                        `**Znalazł:** ${finderName}\n` +
-                        `**Świat:** ${worldName}\n` +
-                        `** czas:** ${timeLeftText}`,
-            color: 0xe67e22,
-            footer: {
-                text: `Kaczor Addons - Mushrooms Abusers • ${timestamp}`
-            },
-            timestamp: new Date().toISOString()
-        };
-
-        try {
-            const response = await fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    content: rolePing,
-                    embeds: [embed]
-                })
-            });
-            return response.ok;
-        } catch (error) {
-            console.error('Błąd wysyłania powiadomienia:', error);
-            return false;
+            const roleIdsList = config.roleId.split(',').map(id => id.trim()).filter(id => id);
+            rolePing = roleIdsList.map(id => `<@&${id}>`).join(' ');
         }
     }
+
+    // Pobierz URL obrazka NPC
+    let npcImageUrl = '';
+    try {
+        if (mobData.npcData) {
+            const npcData = mobData.npcData;
+            let npcIcon = '';
+            if (npcData && npcData.d && npcData.d.icon) {
+                npcIcon = npcData.d.icon;
+            } else if (npcData && npcData.icon) {
+                npcIcon = npcData.icon;
+            }
+
+            if (npcIcon) {
+                const getCookie = (name) => {
+                    const regex = new RegExp(`(^| )${name}=([^;]+)`);
+                    const match = document.cookie.match(regex);
+                    return match ? match[2] : null;
+                };
+
+                let addToThumbnail = '';
+                if (getCookie('interface') === 'ni') {
+                    addToThumbnail = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
+                }
+                npcImageUrl = addToThumbnail + npcIcon;
+            }
+        }
+    } catch (error) {
+        console.error('Błąd pobierania URL obrazka:', error);
+    }
+
+    const embed = {
+        title: `🍄 GRZYB!`,
+        description: `**${mobName}** ${mobLevel ? `(Lvl ${mobLevel})` : ''}\n\n` +
+                    `**Mapa:** ${mapName}\n` +
+                    `**Znalazł:** ${finderName}\n` +
+                    `**Świat:** ${worldName}\n` +
+                    `**Pozostały czas:** ${timeLeftText}`,
+        color: 0xe67e22,
+        footer: {
+            text: `Kaczor Addons - Mushrooms Abusers • ${timestamp}`
+        },
+        timestamp: new Date().toISOString()
+    };
+
+    // Dodaj duży obrazek
+    if (npcImageUrl) {
+        embed.image = {
+            url: npcImageUrl
+        };
+    }
+
+    try {
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                content: rolePing,
+                embeds: [embed]
+            })
+        });
+        return response.ok;
+    } catch (error) {
+        console.error('Błąd wysyłania powiadomienia:', error);
+        return false;
+    }
+}
 
     function showDetectionWindow(mobName, mobLevel, mobData = {}) {
         const windowId = 'special-mob-detection-window-' + Date.now();
