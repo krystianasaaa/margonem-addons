@@ -316,7 +316,7 @@
                     border-radius: 4px;
                     margin-bottom: 12px;
                 ">
-                    Oczekuje na wysłanie
+                    Wyślij na Discorda!
                 </div>
             </div>
 
