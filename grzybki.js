@@ -62,7 +62,6 @@
                 _g('chat&channel=clan', false, {
                     c: message
                 });
-                console.log('Wysłano wiadomość na klan:', message);
                 return true;
             }
             console.error('Funkcja _g nie jest dostępna');
@@ -139,8 +138,8 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
         }
     }
 
-    // Pobierz URL obrazka NPC - POPRAWIONE
-    let npcImageUrl = '';
+    // Pobierz obrazek NPC jako plik
+    let npcImageFile = null;
     try {
         if (mobData.npcData) {
             const npcData = mobData.npcData;
@@ -158,30 +157,29 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
                     return match ? match[2] : null;
                 };
 
-                // POPRAWKA: Zawsze używaj pełnego URL
                 let baseUrl = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
-                
-                // Jeśli to nowe interface (ni), użyj tego URL
+
                 if (getCookie('interface') === 'ni') {
                     baseUrl = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
-                } else {
-                    // Dla starego interface też spróbuj użyć tego samego URL
-                    // lub alternatywnie możesz użyć innego jeśli znasz
-                    baseUrl = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
                 }
-                
-                // Upewnij się, że npcIcon nie zawiera już pełnego URL
+
+                let npcImageUrl = '';
                 if (!npcIcon.startsWith('http://') && !npcIcon.startsWith('https://')) {
                     npcImageUrl = baseUrl + npcIcon;
                 } else {
                     npcImageUrl = npcIcon;
                 }
-                
-                console.log('Discord embed image URL:', npcImageUrl);
+
+                // Pobierz obrazek jako blob i utwórz plik
+                const response = await fetch(npcImageUrl);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    npcImageFile = new File([blob], 'npc.gif', { type: blob.type });
+                }
             }
         }
     } catch (error) {
-        console.error('Błąd pobierania URL obrazka:', error);
+        console.error('Błąd pobierania obrazka NPC:', error);
     }
 
     const embed = {
@@ -198,33 +196,56 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
         timestamp: new Date().toISOString()
     };
 
-    // Dodaj obrazek - można użyć też thumbnail dla mniejszego obrazka
-    if (npcImageUrl) {
-        
+    // Jeśli udało się pobrać obrazek, użyj go jako thumbnail
+    if (npcImageFile) {
         embed.thumbnail = {
-            url: npcImageUrl
-     };
+            url: 'attachment://npc.gif'
+        };
     }
 
     try {
-        const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+        // Użyj FormData jeśli mamy plik obrazka
+        if (npcImageFile) {
+            const formData = new FormData();
+            formData.append('files[0]', npcImageFile);
+            formData.append('payload_json', JSON.stringify({
                 content: rolePing,
                 embeds: [embed]
-            })
-        });
-        
-        if (!response.ok) {
-            console.error('Discord webhook response:', response.status, response.statusText);
-            const text = await response.text();
-            console.error('Response body:', text);
+            }));
+
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                console.error('Discord webhook response:', response.status, response.statusText);
+                const text = await response.text();
+                console.error('Response body:', text);
+            }
+
+            return response.ok;
+        } else {
+            // Fallback - wyślij bez obrazka
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: rolePing,
+                    embeds: [embed]
+                })
+            });
+
+            if (!response.ok) {
+                console.error('Discord webhook response:', response.status, response.statusText);
+                const text = await response.text();
+                console.error('Response body:', text);
+            }
+
+            return response.ok;
         }
-        
-        return response.ok;
     } catch (error) {
         console.error('Błąd wysyłania powiadomienia:', error);
         return false;
