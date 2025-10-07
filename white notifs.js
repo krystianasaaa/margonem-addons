@@ -17,84 +17,10 @@
             fontFamily: 'Arial',
             italic: false,
             bold: false,
-            rgbEffect: false
+            rgbEffect: false,
+            emoticons: true  // Dodany checkbox dla emotek
         }
     };
-
-    // Konfiguracja emotek dla różnych powiadomień
-    const notificationEmotes = {
-        'Brak łupu': {
-            prefix: '😭',
-            suffix: '😭',
-            enabled: true
-        },
-        'Zdobyłeś:': {
-            prefix: '🎉',
-            suffix: '🎉',
-            enabled: true
-        }
-     };
-
-    // Funkcja przechwytująca i modyfikująca powiadomienia
-    function interceptBigMessages() {
-        const originalMessage = window.message;
-
-        if (typeof originalMessage === 'function') {
-            window.message = function(text) {
-                let modifiedText = text;
-
-                // Sprawdź każde powiadomienie z konfiguracji
-                for (const [notification, emoteConfig] of Object.entries(notificationEmotes)) {
-                    if (emoteConfig.enabled && text.includes(notification)) {
-                        modifiedText = `${emoteConfig.prefix} ${text} ${emoteConfig.suffix}`;
-                        break;
-                    }
-                }
-
-                return originalMessage.call(this, modifiedText);
-            };
-        }
-    }
-
-    // Funkcja do dynamicznego dodawania/usuwania emotek
-    function toggleNotificationEmote(notificationName, enabled) {
-        if (notificationEmotes[notificationName]) {
-            notificationEmotes[notificationName].enabled = enabled;
-            saveEmoteConfig();
-        }
-    }
-
-    // Funkcja do dodawania nowych powiadomień z emotkami
-    function addNotificationEmote(notificationName, prefix, suffix) {
-        notificationEmotes[notificationName] = {
-            prefix: prefix,
-            suffix: suffix,
-            enabled: true
-        };
-        saveEmoteConfig();
-    }
-
-    // Zapisz konfigurację emotek
-    function saveEmoteConfig() {
-        try {
-            localStorage.setItem('notificationEmotesConfig', JSON.stringify(notificationEmotes));
-        } catch (e) {
-            console.error('Błąd zapisu konfiguracji emotek:', e);
-        }
-    }
-
-    // Wczytaj konfigurację emotek
-    function loadEmoteConfig() {
-        try {
-            const saved = localStorage.getItem('notificationEmotesConfig');
-            if (saved) {
-                const savedConfig = JSON.parse(saved);
-                Object.assign(notificationEmotes, savedConfig);
-            }
-        } catch (e) {
-            console.error('Błąd wczytywania konfiguracji emotek:', e);
-        }
-    }
 
     // Ogromna lista dostępnych czcionek (60+ opcji dla MMORPG)
     const fontPresets = {
@@ -182,7 +108,7 @@
         'Wide Latin': 'Wide Latin, fantasy'
     };
 
-    const colorPresets = {
+const colorPresets = {
         'Biały': '#ffffff',
         'Żółty': '#ffff00',
         'Czerwony': '#ff0000',
@@ -215,76 +141,76 @@
         }
     }
 
-    function generateCSS() {
-        let css = '';
+function generateCSS() {
+    let css = '';
 
-        if (config.chat.enabled) {
+    if (config.chat.enabled) {
+        css += `
+            .fading-message-wrapper, .one-message-wrapper {
+                font-size: ${config.chat.fontSize}px !important;
+                font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
+                font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
+                font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
+            }
+        `;
+    }
+
+    if (config.bigMessages.enabled) {
+        if (config.bigMessages.rgbEffect) {
             css += `
-                .fading-message-wrapper, .one-message-wrapper {
-                    font-size: ${config.chat.fontSize}px !important;
-                    font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
-                    font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
-                    font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
+                @keyframes rgb-wave {
+                    0% { background-position: 0% 50%; }
+                    100% { background-position: 400% 50%; }
+                }
+
+                .big-messages,
+                [class*="big-message"] {
+                    font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                }
+
+                .big-messages *:not([style*="color"]):not(span[style]),
+                [class*="big-message"] *:not([style*="color"]):not(span[style]) {
+                    background-image: linear-gradient(90deg, #ff4444, #ffaa44, #ffff44, #44ff44, #44ddff, #8844ff, #ff44ff) !important;
+                    background-size: 400% 100% !important;
+                    -webkit-background-clip: text !important;
+                    background-clip: text !important;
+                    -webkit-text-fill-color: transparent !important;
+                    color: transparent !important;
+                    animation: rgb-wave 3s linear infinite !important;
+                    font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                }
+            `;
+        } else {
+            css += `
+                .big-messages,
+                [class*="big-message"] {
+                    color: ${config.bigMessages.color} !important;
+                    font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                }
+
+                .big-messages *:not([style*="color"]):not(i):not(span),
+                [class*="big-message"] *:not([style*="color"]):not(i):not(span) {
+                    color: ${config.bigMessages.color} !important;
+                    font-size: ${config.bigMessages.fontSize}px !important;
+                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
                 }
             `;
         }
-
-        if (config.bigMessages.enabled) {
-            if (config.bigMessages.rgbEffect) {
-                css += `
-                    @keyframes rgb-wave {
-                        0% { background-position: 0% 50%; }
-                        100% { background-position: 400% 50%; }
-                    }
-
-                    .big-messages,
-                    [class*="big-message"] {
-                        font-size: ${config.bigMessages.fontSize}px !important;
-                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    }
-
-                    .big-messages *:not([style*="color"]):not(span[style]),
-                    [class*="big-message"] *:not([style*="color"]):not(span[style]) {
-                        background-image: linear-gradient(90deg, #ff4444, #ffaa44, #ffff44, #44ff44, #44ddff, #8844ff, #ff44ff) !important;
-                        background-size: 400% 100% !important;
-                        -webkit-background-clip: text !important;
-                        background-clip: text !important;
-                        -webkit-text-fill-color: transparent !important;
-                        color: transparent !important;
-                        animation: rgb-wave 3s linear infinite !important;
-                        font-size: ${config.bigMessages.fontSize}px !important;
-                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    }
-                `;
-            } else {
-                css += `
-                    .big-messages,
-                    [class*="big-message"] {
-                        color: ${config.bigMessages.color} !important;
-                        font-size: ${config.bigMessages.fontSize}px !important;
-                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    }
-
-                    .big-messages *:not([style*="color"]):not(i):not(span),
-                    [class*="big-message"] *:not([style*="color"]):not(i):not(span) {
-                        color: ${config.bigMessages.color} !important;
-                        font-size: ${config.bigMessages.fontSize}px !important;
-                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                    }
-                `;
-            }
-        }
-
-        return css;
     }
+
+    return css;
+}
 
     // Funkcja dodająca/aktualizująca CSS
     function updateCSS() {
@@ -295,15 +221,6 @@
             document.head.appendChild(style);
         }
         style.textContent = generateCSS();
-    }
-
-    // Funkcja testowa Big Message z emotkami
-    function showTestBigMessage() {
-        if (typeof message === 'function') {
-            message('Test Brak łupu');
-        } else {
-            console.log('Funkcja message() nie jest dostępna w grze');
-        }
     }
 
     // Funkcja integracji z Addon Managerem
@@ -356,6 +273,15 @@
             e.stopPropagation();
             toggleSettingsPanel();
         });
+    }
+
+    // Funkcja testowa Big Message
+    function showTestBigMessage() {
+        if (typeof message === 'function') {
+            message('Test ');
+        } else {
+            console.log('Funkcja message() nie jest dostępna w grze');
+        }
     }
 
     function createSettingsPanel() {
@@ -431,94 +357,83 @@
                     </div>
                 </div>
 
-                <!-- SEKCJA BIG MESSAGES -->
-                <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Powiadomienia</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="big-enabled-toggle" ${config.bigMessages.enabled ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
+<!-- SEKCJA BIG MESSAGES -->
+<div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <span style="color: #fff; font-size: 13px; font-weight: bold;">Powiadomienia</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="big-enabled-toggle" ${config.bigMessages.enabled ? 'checked' : ''}>
+            <span class="slider"></span>
+        </label>
+    </div>
 
-                    <div style="margin-bottom: 12px;">
-                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Rozmiar czcionki:</label>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="range" id="big-font-size-slider" min="8" max="30" value="${config.bigMessages.fontSize}"
-                                style="flex: 1; accent-color: #4CAF50;">
-                            <span id="big-font-size-value" style="color: #fff; font-size: 12px; min-width: 35px;">${config.bigMessages.fontSize}px</span>
-                        </div>
-                    </div>
+    <div style="margin-bottom: 12px;">
+        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Rozmiar czcionki:</label>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="big-font-size-slider" min="8" max="30" value="${config.bigMessages.fontSize}"
+                style="flex: 1; accent-color: #4CAF50;">
+            <span id="big-font-size-value" style="color: #fff; font-size: 12px; min-width: 35px;">${config.bigMessages.fontSize}px</span>
+        </div>
+    </div>
 
-                    <div style="margin-bottom: 12px;">
-                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
-                        <select id="big-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
-                            ${Object.entries(fontPresets).map(([name]) =>
-                                `<option value="${name}" ${config.bigMessages.fontFamily === name ? 'selected' : ''}>${name}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
+    <div style="margin-bottom: 12px;">
+        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
+        <select id="big-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
+            ${Object.entries(fontPresets).map(([name]) =>
+                `<option value="${name}" ${config.bigMessages.fontFamily === name ? 'selected' : ''}>${name}</option>`
+            ).join('')}
+        </select>
+    </div>
 
-                    <div style="margin-bottom: 12px;">
-                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Kolor tekstu:</label>
-                        <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;">
-                            ${Object.entries(colorPresets).map(([name, color]) =>
-                                `<div class="color-option" data-color="${color}"
-                                    style="width: 30px; height: 30px; background: ${color}; border: 2px solid ${config.bigMessages.color === color ? '#fff' : '#666'};
-                                    border-radius: 4px; cursor: pointer;" title="${name}"></div>`
-                            ).join('')}
-                        </div>
-                        <input type="color" id="big-custom-color" value="${config.bigMessages.color}"
-                            style="width: 100%; height: 30px; border: 1px solid #666; background: #2a2a2a; border-radius: 4px;">
-                    </div>
+    <div style="margin-bottom: 12px;">
+        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Kolor tekstu:</label>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;">
+            ${Object.entries(colorPresets).map(([name, color]) =>
+                `<div class="color-option" data-color="${color}"
+                    style="width: 30px; height: 30px; background: ${color}; border: 2px solid ${config.bigMessages.color === color ? '#fff' : '#666'};
+                    border-radius: 4px; cursor: pointer;" title="${name}"></div>`
+            ).join('')}
+        </div>
+        <input type="color" id="big-custom-color" value="${config.bigMessages.color}"
+            style="width: 100%; height: 30px; border: 1px solid #666; background: #2a2a2a; border-radius: 4px;">
+    </div>
 
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 12px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="big-italic-toggle" ${config.bigMessages.italic ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="big-bold-toggle" ${config.bigMessages.bold ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 16px;">🌈</span>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="big-rgb-toggle" ${config.bigMessages.rgbEffect ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
+            <label class="checkbox-container">
+                <input type="checkbox" id="big-italic-toggle" ${config.bigMessages.italic ? 'checked' : ''}>
+                <span class="checkmark"></span>
+            </label>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
+            <label class="checkbox-container">
+                <input type="checkbox" id="big-bold-toggle" ${config.bigMessages.bold ? 'checked' : ''}>
+                <span class="checkmark"></span>
+            </label>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px;">🌈</span>
+            <label class="checkbox-container">
+                <input type="checkbox" id="big-rgb-toggle" ${config.bigMessages.rgbEffect ? 'checked' : ''}>
+                <span class="checkmark"></span>
+            </label>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px;">😊</span>
+            <label class="checkbox-container">
+                <input type="checkbox" id="big-emoticons-toggle" ${config.bigMessages.emoticons ? 'checked' : ''}>
+                <span class="checkmark"></span>
+            </label>
+        </div>
+    </div>
 
-                    <!-- PRZYCISK TESTOWY -->
-                    <button id="test-big-message" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
-                        Test (Brak łupu z emotkami)
-                    </button>
-                </div>
-
-                <!-- SEKCJA EMOTEK -->
-                <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Emotki w powiadomieniach</span>
-                    </div>
-                    <div id="emotes-list" style="max-height: 150px; overflow-y: auto;">
-                        ${Object.entries(notificationEmotes).map(([name, emote]) => `
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #444;">
-                                <span style="color: #ccc; font-size: 11px;">${emote.prefix} ${name} ${emote.suffix}</span>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" data-notification="${name}" ${emote.enabled ? 'checked' : ''}>
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
+    <!-- PRZYCISK TESTOWY -->
+    <button id="test-big-message" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+        Test
+    </button>
+</div>
 
                 <!-- PRZYCISKI -->
                 <div style="display: flex; gap: 8px; border-top: 1px solid #444; padding-top: 12px;">
@@ -529,6 +444,7 @@
             </div>
         `;
 
+        // Dodaj style przełączników i checkboxów
         if (!document.getElementById('message-styler-toggle-styles')) {
             const style = document.createElement('style');
             style.id = 'message-styler-toggle-styles';
@@ -699,7 +615,7 @@
             saveConfig();
         });
 
-        const bigFontSizeSlider = panel.querySelector('#big-font-size-slider');
+const bigFontSizeSlider = panel.querySelector('#big-font-size-slider');
         const bigFontSizeValue = panel.querySelector('#big-font-size-value');
         bigFontSizeSlider.addEventListener('input', (e) => {
             const size = parseInt(e.target.value);
@@ -781,12 +697,10 @@
     }
 
     // Inicjalizacja
-function init() {
-    loadConfig();
-    loadEmoteConfig(); 
-    updateCSS();
-    integrateWithAddonManager();
-    interceptBigMessages();
+    function init() {
+        loadConfig();
+        updateCSS();
+        integrateWithAddonManager();
     }
 
     if (document.readyState === 'loading') {
