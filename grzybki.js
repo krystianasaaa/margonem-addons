@@ -139,7 +139,7 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
         }
     }
 
-    // Pobierz URL obrazka NPC
+    // Pobierz URL obrazka NPC - POPRAWIONE
     let npcImageUrl = '';
     try {
         if (mobData.npcData) {
@@ -158,11 +158,26 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
                     return match ? match[2] : null;
                 };
 
-                let addToThumbnail = '';
+                // POPRAWKA: Zawsze używaj pełnego URL
+                let baseUrl = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
+                
+                // Jeśli to nowe interface (ni), użyj tego URL
                 if (getCookie('interface') === 'ni') {
-                    addToThumbnail = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
+                    baseUrl = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
+                } else {
+                    // Dla starego interface też spróbuj użyć tego samego URL
+                    // lub alternatywnie możesz użyć innego jeśli znasz
+                    baseUrl = 'https://micc.garmory-cdn.cloud/obrazki/npc/';
                 }
-                npcImageUrl = addToThumbnail + npcIcon;
+                
+                // Upewnij się, że npcIcon nie zawiera już pełnego URL
+                if (!npcIcon.startsWith('http://') && !npcIcon.startsWith('https://')) {
+                    npcImageUrl = baseUrl + npcIcon;
+                } else {
+                    npcImageUrl = npcIcon;
+                }
+                
+                console.log('Discord embed image URL:', npcImageUrl);
             }
         }
     } catch (error) {
@@ -183,11 +198,18 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
         timestamp: new Date().toISOString()
     };
 
-    // Dodaj duży obrazek
+    // Dodaj obrazek - można użyć też thumbnail dla mniejszego obrazka
     if (npcImageUrl) {
+        // Opcja 1: Duży obrazek
         embed.image = {
             url: npcImageUrl
         };
+        
+        // Opcja 2: Mały obrazek w rogu (thumbnail)
+        // Odkomentuj jeśli wolisz mniejszy obrazek:
+        // embed.thumbnail = {
+        //     url: npcImageUrl
+        // };
     }
 
     try {
@@ -201,6 +223,13 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
                 embeds: [embed]
             })
         });
+        
+        if (!response.ok) {
+            console.error('Discord webhook response:', response.status, response.statusText);
+            const text = await response.text();
+            console.error('Response body:', text);
+        }
+        
         return response.ok;
     } catch (error) {
         console.error('Błąd wysyłania powiadomienia:', error);
