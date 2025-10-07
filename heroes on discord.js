@@ -553,7 +553,7 @@
 
     const embed = {
         title: `!#HEROS#!`,
-        description: `**${heroName} (Lvl ${heroLevel})**\n\n` +
+        description: `**${heroName} (${heroLevel})**\n\n` +
                     `**Mapa:** ${mapName}\n` +
                     `**Znalazł:** ${finderName}\n` +
                     `**Świat:** ${worldName}`,
@@ -1006,7 +1006,7 @@ gameWindow.querySelector('#hero-clan-btn').onclick = () => {
     const mapName = heroData.mapName || getCurrentMapName();
     const coords = heroData.heroCoords || getHeroCoordinates(heroData.npcData) || '[?, ?]';
 
-    const message = `Heros! ${heroName} na mapie ${mapName} ${coords}`;
+    const message = `Heros! ${heroName} ${heroLevel ? `(${heroLevel})` : ''} na mapie ${mapName} ${coords}`;
 
     const success = sendClanMessage(message);
 
@@ -1109,7 +1109,7 @@ gameWindow.querySelector('#hero-send-btn').onclick = async () => {
         const finderName = heroData.finderName || getCurrentPlayerName() || 'Nieznany gracz';
         const customMessage = heroData.customMessage || '';
 
-        let description = `**${heroName} (Lvl ${heroLevel})**\n\n` +
+        let description = `**${heroName} (${heroLevel})**\n\n` +
                          `**Mapa:** ${mapName} ${heroData.heroCoords || getHeroCoordinates(heroData.npcData) || '[?, ?]'}\n` +
                          `**Znalazł:** ${finderName}\n` +
                          `**Świat:** ${worldName}`;
