@@ -21,6 +21,81 @@
         }
     };
 
+    // Konfiguracja emotek dla różnych powiadomień
+    const notificationEmotes = {
+        'Brak łupu': {
+            prefix: '😭',
+            suffix: '😭',
+            enabled: true
+        },
+        'Zdobyłeś:': {
+            prefix: '🎉',
+            suffix: '🎉',
+            enabled: true
+        }
+     };
+
+    // Funkcja przechwytująca i modyfikująca powiadomienia
+    function interceptBigMessages() {
+        const originalMessage = window.message;
+
+        if (typeof originalMessage === 'function') {
+            window.message = function(text) {
+                let modifiedText = text;
+
+                // Sprawdź każde powiadomienie z konfiguracji
+                for (const [notification, emoteConfig] of Object.entries(notificationEmotes)) {
+                    if (emoteConfig.enabled && text.includes(notification)) {
+                        modifiedText = `${emoteConfig.prefix} ${text} ${emoteConfig.suffix}`;
+                        break;
+                    }
+                }
+
+                return originalMessage.call(this, modifiedText);
+            };
+        }
+    }
+
+    // Funkcja do dynamicznego dodawania/usuwania emotek
+    function toggleNotificationEmote(notificationName, enabled) {
+        if (notificationEmotes[notificationName]) {
+            notificationEmotes[notificationName].enabled = enabled;
+            saveEmoteConfig();
+        }
+    }
+
+    // Funkcja do dodawania nowych powiadomień z emotkami
+    function addNotificationEmote(notificationName, prefix, suffix) {
+        notificationEmotes[notificationName] = {
+            prefix: prefix,
+            suffix: suffix,
+            enabled: true
+        };
+        saveEmoteConfig();
+    }
+
+    // Zapisz konfigurację emotek
+    function saveEmoteConfig() {
+        try {
+            localStorage.setItem('notificationEmotesConfig', JSON.stringify(notificationEmotes));
+        } catch (e) {
+            console.error('Błąd zapisu konfiguracji emotek:', e);
+        }
+    }
+
+    // Wczytaj konfigurację emotek
+    function loadEmoteConfig() {
+        try {
+            const saved = localStorage.getItem('notificationEmotesConfig');
+            if (saved) {
+                const savedConfig = JSON.parse(saved);
+                Object.assign(notificationEmotes, savedConfig);
+            }
+        } catch (e) {
+            console.error('Błąd wczytywania konfiguracji emotek:', e);
+        }
+    }
+
     // Ogromna lista dostępnych czcionek (60+ opcji dla MMORPG)
     const fontPresets = {
         'Arial': 'Arial, sans-serif',
@@ -107,7 +182,7 @@
         'Wide Latin': 'Wide Latin, fantasy'
     };
 
-const colorPresets = {
+    const colorPresets = {
         'Biały': '#ffffff',
         'Żółty': '#ffff00',
         'Czerwony': '#ff0000',
@@ -140,76 +215,76 @@ const colorPresets = {
         }
     }
 
-function generateCSS() {
-    let css = '';
+    function generateCSS() {
+        let css = '';
 
-    if (config.chat.enabled) {
-        css += `
-            .fading-message-wrapper, .one-message-wrapper {
-                font-size: ${config.chat.fontSize}px !important;
-                font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
-                font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
-                font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
-            }
-        `;
-    }
-
-    if (config.bigMessages.enabled) {
-        if (config.bigMessages.rgbEffect) {
+        if (config.chat.enabled) {
             css += `
-                @keyframes rgb-wave {
-                    0% { background-position: 0% 50%; }
-                    100% { background-position: 400% 50%; }
-                }
-
-                .big-messages,
-                [class*="big-message"] {
-                    font-size: ${config.bigMessages.fontSize}px !important;
-                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                }
-
-                .big-messages *:not([style*="color"]):not(span[style]),
-                [class*="big-message"] *:not([style*="color"]):not(span[style]) {
-                    background-image: linear-gradient(90deg, #ff4444, #ffaa44, #ffff44, #44ff44, #44ddff, #8844ff, #ff44ff) !important;
-                    background-size: 400% 100% !important;
-                    -webkit-background-clip: text !important;
-                    background-clip: text !important;
-                    -webkit-text-fill-color: transparent !important;
-                    color: transparent !important;
-                    animation: rgb-wave 3s linear infinite !important;
-                    font-size: ${config.bigMessages.fontSize}px !important;
-                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                }
-            `;
-        } else {
-            css += `
-                .big-messages,
-                [class*="big-message"] {
-                    color: ${config.bigMessages.color} !important;
-                    font-size: ${config.bigMessages.fontSize}px !important;
-                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
-                }
-
-                .big-messages *:not([style*="color"]):not(i):not(span),
-                [class*="big-message"] *:not([style*="color"]):not(i):not(span) {
-                    color: ${config.bigMessages.color} !important;
-                    font-size: ${config.bigMessages.fontSize}px !important;
-                    font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
-                    font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
-                    font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                .fading-message-wrapper, .one-message-wrapper {
+                    font-size: ${config.chat.fontSize}px !important;
+                    font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
+                    font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
+                    font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
                 }
             `;
         }
-    }
 
-    return css;
-}
+        if (config.bigMessages.enabled) {
+            if (config.bigMessages.rgbEffect) {
+                css += `
+                    @keyframes rgb-wave {
+                        0% { background-position: 0% 50%; }
+                        100% { background-position: 400% 50%; }
+                    }
+
+                    .big-messages,
+                    [class*="big-message"] {
+                        font-size: ${config.bigMessages.fontSize}px !important;
+                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    }
+
+                    .big-messages *:not([style*="color"]):not(span[style]),
+                    [class*="big-message"] *:not([style*="color"]):not(span[style]) {
+                        background-image: linear-gradient(90deg, #ff4444, #ffaa44, #ffff44, #44ff44, #44ddff, #8844ff, #ff44ff) !important;
+                        background-size: 400% 100% !important;
+                        -webkit-background-clip: text !important;
+                        background-clip: text !important;
+                        -webkit-text-fill-color: transparent !important;
+                        color: transparent !important;
+                        animation: rgb-wave 3s linear infinite !important;
+                        font-size: ${config.bigMessages.fontSize}px !important;
+                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    }
+                `;
+            } else {
+                css += `
+                    .big-messages,
+                    [class*="big-message"] {
+                        color: ${config.bigMessages.color} !important;
+                        font-size: ${config.bigMessages.fontSize}px !important;
+                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    }
+
+                    .big-messages *:not([style*="color"]):not(i):not(span),
+                    [class*="big-message"] *:not([style*="color"]):not(i):not(span) {
+                        color: ${config.bigMessages.color} !important;
+                        font-size: ${config.bigMessages.fontSize}px !important;
+                        font-family: ${fontPresets[config.bigMessages.fontFamily] || 'Arial, sans-serif'} !important;
+                        font-style: ${config.bigMessages.italic ? 'italic' : 'normal'} !important;
+                        font-weight: ${config.bigMessages.bold ? 'bold' : 'normal'} !important;
+                    }
+                `;
+            }
+        }
+
+        return css;
+    }
 
     // Funkcja dodająca/aktualizująca CSS
     function updateCSS() {
@@ -220,6 +295,15 @@ function generateCSS() {
             document.head.appendChild(style);
         }
         style.textContent = generateCSS();
+    }
+
+    // Funkcja testowa Big Message z emotkami
+    function showTestBigMessage() {
+        if (typeof message === 'function') {
+            message('Test Brak łupu');
+        } else {
+            console.log('Funkcja message() nie jest dostępna w grze');
+        }
     }
 
     // Funkcja integracji z Addon Managerem
@@ -272,15 +356,6 @@ function generateCSS() {
             e.stopPropagation();
             toggleSettingsPanel();
         });
-    }
-
-    // Funkcja testowa Big Message
-    function showTestBigMessage() {
-        if (typeof message === 'function') {
-            message('Test ');
-        } else {
-            console.log('Funkcja message() nie jest dostępna w grze');
-        }
     }
 
     function createSettingsPanel() {
@@ -423,8 +498,26 @@ function generateCSS() {
 
                     <!-- PRZYCISK TESTOWY -->
                     <button id="test-big-message" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
-                        Test
+                        Test (Brak łupu z emotkami)
                     </button>
+                </div>
+
+                <!-- SEKCJA EMOTEK -->
+                <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Emotki w powiadomieniach</span>
+                    </div>
+                    <div id="emotes-list" style="max-height: 150px; overflow-y: auto;">
+                        ${Object.entries(notificationEmotes).map(([name, emote]) => `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #444;">
+                                <span style="color: #ccc; font-size: 11px;">${emote.prefix} ${name} ${emote.suffix}</span>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" data-notification="${name}" ${emote.enabled ? 'checked' : ''}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
 
                 <!-- PRZYCISKI -->
@@ -436,7 +529,6 @@ function generateCSS() {
             </div>
         `;
 
-        // Dodaj style przełączników i checkboxów
         if (!document.getElementById('message-styler-toggle-styles')) {
             const style = document.createElement('style');
             style.id = 'message-styler-toggle-styles';
@@ -689,10 +781,12 @@ function generateCSS() {
     }
 
     // Inicjalizacja
-    function init() {
-        loadConfig();
-        updateCSS();
-        integrateWithAddonManager();
+function init() {
+    loadConfig();
+    loadEmoteConfig(); 
+    updateCSS();
+    integrateWithAddonManager();
+    interceptBigMessages();
     }
 
     if (document.readyState === 'loading') {
