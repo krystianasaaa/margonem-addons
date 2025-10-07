@@ -21,7 +21,18 @@
             emoticons: true  // Dodany checkbox dla emotek
         }
     };
-
+    const notificationEmotes = {
+        'Brak łupu': {
+            prefix: '😭',
+            suffix: '😭',
+            enabled: true
+        },
+        'Zdobyłeś:': {
+            prefix: '🎉',
+            suffix: '🎉',
+            enabled: true
+        }
+    };
     // Ogromna lista dostępnych czcionek (60+ opcji dla MMORPG)
     const fontPresets = {
         'Arial': 'Arial, sans-serif',
@@ -211,6 +222,20 @@ function generateCSS() {
 
     return css;
 }
+const originalMessage = window.message;
+if (originalMessage) {
+    window.message = function(text) {
+        if (config.bigMessages.emoticons) {
+            for (const [keyword, emotes] of Object.entries(notificationEmotes)) {
+                if (text.includes(keyword) && emotes.enabled) {
+                    text = emotes.prefix + ' ' + text + ' ' + emotes.suffix;
+                    break;
+                }
+            }
+        }
+        return originalMessage.call(this, text);
+    };
+}
 
     // Funkcja dodająca/aktualizująca CSS
     function updateCSS() {
@@ -278,7 +303,7 @@ function generateCSS() {
     // Funkcja testowa Big Message
     function showTestBigMessage() {
         if (typeof message === 'function') {
-            message('Test ');
+            message('Brak łupu');
         } else {
             console.log('Funkcja message() nie jest dostępna w grze');
         }
