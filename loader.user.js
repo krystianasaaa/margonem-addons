@@ -2,7 +2,7 @@
 // @name         Kaczor Addons Manager - Dream
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  zestaw dodatkow 
+// @description  zestaw dodateczkow
 // @author       kaczka
 // @match        https://dream.margonem.pl/*
 // @grant        GM_xmlhttpRequest
@@ -14,14 +14,8 @@
 // @downloadURL  https://krystianasaaa.github.io/margonem-addons/loader.user.js
 // ==/UserScript==
 
-"use strict";
-
 (function() {
-    const date = new Date();
-    const version = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
-    const build = `https://krystianasaaa.github.io/margonem-addons/addons.js?v=${version}`;
-    const script = document.createElement("script");
-    
-    script.src = `${build}?v=${version}`;
-    document.body.appendChild(script);
+    const s = document.createElement("script");
+    s.src = "https://krystianasaaa.github.io/margonem-addons/addons.js?" + Date.now();
+    document.head.appendChild(s);
 })();
