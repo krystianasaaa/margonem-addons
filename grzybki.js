@@ -184,7 +184,7 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
 
     const embed = {
         title: `🍄 GRZYB!`,
-        description: `**${mobName}** ${mobLevel ? `(Lvl ${mobLevel})` : ''}\n\n` +
+        description: `**${mobName}** ${mobLevel ? `(${mobLevel})` : ''}\n\n` +
                     `**Mapa:** ${mapName}\n` +
                     `**Znalazł:** ${finderName}\n` +
                     `**Świat:** ${worldName}\n` +
@@ -592,7 +592,7 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
                 timeLeftText = 'Jeszcze nie otwarty';
             }
 
-            const message = `GRZYB! ${mobName} ${mobLevel ? `(Lvl ${mobLevel})` : ''} na mapie ${mapName}, Pozostały czas: ${timeLeftText}`;
+            const message = `GRZYB! ${mobName} ${mobLevel ? `(${mobLevel})` : ''} na mapie ${mapName}, Pozostały czas: ${timeLeftText}`;
 
             try {
                 await navigator.clipboard.writeText(message);
