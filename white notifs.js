@@ -673,6 +673,12 @@ const bigFontSizeSlider = panel.querySelector('#big-font-size-slider');
             updateCSS();
             saveConfig();
         });
+        // Emoticons toggle
+       panel.querySelector('#big-emoticons-toggle').addEventListener('change', (e) => {
+           config.bigMessages.emoticons = e.target.checked;
+           updateCSS();
+           saveConfig();
+       });
 
         // Przycisk testowy
         panel.querySelector('#test-big-message').addEventListener('click', (e) => {
