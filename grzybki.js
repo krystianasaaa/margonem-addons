@@ -200,16 +200,10 @@ async function sendDiscordNotification(mobName, mobLevel, mobData = {}) {
 
     // Dodaj obrazek - można użyć też thumbnail dla mniejszego obrazka
     if (npcImageUrl) {
-        // Opcja 1: Duży obrazek
-        embed.image = {
-            url: npcImageUrl
-        };
         
-        // Opcja 2: Mały obrazek w rogu (thumbnail)
-        // Odkomentuj jeśli wolisz mniejszy obrazek:
-        // embed.thumbnail = {
-        //     url: npcImageUrl
-        // };
+        embed.thumbnail = {
+            url: npcImageUrl
+     };
     }
 
     try {
