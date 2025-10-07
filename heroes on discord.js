@@ -1039,8 +1039,6 @@ gameWindow.querySelector('#hero-clan-btn').onclick = () => {
         document.body.appendChild(errorMsg);
         setTimeout(() => errorMsg.remove(), 3000);
     }
-
-    document.body.removeChild(gameWindow);
 };
 
 gameWindow.querySelector('#hero-send-btn').onclick = async () => {
@@ -1083,7 +1081,6 @@ gameWindow.querySelector('#hero-send-btn').onclick = async () => {
         setTimeout(() => errorMsg.remove(), 3000);
     }
 
-    document.body.removeChild(gameWindow);
 };
 }
     async function sendHeroRespawnNotificationWithMessage(heroName, heroLevel, heroData = {}) {
