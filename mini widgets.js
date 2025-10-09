@@ -15,12 +15,14 @@
 
     let config = {
         enabled: localStorage.getItem('miniWidgetsEnabled') !== 'false',
-        scale: parseFloat(localStorage.getItem('miniWidgetsScale')) || 0.7
+        scale: parseFloat(localStorage.getItem('miniWidgetsScale')) || 0.7,
+        centered: localStorage.getItem('miniWidgetsCentered') !== 'false' // domyślnie włączone
     };
 
     function saveConfig() {
         localStorage.setItem('miniWidgetsEnabled', config.enabled.toString());
         localStorage.setItem('miniWidgetsScale', config.scale.toString());
+        localStorage.setItem('miniWidgetsCentered', config.centered.toString());
     }
 
     function applyScaling() {
@@ -38,7 +40,15 @@
             const positionClass = Array.from(container.classList).find(c => c.includes('bottom-') || c.includes('top-'));
             if (positionClass) {
                 container.style.transform = `scale(${config.scale})`;
-                container.style.transformOrigin = positionClass.replace('top-', '').replace('bottom-', '');
+
+                // Wybór sposobu centrowania w zależności od ustawienia
+                if (config.centered) {
+                    // Oryginalny sposób - centrowanie
+                    container.style.transformOrigin = positionClass.replace('top-', '').replace('bottom-', '');
+                } else {
+                    // Nowy sposób - bez centrowania
+                    container.style.transformOrigin = positionClass.replace('-', ' ');
+                }
             }
         }
     }
@@ -86,6 +96,20 @@
                     <div style="color: #888; font-size: 10px; margin-top: 5px;">Wprowadź wartość między 30% a 150%</div>
                 </div>
 
+                <div style="margin-bottom: 15px; padding: 12px; background: #333; border-radius: 3px; border: 1px solid #444;">
+                    <label style="display: flex; align-items: center; cursor: pointer; color: #ccc; font-size: 12px;">
+                        <div style="position: relative; display: inline-block; width: 40px; height: 20px; margin-right: 10px;">
+                            <input type="checkbox" id="centered-checkbox" ${config.centered ? 'checked' : ''} style="opacity: 0; width: 0; height: 0; position: absolute;">
+                            <span id="centered-toggle" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: 0.3s; border-radius: 20px; border: 1px solid #666;"></span>
+                            <span id="centered-slider" style="position: absolute; content: ''; height: 16px; width: 16px; left: 2px; top: 50%; transform: translateY(-50%); background-color: white; transition: 0.3s; border-radius: 50%;"></span>
+                        </div>
+                        <span>Wycentrowane widgety</span>
+                    </label>
+                    <div style="color: #888; font-size: 10px; margin-top: 8px; margin-left: 50px;">
+                        Gdy zaznaczone, widgety przesuną się, aby wycentrować pozycję od krawędzi .
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
                     <button id="close-mini-widgets-settings" style="flex: 1; padding: 8px 12px; background: #e67e22; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
                         Zamknij
@@ -125,6 +149,7 @@
         const slider = panel.querySelector('#scale-slider');
         const input = panel.querySelector('#scale-input');
         const valueDisplay = panel.querySelector('#scale-value');
+        const centeredCheckbox = panel.querySelector('#centered-checkbox');
 
         slider.addEventListener('input', (e) => {
             const value = parseInt(e.target.value);
@@ -141,6 +166,28 @@
             slider.value = value;
             valueDisplay.textContent = `${value}%`;
             config.scale = value / 100;
+            saveConfig();
+            applyScaling();
+        });
+
+        const toggleBg = panel.querySelector('#centered-toggle');
+        const toggleSlider = panel.querySelector('#centered-slider');
+
+        function updateToggleUI() {
+            if (config.centered) {
+                toggleBg.style.backgroundColor = '#4CAF50';
+                toggleSlider.style.transform = 'translateX(20px) translateY(-50%)';
+            } else {
+                toggleBg.style.backgroundColor = '#555';
+                toggleSlider.style.transform = 'translateX(0) translateY(-50%)';
+            }
+        }
+
+        updateToggleUI();
+
+        centeredCheckbox.addEventListener('change', (e) => {
+            config.centered = e.target.checked;
+            updateToggleUI();
             saveConfig();
             applyScaling();
         });
