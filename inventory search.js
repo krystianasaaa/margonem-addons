@@ -669,7 +669,7 @@
 
         panel.innerHTML = `
             <div id="inv-settings-header">
-                Inventory Search - Ustawienia
+                Inventory Search - Settings
             </div>
 
             <div class="inv-settings-content">
