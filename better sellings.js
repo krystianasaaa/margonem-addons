@@ -445,19 +445,38 @@
 
 // Integracja z managerem
 function integrateWithAddonManager() {
-    const addonContainer = document.getElementById('addon-shop_hotkey');
-    if (!addonContainer) return;
+    // Sprawdź czy już jest
+    const tryAddButton = () => {
+        const addonContainer = document.getElementById('addon-shop_hotkey');
+        if (!addonContainer) return false;
 
-    // Sprawdź czy przycisk już istnieje
-    if (addonContainer.querySelector('#shop-hotkey-settings-btn')) {
-        return;
-    }
+        if (addonContainer.querySelector('#shop-hotkey-settings-btn')) {
+            return true;
+        }
 
-    // Szukaj kontenera z nazwą dodatku
-    const addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
-    if (addonNameContainer) {
-        addManagerSettingsButton(addonNameContainer);
-    }
+        const addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
+        if (addonNameContainer) {
+            addManagerSettingsButton(addonNameContainer);
+            return true;
+        }
+        
+        return false;
+    };
+
+    // Spróbuj od razu
+    if (tryAddButton()) return;
+
+    // Obserwuj zmiany w DOM
+    const observer = new MutationObserver(() => {
+        if (tryAddButton()) {
+            observer.disconnect();
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
 }
 
     // Kliknięcie przycisku torby
