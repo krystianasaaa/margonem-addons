@@ -6,15 +6,15 @@
     }
     window.customTooltipsRunning = true;
 
-    // Domyślna konfiguracja
+    // Domyślna konfiguracja - BIAŁY jako domyślny
     let config = {
         enabled: localStorage.getItem('customTooltipsEnabled') !== 'false',
-        borderColor: localStorage.getItem('customTooltipsBorderColor') || '#00ff2a',
-        glowColor: localStorage.getItem('customTooltipsGlowColor') || '#38ff60',
-        textColor: localStorage.getItem('customTooltipsTextColor') || '#00ff2a',
-        damageColor: localStorage.getItem('customTooltipsDamageColor') || '#00cd1a',
+        borderColor: localStorage.getItem('customTooltipsBorderColor') || '#ffffff',
+        glowColor: localStorage.getItem('customTooltipsGlowColor') || '#e0e0e0',
+        textColor: localStorage.getItem('customTooltipsTextColor') || '#ffffff',
+        damageColor: localStorage.getItem('customTooltipsDamageColor') || '#cccccc',
         gradientColors: JSON.parse(localStorage.getItem('customTooltipsGradientColors') || 
-            '["#29ff68", "#3fff89", "#1dff6b", "#20b753", "#13bb47", "#4dff94", "#25ff6e", "#21bb6d", "#00c567", "#2fc75e"]')
+            '["#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8", "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"]')
     };
 
     function saveConfig() {
@@ -46,7 +46,7 @@
             border: 2px solid #7b2cbf;
             border-radius: 12px;
             padding: 0;
-            width: 650px;
+            width: 600px;
             max-width: 90vw;
             max-height: 85vh;
             color: #e8f4fd;
@@ -143,12 +143,18 @@
 
         .tooltip-color-input {
             flex: 1;
-            padding: 8px;
-            background: rgba(157,78,221,0.2);
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
             border: 1px solid #7b2cbf;
             border-radius: 6px;
             color: #e8f4fd;
             font-size: 14px;
+        }
+
+        .tooltip-color-input:focus {
+            outline: none;
+            border-color: #9d4edd;
+            box-shadow: 0 0 10px rgba(157,78,221,0.3);
         }
 
         .tooltip-color-picker {
@@ -182,7 +188,7 @@
 
         .tooltip-gradient-item input[type="text"] {
             flex: 1;
-            padding: 6px;
+            padding: 8px;
             background: rgba(0,0,0,0.3);
             border: 1px solid #7b2cbf;
             border-radius: 4px;
@@ -190,12 +196,24 @@
             font-size: 12px;
         }
 
+        .tooltip-gradient-item input[type="text"]:focus {
+            outline: none;
+            border-color: #9d4edd;
+        }
+
         .tooltip-gradient-item input[type="color"] {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border: 2px solid #7b2cbf;
             border-radius: 4px;
             cursor: pointer;
+        }
+
+        .tooltip-gradient-number {
+            color: #9d4edd;
+            font-size: 12px;
+            min-width: 25px;
+            font-weight: bold;
         }
 
         .tooltip-buttons {
@@ -328,6 +346,16 @@
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(157,78,221,0.1);
+            border: 1px solid #7b2cbf;
+            border-radius: 8px;
+        }
+
+        .tooltip-toggle-label {
+            color: #a8dadc;
+            font-weight: bold;
+            font-size: 14px;
         }
     `;
 
@@ -343,7 +371,7 @@
 
         const tooltipStyles = `
             <style id="custom-tooltips-style">
-            *ANIMOWANE-TIPY*/
+            /*ANIMOWANE-TIPY*/
             .item-type{text-align:center;}
             .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${config.borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${config.glowColor} 0px 1px 24px -4px !important;}
             .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${config.borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500;}
@@ -439,7 +467,7 @@
                 
                 <div class="custom-tooltips-content">
                     <div class="tooltip-toggle-container">
-                        <span style="color: #a8dadc; font-weight: bold;">Włącz dodatek:</span>
+                        <span class="tooltip-toggle-label">Włącz dodatek:</span>
                         <label class="tooltip-toggle-switch">
                             <input type="checkbox" id="tooltip-enabled" ${config.enabled ? 'checked' : ''}>
                             <span class="tooltip-toggle-slider"></span>
@@ -488,7 +516,7 @@
                         <div class="tooltip-gradient-inputs">
                             ${config.gradientColors.map((color, index) => `
                                 <div class="tooltip-gradient-item">
-                                    <span style="color: #a8dadc; font-size: 11px; min-width: 30px;">${index + 1}.</span>
+                                    <span class="tooltip-gradient-number">${index + 1}.</span>
                                     <input type="text" class="gradient-color-text" data-index="${index}" value="${color}">
                                     <input type="color" class="gradient-color-picker" data-index="${index}" value="${color}">
                                 </div>
@@ -506,7 +534,7 @@
                 </div>
 
                 <div class="tooltip-buttons">
-                    <button class="tooltip-btn tooltip-btn-reset" id="tooltip-reset">Resetuj do zielonego</button>
+                    <button class="tooltip-btn tooltip-btn-reset" id="tooltip-reset">Resetuj do białego</button>
                     <button class="tooltip-btn tooltip-btn-secondary" id="tooltip-cancel">Anuluj</button>
                     <button class="tooltip-btn tooltip-btn-primary" id="tooltip-save">Zapisz i zastosuj</button>
                 </div>
@@ -612,15 +640,15 @@
             }
         });
 
-        // Reset do zielonego
+        // Reset do białego
         document.getElementById('tooltip-reset').addEventListener('click', () => {
-            config.borderColor = '#00ff2a';
-            config.glowColor = '#38ff60';
-            config.textColor = '#00ff2a';
-            config.damageColor = '#00cd1a';
+            config.borderColor = '#ffffff';
+            config.glowColor = '#e0e0e0';
+            config.textColor = '#ffffff';
+            config.damageColor = '#cccccc';
             config.gradientColors = [
-                "#29ff68", "#3fff89", "#1dff6b", "#20b753", "#13bb47",
-                "#4dff94", "#25ff6e", "#21bb6d", "#00c567", "#2fc75e"
+                "#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8",
+                "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"
             ];
 
             document.getElementById('border-color-text').value = config.borderColor;
