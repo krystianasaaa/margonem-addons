@@ -1,6 +1,18 @@
+// ==UserScript==
+// @name         customtooltipy
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  hehhe
+// @author       kaczka
+// @match        https://dream.margonem.pl/
+// @grant        GM_getValue
+// @grant        none
+// @run-at       document-end
+// ==/UserScript==
+
 (function() {
     'use strict';
-    
+
     if (window.customTooltipsRunning) {
         return;
     }
@@ -13,7 +25,7 @@
         glowColor: localStorage.getItem('customTooltipsGlowColor') || '#e0e0e0',
         textColor: localStorage.getItem('customTooltipsTextColor') || '#ffffff',
         damageColor: localStorage.getItem('customTooltipsDamageColor') || '#cccccc',
-        gradientColors: JSON.parse(localStorage.getItem('customTooltipsGradientColors') || 
+        gradientColors: JSON.parse(localStorage.getItem('customTooltipsGradientColors') ||
             '["#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8", "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"]')
     };
 
@@ -26,338 +38,467 @@
         localStorage.setItem('customTooltipsGradientColors', JSON.stringify(config.gradientColors));
     }
 
-    const styles = `
-        .custom-tooltips-modal {
+    // NOWE FUNKCJE - Import/Export
+    function exportSettings() {
+        const settingsData = {
+            version: "1.0",
+            settings: {
+                borderColor: config.borderColor,
+                glowColor: config.glowColor,
+                textColor: config.textColor,
+                damageColor: config.damageColor,
+                gradientColors: config.gradientColors
+            }
+        };
+
+        const dataStr = JSON.stringify(settingsData, null, 2);
+
+        // Kopiuj do schowka
+        navigator.clipboard.writeText(dataStr).then(() => {
+            showNotification('Ustawienia skopiowane do schowka!', 'success');
+        }).catch(() => {
+            // Fallback dla starszych przeglądarek
+            const textarea = document.createElement('textarea');
+            textarea.value = dataStr;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showNotification('Ustawienia skopiowane do schowka!', 'success');
+        });
+    }
+
+    function showImportDialog() {
+        const importModal = document.createElement('div');
+        importModal.className = 'custom-tooltips-modal';
+        importModal.innerHTML = `
+            <div class="custom-tooltips-dialog" style="width: 500px;">
+                <div class="custom-tooltips-header">
+                    <h3>Importuj ustawienia</h3>
+                    <button class="custom-tooltips-close" id="import-close">×</button>
+                </div>
+                <div style="padding: 15px;">
+                    <div class="tooltip-setting-description" style="margin-bottom: 10px; color: #ccc;">
+                        Wklej tutaj skopiowany kod z ustawień:
+                    </div>
+                    <textarea id="import-textarea" style="
+                        width: 100%;
+                        height: 200px;
+                        background: #1a1a1a;
+                        border: 1px solid #444;
+                        border-radius: 3px;
+                        color: #fff;
+                        padding: 10px;
+                        font-family: 'Courier New', monospace;
+                        font-size: 11px;
+                        resize: vertical;
+                    " placeholder='{"version":"1.0","settings":{...}}'></textarea>
+                </div>
+                <div class="tooltip-buttons">
+                    <button class="tooltip-btn tooltip-btn-secondary" id="import-cancel">Anuluj</button>
+                    <button class="tooltip-btn tooltip-btn-primary" id="import-confirm">Importuj</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(importModal);
+
+        const textarea = document.getElementById('import-textarea');
+        textarea.focus();
+
+        document.getElementById('import-close').addEventListener('click', () => {
+            importModal.remove();
+        });
+
+        document.getElementById('import-cancel').addEventListener('click', () => {
+            importModal.remove();
+        });
+
+        document.getElementById('import-confirm').addEventListener('click', () => {
+            const code = textarea.value.trim();
+            if (!code) {
+                showNotification('Pole jest puste!', 'error');
+                return;
+            }
+
+            if (importSettings(code)) {
+                importModal.remove();
+            }
+        });
+
+        importModal.addEventListener('click', (e) => {
+            if (e.target === importModal) {
+                importModal.remove();
+            }
+        });
+    }
+
+    function importSettings(jsonString) {
+        try {
+            const data = JSON.parse(jsonString);
+
+            if (!data.settings) {
+                throw new Error('Nieprawidłowy format - brak sekcji "settings"');
+            }
+
+            // Walidacja kolorów
+            const hexRegex = /^#[0-9A-F]{6}$/i;
+
+            if (data.settings.borderColor && hexRegex.test(data.settings.borderColor)) {
+                config.borderColor = data.settings.borderColor;
+            }
+            if (data.settings.glowColor && hexRegex.test(data.settings.glowColor)) {
+                config.glowColor = data.settings.glowColor;
+            }
+            if (data.settings.textColor && hexRegex.test(data.settings.textColor)) {
+                config.textColor = data.settings.textColor;
+            }
+            if (data.settings.damageColor && hexRegex.test(data.settings.damageColor)) {
+                config.damageColor = data.settings.damageColor;
+            }
+
+            if (Array.isArray(data.settings.gradientColors) && data.settings.gradientColors.length === 10) {
+                const validGradient = data.settings.gradientColors.every(color => hexRegex.test(color));
+                if (validGradient) {
+                    config.gradientColors = data.settings.gradientColors;
+                }
+            }
+
+            saveConfig();
+            applyTooltipStyles();
+            showNotification('Ustawienia zaimportowane pomyślnie!', 'success');
+
+            // Odśwież okno ustawień jeśli jest otwarte
+            const modal = document.querySelector('.custom-tooltips-modal');
+            if (modal) {
+                modal.remove();
+                showSettingsDialog();
+            }
+
+            return true;
+        } catch (error) {
+            showNotification('Błąd importu: ' + error.message, 'error');
+            return false;
+        }
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 10001;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+            font-size: 13px;
+            animation: slideIn 0.3s ease-out;
+        `;
+        notification.textContent = message;
 
-        .custom-tooltips-dialog {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 2px solid #7b2cbf;
-            border-radius: 12px;
-            padding: 0;
-            width: 600px;
-            max-width: 90vw;
-            max-height: 85vh;
-            color: #e8f4fd;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
 
-        .custom-tooltips-header {
-            background: #7b2cbf;
-            padding: 15px 20px;
-            cursor: move;
-            user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 10px 10px 0 0;
-        }
+        document.body.appendChild(notification);
 
-        .custom-tooltips-header h3 {
-            margin: 0;
-            color: #fff;
-            font-size: 18px;
-        }
+        setTimeout(() => {
+            notification.style.animation = 'slideIn 0.3s ease-out reverse';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
 
-        .custom-tooltips-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
+const styles = `
+    /* Główne okno modalne - BEZ PRZYCIEMNIENIA TŁA */
+    .custom-tooltips-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        pointer-events: none;
+    }
 
-        .custom-tooltips-close:hover {
-            background: rgba(255,255,255,0.2);
-        }
+    /* Dialog - CZARNE TŁO, bez przyciemnienia */
+    .custom-tooltips-dialog {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        border-radius: 4px;
+        padding: 0;
+        width: 400px;
+        max-width: 90vw;
+        max-height: 80vh;
+        color: #ccc;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        pointer-events: all;
+    }
 
-        .custom-tooltips-content {
-            overflow-y: auto;
-            flex: 1;
-            padding: 20px;
-            scrollbar-width: thin;
-            scrollbar-color: #7b2cbf rgba(0,0,0,0.2);
-        }
+    /* Nagłówek - SZARY, nie fioletowy */
+    .custom-tooltips-header {
+        background: #333;
+        padding: 15px;
+        cursor: move;
+        user-select: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 4px 4px 0 0;
+        border-bottom: 1px solid #444;
+    }
 
-        .custom-tooltips-content::-webkit-scrollbar {
-            width: 12px;
-        }
+    .custom-tooltips-header h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        flex: 1;
+    }
 
-        .custom-tooltips-content::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
-            border-radius: 6px;
-        }
+    /* Przycisk zamykania */
+    .custom-tooltips-close {
+        background: none;
+        border: none;
+        color: #888;
+        font-size: 20px;
+        cursor: pointer;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s;
+        padding: 0;
+    }
 
-        .custom-tooltips-content::-webkit-scrollbar-thumb {
-            background: #7b2cbf;
-            border-radius: 6px;
-            border: 2px solid rgba(0,0,0,0.2);
-        }
+    .custom-tooltips-close:hover {
+        color: #fff;
+    }
 
-        .custom-tooltips-content::-webkit-scrollbar-thumb:hover {
-            background: #9d4edd;
-        }
+    /* Zawartość */
+    .custom-tooltips-content {
+        overflow-y: auto;
+        flex: 1;
+        padding: 15px;
+        max-height: calc(80vh - 60px);
+        scrollbar-width: thin;
+        scrollbar-color: #555 #2a2a2a;
+    }
 
-        .tooltip-setting-group {
-            margin-bottom: 20px;
-            background: rgba(157,78,221,0.1);
-            border: 1px solid #7b2cbf;
-            border-radius: 8px;
-            padding: 15px;
-        }
+    .custom-tooltips-content::-webkit-scrollbar {
+        width: 8px;
+    }
 
-        .tooltip-setting-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #a8dadc;
-            font-size: 14px;
-        }
+    .custom-tooltips-content::-webkit-scrollbar-track {
+        background: #2a2a2a;
+        border-radius: 4px;
+    }
 
-        .tooltip-color-input-wrapper {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+    .custom-tooltips-content::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 4px;
+    }
 
-        .tooltip-color-input {
-            flex: 1;
-            padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #7b2cbf;
-            border-radius: 6px;
-            color: #e8f4fd;
-            font-size: 14px;
-        }
+    .custom-tooltips-content::-webkit-scrollbar-thumb:hover {
+        background: #666;
+    }
 
-        .tooltip-color-input:focus {
-            outline: none;
-            border-color: #9d4edd;
-            box-shadow: 0 0 10px rgba(157,78,221,0.3);
-        }
+    /* Grupy ustawień */
+    .tooltip-setting-group {
+        margin-bottom: 15px;
+        background: #333;
+        border: 1px solid #444;
+        border-radius: 3px;
+        padding: 12px;
+    }
 
-        .tooltip-color-picker {
-            width: 50px;
-            height: 40px;
-            border: 2px solid #7b2cbf;
-            border-radius: 6px;
-            cursor: pointer;
-            background: transparent;
-        }
+    /* Etykiety */
+    .tooltip-setting-label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: normal;
+        color: #ccc;
+        font-size: 12px;
+    }
 
-        .tooltip-setting-description {
-            font-size: 12px;
-            color: #a8dadc;
-            margin-top: 5px;
-            line-height: 1.4;
-        }
+    /* Wrapper inputów kolorów */
+    .tooltip-color-input-wrapper {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
 
-        .tooltip-gradient-inputs {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
+    /* Inputy tekstowe */
+    .tooltip-color-input {
+        flex: 1;
+        padding: 5px;
+        background: #555;
+        border: 1px solid #666;
+        border-radius: 3px;
+        color: #fff;
+        font-size: 11px;
+    }
 
-        .tooltip-gradient-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .tooltip-color-input:focus {
+        outline: none;
+        border-color: #888;
+    }
 
-        .tooltip-gradient-item input[type="text"] {
-            flex: 1;
-            padding: 8px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #7b2cbf;
-            border-radius: 4px;
-            color: #e8f4fd;
-            font-size: 12px;
-        }
+    /* Color pickery */
+    .tooltip-color-picker {
+        width: 40px;
+        height: 28px;
+        border: 1px solid #666;
+        border-radius: 3px;
+        cursor: pointer;
+        background: transparent;
+    }
 
-        .tooltip-gradient-item input[type="text"]:focus {
-            outline: none;
-            border-color: #9d4edd;
-        }
+    /* Opisy */
+    .tooltip-setting-description {
+        font-size: 10px;
+        color: #888;
+        margin-top: 5px;
+        line-height: 1.4;
+    }
 
-        .tooltip-gradient-item input[type="color"] {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #7b2cbf;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+    /* Siatka gradientów - ZMIENIONA NA PIONOWĄ */
+    .tooltip-gradient-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+    }
 
-        .tooltip-gradient-number {
-            color: #9d4edd;
-            font-size: 12px;
-            min-width: 25px;
-            font-weight: bold;
-        }
+    /* Pojedynczy element gradientu */
+    .tooltip-gradient-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-        .tooltip-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 15px 20px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 0 0 10px 10px;
-        }
+    .tooltip-gradient-item input[type="text"] {
+        flex: 1;
+        padding: 5px;
+        background: #555;
+        border: 1px solid #666;
+        border-radius: 3px;
+        color: #fff;
+        font-size: 11px;
+    }
 
-        .tooltip-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
+    .tooltip-gradient-item input[type="text"]:focus {
+        outline: none;
+        border-color: #888;
+    }
 
-        .tooltip-btn-primary {
-            background: #9d4edd;
-            color: white;
-            flex: 1;
-        }
+    .tooltip-gradient-item input[type="color"] {
+        width: 32px;
+        height: 28px;
+        border: 1px solid #666;
+        border-radius: 3px;
+        cursor: pointer;
+    }
 
-        .tooltip-btn-primary:hover {
-            background: #7b2cbf;
-        }
+    .tooltip-gradient-number {
+        color: #888;
+        font-size: 11px;
+        min-width: 20px;
+        font-weight: normal;
+    }
 
-        .tooltip-btn-secondary {
-            background: #666;
-            color: white;
-        }
+    /* Przyciski */
+    .tooltip-buttons {
+        display: flex;
+        gap: 8px;
+        padding: 12px 15px;
+        background: #2a2a2a;
+        border-radius: 0 0 4px 4px;
+        border-top: 1px solid #444;
+        flex-wrap: wrap;
+    }
 
-        .tooltip-btn-secondary:hover {
-            background: #555;
-        }
+    .tooltip-btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: bold;
+        transition: background 0.2s;
+        flex: 1;
+        min-width: 100px;
+    }
 
-        .tooltip-btn-reset {
-            background: #dc3545;
-            color: white;
-        }
+    .tooltip-btn-primary {
+        background: #5865F2;
+        color: white;
+    }
 
-        .tooltip-btn-reset:hover {
-            background: #c82333;
-        }
+    .tooltip-btn-primary:hover {
+        background: #4752C4;
+    }
 
-        .tooltip-preview {
-            background: rgba(0,0,0,0.3);
-            border: 2px solid #7b2cbf;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            text-align: center;
-        }
+    .tooltip-btn-secondary {
+        background: #4e4e4e;
+        color: white;
+    }
 
-        .tooltip-preview-title {
-            font-size: 12px;
-            color: #a8dadc;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
+    .tooltip-btn-secondary:hover {
+        background: #5a5a5a;
+    }
 
-        .tooltip-preview-box {
-            display: inline-block;
-            padding: 15px;
-            border-radius: 4px;
-            position: relative;
-        }
+    .tooltip-btn-reset {
+        background: #ED4245;
+        color: white;
+    }
 
-        .tooltip-preview-text {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+    .tooltip-btn-reset:hover {
+        background: #C03537;
+    }
 
-        .tooltip-preview-damage {
-            font-size: 12px;
-        }
+    .tooltip-btn-success {
+        background: #3BA55D;
+        color: white;
+    }
 
-        .tooltip-toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
+    .tooltip-btn-success:hover {
+        background: #2D7D46;
+    }
 
-        .tooltip-toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+    .tooltip-btn-info {
+        background: #5865F2;
+        color: white;
+    }
 
-        .tooltip-toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #666;
-            transition: .4s;
-            border-radius: 34px;
-        }
+    .tooltip-btn-info:hover {
+        background: #4752C4;
+    }
 
-        .tooltip-toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .tooltip-toggle-slider {
-            background-color: #9d4edd;
-        }
-
-        input:checked + .tooltip-toggle-slider:before {
-            transform: translateX(26px);
-        }
-
-        .tooltip-toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(157,78,221,0.1);
-            border: 1px solid #7b2cbf;
-            border-radius: 8px;
-        }
-
-        .tooltip-toggle-label {
-            color: #a8dadc;
-            font-weight: bold;
-            font-size: 14px;
-        }
-    `;
+    /* Hidden file input */
+    #tooltip-import-file {
+        display: none;
+    }
+`;
 
     function applyTooltipStyles() {
         const existingStyle = document.getElementById('custom-tooltips-style');
@@ -435,113 +576,88 @@
         $('body').append(tooltipStyles);
     }
 
-    function updatePreview() {
-        const preview = document.querySelector('.tooltip-preview-box');
-        if (!preview) return;
-
-        preview.style.border = `2px solid ${config.borderColor}`;
-        preview.style.boxShadow = `0 0 20px ${config.glowColor}`;
-        
-        const text = preview.querySelector('.tooltip-preview-text');
-        if (text) text.style.color = config.textColor;
-        
-        const damage = preview.querySelector('.tooltip-preview-damage');
-        if (damage) damage.style.color = config.damageColor;
+function showSettingsDialog() {
+    const existingModal = document.querySelector('.custom-tooltips-modal');
+    if (existingModal) {
+        existingModal.remove();
     }
 
-    function showSettingsDialog() {
-        const existingModal = document.querySelector('.custom-tooltips-modal');
-        if (existingModal) {
-            existingModal.remove();
-        }
+    const modal = document.createElement('div');
+    modal.className = 'custom-tooltips-modal';
 
-        const modal = document.createElement('div');
-        modal.className = 'custom-tooltips-modal';
+    modal.innerHTML = `
+        <div class="custom-tooltips-dialog">
+            <div class="custom-tooltips-header" id="tooltip-header">
+                <h3>Custom Tooltips - Settings</h3>
+                <button class="custom-tooltips-close" id="tooltip-close">×</button>
+            </div>
 
-        modal.innerHTML = `
-            <div class="custom-tooltips-dialog">
-                <div class="custom-tooltips-header" id="tooltip-header">
-                    <h3>⚙️ Custom Tooltips - Ustawienia</h3>
-                    <button class="custom-tooltips-close" id="tooltip-close">×</button>
-                </div>
-                
-                <div class="custom-tooltips-content">
-                    <div class="tooltip-toggle-container">
-                        <span class="tooltip-toggle-label">Włącz dodatek:</span>
-                        <label class="tooltip-toggle-switch">
-                            <input type="checkbox" id="tooltip-enabled" ${config.enabled ? 'checked' : ''}>
-                            <span class="tooltip-toggle-slider"></span>
-                        </label>
+            <div class="custom-tooltips-content" id="tooltip-scroll-content">
+                <div class="tooltip-setting-group">
+                    <label class="tooltip-setting-label">Kolor ramki</label>
+                    <div class="tooltip-color-input-wrapper">
+                        <input type="text" class="tooltip-color-input" id="border-color-text" value="${config.borderColor}">
+                        <input type="color" class="tooltip-color-picker" id="border-color" value="${config.borderColor}">
                     </div>
-
-                    <div class="tooltip-setting-group">
-                        <label class="tooltip-setting-label">Kolor ramki</label>
-                        <div class="tooltip-color-input-wrapper">
-                            <input type="text" class="tooltip-color-input" id="border-color-text" value="${config.borderColor}">
-                            <input type="color" class="tooltip-color-picker" id="border-color" value="${config.borderColor}">
-                        </div>
-                        <div class="tooltip-setting-description">Główny kolor obramowania tooltipów</div>
-                    </div>
-
-                    <div class="tooltip-setting-group">
-                        <label class="tooltip-setting-label">Kolor świecenia</label>
-                        <div class="tooltip-color-input-wrapper">
-                            <input type="text" class="tooltip-color-input" id="glow-color-text" value="${config.glowColor}">
-                            <input type="color" class="tooltip-color-picker" id="glow-color" value="${config.glowColor}">
-                        </div>
-                        <div class="tooltip-setting-description">Kolor efektu świecenia wokół ramki</div>
-                    </div>
-
-                    <div class="tooltip-setting-group">
-                        <label class="tooltip-setting-label">Kolor tekstu (legendary/unique)</label>
-                        <div class="tooltip-color-input-wrapper">
-                            <input type="text" class="tooltip-color-input" id="text-color-text" value="${config.textColor}">
-                            <input type="color" class="tooltip-color-picker" id="text-color" value="${config.textColor}">
-                        </div>
-                        <div class="tooltip-setting-description">Kolor nazw przedmiotów legendarnych i unikalnych</div>
-                    </div>
-
-                    <div class="tooltip-setting-group">
-                        <label class="tooltip-setting-label">Kolor obrażeń</label>
-                        <div class="tooltip-color-input-wrapper">
-                            <input type="text" class="tooltip-color-input" id="damage-color-text" value="${config.damageColor}">
-                            <input type="color" class="tooltip-color-picker" id="damage-color" value="${config.damageColor}">
-                        </div>
-                        <div class="tooltip-setting-description">Kolor wartości obrażeń na przedmiotach</div>
-                    </div>
-
-                    <div class="tooltip-setting-group">
-                        <label class="tooltip-setting-label">Kolory gradientu (animacja legendarnych przedmiotów)</label>
-                        <div class="tooltip-setting-description" style="margin-bottom: 10px;">Zmień kolory animowanej ramki dla legendarnych przedmiotów</div>
-                        <div class="tooltip-gradient-inputs">
-                            ${config.gradientColors.map((color, index) => `
-                                <div class="tooltip-gradient-item">
-                                    <span class="tooltip-gradient-number">${index + 1}.</span>
-                                    <input type="text" class="gradient-color-text" data-index="${index}" value="${color}">
-                                    <input type="color" class="gradient-color-picker" data-index="${index}" value="${color}">
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <div class="tooltip-preview">
-                        <div class="tooltip-preview-title">Podgląd:</div>
-                        <div class="tooltip-preview-box" style="border: 2px solid ${config.borderColor}; box-shadow: 0 0 20px ${config.glowColor};">
-                            <div class="tooltip-preview-text" style="color: ${config.textColor};">Legendarny Miecz</div>
-                            <div class="tooltip-preview-damage" style="color: ${config.damageColor};">Obrażenia: 100-150</div>
-                        </div>
-                    </div>
+                    <div class="tooltip-setting-description">Główny kolor obramowania tooltipów(itemy i widgety)</div>
                 </div>
 
-                <div class="tooltip-buttons">
-                    <button class="tooltip-btn tooltip-btn-reset" id="tooltip-reset">Resetuj do białego</button>
-                    <button class="tooltip-btn tooltip-btn-secondary" id="tooltip-cancel">Anuluj</button>
-                    <button class="tooltip-btn tooltip-btn-primary" id="tooltip-save">Zapisz i zastosuj</button>
+                <div class="tooltip-setting-group">
+                    <label class="tooltip-setting-label">Kolor świecenia</label>
+                    <div class="tooltip-color-input-wrapper">
+                        <input type="text" class="tooltip-color-input" id="glow-color-text" value="${config.glowColor}">
+                        <input type="color" class="tooltip-color-picker" id="glow-color" value="${config.glowColor}">
+                    </div>
+                    <div class="tooltip-setting-description">Kolor efektu świecenia wokół ramki</div>
+                </div>
+
+                <div class="tooltip-setting-group">
+                    <label class="tooltip-setting-label">Kolor nazwy i podpisów</label>
+                    <div class="tooltip-color-input-wrapper">
+                        <input type="text" class="tooltip-color-input" id="text-color-text" value="${config.textColor}">
+                        <input type="color" class="tooltip-color-picker" id="text-color" value="${config.textColor}">
+                    </div>
+                    <div class="tooltip-setting-description">Kolor nazwy i podpisów przedmiotów legendarnych </div>
+                </div>
+
+                <div class="tooltip-setting-group">
+                    <label class="tooltip-setting-label">Kolor statystyk</label>
+                    <div class="tooltip-color-input-wrapper">
+                        <input type="text" class="tooltip-color-input" id="damage-color-text" value="${config.damageColor}">
+                        <input type="color" class="tooltip-color-picker" id="damage-color" value="${config.damageColor}">
+                    </div>
+                    <div class="tooltip-setting-description">Kolor statystyk na przedmiotach</div>
+                </div>
+
+                <div class="tooltip-setting-group">
+                    <label class="tooltip-setting-label">Kolory gradientu (animacja legendarnych przedmiotów)</label>
+                    <div class="tooltip-setting-description" style="margin-bottom: 10px;">Zmień kolory animowanej ramki dla legendarnych przedmiotów</div>
+                    <div class="tooltip-gradient-inputs">
+                        ${config.gradientColors.map((color, index) => `
+                            <div class="tooltip-gradient-item">
+                                <span class="tooltip-gradient-number">${index + 1}.</span>
+                                <input type="text" class="gradient-color-text" data-index="${index}" value="${color}">
+                                <input type="color" class="gradient-color-picker" data-index="${index}" value="${color}">
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
             </div>
-        `;
 
-        document.body.appendChild(modal);
+            <div class="tooltip-buttons">
+                <button class="tooltip-btn tooltip-btn-success" id="tooltip-export">Eksportuj</button>
+                <button class="tooltip-btn tooltip-btn-info" id="tooltip-import">Importuj</button>
+                <button class="tooltip-btn tooltip-btn-reset" id="tooltip-reset">Reset</button>
+                <button class="tooltip-btn tooltip-btn-primary" id="tooltip-save">Zapisz</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+        // Obsługa scrolla - zapobiega przewijaniu strony w tle
+        const scrollContent = document.getElementById('tooltip-scroll-content');
+        scrollContent.addEventListener('wheel', e => e.stopPropagation());
 
         // Przeciąganie okna
         let isDragging = false;
@@ -581,7 +697,6 @@
                 if (/^#[0-9A-F]{6}$/i.test(value)) {
                     colorPicker.value = value;
                     config[configKey] = value;
-                    updatePreview();
                 }
             });
 
@@ -589,7 +704,6 @@
                 const value = e.target.value;
                 textInput.value = value;
                 config[configKey] = value;
-                updatePreview();
             });
         }
 
@@ -608,7 +722,6 @@
                 if (/^#[0-9A-F]{6}$/i.test(value)) {
                     picker.value = value;
                     config.gradientColors[index] = value;
-                    updatePreview();
                 }
             });
 
@@ -616,13 +729,7 @@
                 const value = e.target.value;
                 input.value = value;
                 config.gradientColors[index] = value;
-                updatePreview();
             });
-        });
-
-        // Enable/disable toggle
-        document.getElementById('tooltip-enabled').addEventListener('change', (e) => {
-            config.enabled = e.target.checked;
         });
 
         // Zamknij
@@ -630,14 +737,20 @@
             modal.remove();
         });
 
-        document.getElementById('tooltip-cancel').addEventListener('click', () => {
-            modal.remove();
-        });
-
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.remove();
             }
+        });
+
+        // NOWE - Przycisk Eksportu
+        document.getElementById('tooltip-export').addEventListener('click', () => {
+            exportSettings();
+        });
+
+        // NOWE - Przycisk Importu
+        document.getElementById('tooltip-import').addEventListener('click', () => {
+            showImportDialog();
         });
 
         // Reset do białego
@@ -667,14 +780,14 @@
                 picker.value = config.gradientColors[index];
             });
 
-            updatePreview();
+            showNotification('Ustawienia zresetowane do domyślnych (białe)', 'info');
         });
 
         // Zapisz i zastosuj
         document.getElementById('tooltip-save').addEventListener('click', () => {
             saveConfig();
             applyTooltipStyles();
-            modal.remove();
+            showNotification('Ustawienia zapisane!', 'success');
         });
     }
 
