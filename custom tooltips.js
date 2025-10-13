@@ -991,7 +991,7 @@ function showSettingsDialog() {
         <input type="text" class="tooltip-color-input" id="item-desc-color-text" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
         <input type="color" class="tooltip-color-picker" id="item-desc-color" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
     </div>
-    <div class="tooltip-setting-description">Kolor opisów lore przedmiotów (długie teksty opisowe)</div>
+    <div class="tooltip-setting-description">Kolor opisów przedmiotów(w tym eventy itp itd)</div>
 </div>
 
                 <div class="tooltip-setting-group">
