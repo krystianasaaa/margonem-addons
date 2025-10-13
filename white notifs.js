@@ -153,18 +153,20 @@ const colorPresets = {
     }
 
 function generateCSS() {
-    let css = '';
-
-    if (config.chat.enabled) {
-        css += `
-            .fading-message-wrapper, .one-message-wrapper {
-                font-size: ${config.chat.fontSize}px !important;
-                font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
-                font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
-                font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
-            }
-        `;
-    }
+    let css = `
+        /* ULTRA-PRIORYTETOWE NADPISANIE */
+        body .fading-message-wrapper,
+        body .one-message-wrapper,
+        #game-window-inner .fading-message-wrapper,
+        #game-window-inner .one-message-wrapper {
+            font-size: ${config.chat.fontSize}px !important;
+            font-family: ${fontPresets[config.chat.fontFamily] || 'Arial, sans-serif'} !important;
+            font-style: ${config.chat.italic ? 'italic' : 'normal'} !important;
+            font-weight: ${config.chat.bold ? 'bold' : 'normal'} !important;
+        }
+    `;
+    
+}
 
     if (config.bigMessages.enabled) {
         if (config.bigMessages.rgbEffect) {
