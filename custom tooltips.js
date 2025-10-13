@@ -761,98 +761,99 @@ const styles = `
 }
 `;
 
-    function applyTooltipStyles() {
-        const existingStyle = document.getElementById('custom-tooltips-style');
-        if (existingStyle) {
-            existingStyle.remove();
+// Znajdź tę funkcję w swoim skrypcie i zastąp ją tą wersją:
+
+function applyTooltipStyles() {
+    const existingStyle = document.getElementById('custom-tooltips-style');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+
+    if (!config.enabled) return;
+
+    const gradientColorsStr = config.gradientColors.join(', ');
+
+    const borderColor = config.borderEnabled ? config.borderColor : '#ffffff';
+    const glowColor = config.glowEnabled ? config.glowColor : '#e0e0e0';
+    const textColor = config.textEnabled ? config.textColor : '#ffffff';
+    const damageColor = config.damageEnabled ? config.damageColor : '#cccccc';
+    const legendaryNameColor = config.legendaryNameEnabled ? config.legendaryNameColor : '#ff6b35';
+    const legendaryLabelColor = config.legendaryLabelEnabled ? config.legendaryLabelColor : '#ffffff';
+    const legbonColor = config.legbonEnabled ? config.legbonColor : '#00ff88';
+    const upgradeBonusColor = config.upgradeBonusEnabled ? config.upgradeBonusColor : '#4CAF50';
+
+    const fontFamily = fontPresets[config.selectedFont] || '';
+    const fontFamilyCSS = fontFamily ? `font-family: ${fontFamily} !important;` : '';
+
+    const tooltipStyles = `
+        <style id="custom-tooltips-style">
+
+        /*ANIMOWANE-TIPY - WSZYSTKO Z !important*/
+        .item-type{text-align:center !important;}
+        .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
+        .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500 !important;}
+        .tip-wrapper .content {padding: 5px !important; background: rgba(15, 15, 15,.85) !important; word-break: break-word !important; ${fontFamilyCSS}}
+        .tip-wrapper[data-type=t_item] .item-head {border:1px solid #1e1e1e66 !important; border-radius: 2px !important; background: hsl(0deg 0% 4.87% / 10%) !important;}
+        .tip-wrapper[data-type=t_item] .item-head .cl-icon {border: 1px solid rgba(15, 15, 15,.3) !important;}
+        .tip-wrapper[data-type=t_item] .item-tip-section {border-bottom: 1px solid rgba(15, 15, 15,.5) !important;}
+        .tip-wrapper .content .info-wrapper .nick {color:#79e1c5 !important; font-family: Cinzel !important; font-size: 11px !important; text-shadow: 0 0 4px black !important; border: 1px solid ${borderColor} !important; border-radius: 2px !important; background: ${borderColor}20 !important;}
+        .tip-wrapper[data-type=t_other] .line {border-bottom:1px solid ${borderColor} !important; background: none !important;}
+        .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
+        .tip-wrapper[data-type=t_item] .item-head .legendary {color: ${legendaryLabelColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryLabelColor}42 !important;}
+        .tip-wrapper[data-type=t_item] .item-tip-section .legendary {color: ${legendaryNameColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryNameColor}42 !important;}
+        .tip-wrapper[data-type=t_item] .tip-item-stat-legbon {color: ${legbonColor} !important; font-weight: 600 !important;}
+        .tip-wrapper[data-type=t_item] .tip-item-stat-bonus {color: ${upgradeBonusColor} !important; font-weight: 600 !important;}
+        .tip-wrapper[data-type=t_item] .item-head .item-type{padding-left: 48px !important; margin-left: 0px !important;}
+        .tip-wrapper.normal-tip .damage, .tip-wrapper.sticky-tip .damage {color: ${damageColor} !important; font-weight: 999 !important;}
+        .tip-wrapper[data-type=t_item] .item-tip-section.s-7{color: white !important; font-weight: 700 !important;}
+        .tip-wrapper[data-type=t_item] i.looter{color: ${textColor} !important; text-align: center !important;}
+        .tip-wrapper[data-type=t_item] .item-tip-section.s-5{color: ${textColor} !important; text-align: center !important; font-weight: 600 !important;}
+        .tip-wrapper[data-item-type=t-upgraded], .tip-wrapper[data-item-type=upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #111911, 0 0 0 3px #2b2727, 0 0 0 4px #59595a, 0 0 0 5px ${textColor}, 0 0 0 6px #5a585b, 0 0 0 7px #2c2625 !important;}
+        .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{color: ${textColor} !important;}
+        .tip-wrapper[data-type=t_item] .prc-icon{width:0px !important; height:0px !important;}
+        .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .value-item{color:white !important; font-size:10px !important;}
+        .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .lvl-next{float:none !important;}
+        .tip-wrapper[data-type=t_other] .clan-in-tip{color:#d5d5d5 !important;}
+        .tip-wrapper .content .info-wrapper .nick{color:#d5d5d5 !important;}
+        .tip-wrapper normal-tip{box-shadow: ${glowColor} 0px 0px 0px 5px !important;}
+        .item-tip-section.s-4>span {color: ${textColor} !important; font-weight: bold !important;}
+        .tip-wrapper[data-item-type=heroic], .tip-wrapper[data-item-type=t-her]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #00000000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
+        .tip-wrapper[data-item-type=t-uniupg]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px rgb(0 0 0 / 0%), 0 0 0 4px #5a595900, 0 0 0 5px #00ff0000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
+        .tip-wrapper[data-item-type=t-upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #00ff0000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
+        .tip-wrapper[data-item-type=normal], .tip-wrapper[data-item-type=t-norm]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px ${borderColor}fa, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #07a19d00, 0 0 0 6px #5a585b00, 0 0 0 7px rgb(44 38 37 / 0%), 0px 1px 5px 4px ${glowColor}70 !important;}
+        .tip-wrapper[data-type=t_item] .item-head .heroic, .tip-wrapper[data-type=t_item] .item-tip-section .heroic{font-weight: 700 !important;}
+        .tip-wrapper[data-type=t_item] .item-head .unique, .tip-wrapper[data-type=t_item] .item-tip-section .unique{font-weight: 700 !important;}
+        .tip-wrapper[data-type=t_item] .item-head .common, .tip-wrapper[data-type=t_item] .item-tip-section .common{font-weight: 700 !important;}
+        .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{font-weight: 700 !important;}
+        .tip-wrapper[data-type=t_item] .item-expired{font-size: 7px !important; display:block !important;}
+        .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 5px 4px !important;}
+        .tip-wrapper.own{color: #ffffff !important; box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500 !important;}
+        .item-tip-section.s-1.no-border {text-align: center !important;}
+        .item-tip-section.s-3 {text-align: center !important;}
+        .item-tip-section.s-2.no-border {text-align: center !important;}
+
+        /*lega tip*/
+        ${config.gradientEnabled ? `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]{--a:0deg; background: linear-gradient(var(--a), #000, #272727) !important; box-shadow: inset 100px 100px 100px 184px #0000007a !important;}
+
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:before, .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:after {content: '' !important; position: absolute !important; left: -2px !important; top: -2px !important; background: linear-gradient(var(--a), ${gradientColorsStr}) !important; background-size: 400% !important; width: calc(100% + 4px) !important; height: calc(100% + 4px) !important; z-index: -1 !important; animation: a 10s linear infinite !important;}
+
+        @property --a{ syntax: '<angle>'; inherits: false; initial-value: 0deg;}
+
+        @keyframes a{
+            from {
+            --a:0deg;
+            }
+            to {
+            --a:360deg;
+            }
         }
+        ` : ''}
+        </style>
+    `;
 
-        if (!config.enabled) return;
-
-        const gradientColorsStr = config.gradientColors.join(', ');
-
-const borderColor = config.borderEnabled ? config.borderColor : '#ffffff';
-const glowColor = config.glowEnabled ? config.glowColor : '#e0e0e0';
-const textColor = config.textEnabled ? config.textColor : '#ffffff';
-const damageColor = config.damageEnabled ? config.damageColor : '#cccccc';
-const legendaryNameColor = config.legendaryNameEnabled ? config.legendaryNameColor : '#ff6b35';
-const legendaryLabelColor = config.legendaryLabelEnabled ? config.legendaryLabelColor : '#ffffff';
-const legbonColor = config.legbonEnabled ? config.legbonColor : '#00ff88';
-const upgradeBonusColor = config.upgradeBonusEnabled ? config.upgradeBonusColor : '#4CAF50';
-
-const fontFamily = fontPresets[config.selectedFont] || '';
-const fontFamilyCSS = fontFamily ? `font-family: ${fontFamily} !important;` : '';
-
-        const tooltipStyles = `
-            <style id="custom-tooltips-style">
-
-            /*ANIMOWANE-TIPY*/
-            .item-type{text-align:center;}
-            .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
-            .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500;}
-            .tip-wrapper .content {padding: 5px;background: rgba(15, 15, 15,.85);word-break: break-word; ${fontFamilyCSS}}
-            .tip-wrapper[data-type=t_item] .item-head {border:1px solid #1e1e1e66;border-radius: 2px; background: hsl(0deg 0% 4.87% / 10%);}
-            .tip-wrapper[data-type=t_item] .item-head .cl-icon {border: 1px solid rgba(15, 15, 15,.3);}
-            .tip-wrapper[data-type=t_item] .item-tip-section {border-bottom: 1px solid rgba(15, 15, 15,.5);}
-            .tip-wrapper .content .info-wrapper .nick {color:#79e1c5; font-family: Cinzel; font-size: 11px; text-shadow: 0 0 4px black; border: 1px solid ${borderColor};border-radius: 2px;background: ${borderColor}20;}
-            .tip-wrapper[data-type=t_other] .line {border-bottom:1px solid ${borderColor}; background: none;}
-            .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important; !important;}
-            .tip-wrapper[data-type=t_item] .item-head .legendary {color: ${legendaryLabelColor} !important; text-align: center; font-size: 13px; font-weight: 700; text-shadow: 1px 1px ${legendaryLabelColor}42;}
-            .tip-wrapper[data-type=t_item] .item-tip-section .legendary {color: ${legendaryNameColor} !important; text-align: center; font-size: 13px; font-weight: 700; text-shadow: 1px 1px ${legendaryNameColor}42;}
-            .tip-wrapper[data-type=t_item] .tip-item-stat-legbon {color: ${legbonColor} !important; font-weight: 600;}
-            .tip-wrapper[data-type=t_item] .tip-item-stat-bonus {color: ${upgradeBonusColor} !important; font-weight: 600;}
-            .tip-wrapper[data-type=t_item] .item-head .item-type{padding-left: 48px !important; margin-left: 0px !important;}
-            .tip-wrapper.normal-tip .damage, .tip-wrapper.sticky-tip .damage {color: ${damageColor} !important;font-weight: 999;}
-            .tip-wrapper[data-type=t_item] .item-tip-section.s-7{color: white; font-weight: 700;}
-            .tip-wrapper[data-type=t_item] i.looter{color: ${textColor} !important;text-align: center;}
-            .tip-wrapper[data-type=t_item] .item-tip-section.s-5{color: ${textColor} !important;text-align: center;font-weight: 600;}
-            .tip-wrapper[data-item-type=t-upgraded], .tip-wrapper[data-item-type=upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #111911, 0 0 0 3px #2b2727, 0 0 0 4px #59595a, 0 0 0 5px ${textColor}, 0 0 0 6px #5a585b, 0 0 0 7px #2c2625;}
-            .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{color: ${textColor};}
-            .tip-wrapper[data-type=t_item] .prc-icon{width:0px; height:0px !important;}
-            .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .value-item{color:white; font-size:10px;}
-            .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .lvl-next{float:none;}
-            .tip-wrapper[data-type=t_other] .clan-in-tip{color:#d5d5d5;}
-            .tip-wrapper .content .info-wrapper .nick{color:#d5d5d5;}
-            .tip-wrapper normal-tip{box-shadow: ${glowColor} 0px 0px 0px 5px;}
-            .item-tip-section.s-4>span {color: ${textColor} !important; font-weight: bold;}
-            .tip-wrapper[data-item-type=heroic], .tip-wrapper[data-item-type=t-her]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #00000000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
-            .tip-wrapper[data-item-type=t-uniupg]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px rgb(0 0 0 / 0%), 0 0 0 4px #5a595900, 0 0 0 5px #00ff0000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
-            .tip-wrapper[data-item-type=t-upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #00ff0000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
-            .tip-wrapper[data-item-type=normal], .tip-wrapper[data-item-type=t-norm]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px ${borderColor}fa, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #07a19d00, 0 0 0 6px #5a585b00, 0 0 0 7px rgb(44 38 37 / 0%), 0px 1px 5px 4px ${glowColor}70 !important;}
-            .tip-wrapper[data-type=t_item] .item-head .heroic, .tip-wrapper[data-type=t_item] .item-tip-section .heroic{font-weight: 700;}
-            .tip-wrapper[data-type=t_item] .item-head .unique, .tip-wrapper[data-type=t_item] .item-tip-section .unique{font-weight: 700;}
-            .tip-wrapper[data-type=t_item] .item-head .common, .tip-wrapper[data-type=t_item] .item-tip-section .common{font-weight: 700;}
-            .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{font-weight: 700;}
-            .tip-wrapper[data-type=t_item] .item-expired{font-size: 7px !important;}
-            .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 5px 4px;}
-            .tip-wrapper.own{color: #ffffff; box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500;}
-            .tip-wrapper[data-type=t_item] .item-expired{display:block !important;}
-            .item-tip-section.s-1.no-border {text-align: center;}
-            .item-tip-section.s-3 {text-align: center;}
-            .item-tip-section.s-2.no-border {text-align: center;}
-
-/*lega tip*/
-${config.gradientEnabled ? `
-.tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]{--a:0deg; background: linear-gradient(var(--a), #000, #272727); box-shadow: inset 100px 100px 100px 184px #0000007a;}
-
-.tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:before, .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:after {content: ''; position: absolute; left: -2px; top: -2px; background: linear-gradient(var(--a), ${gradientColorsStr}); background-size: 400%; width: calc(100% + 4px); height: calc(100% + 4px); z-index: -1; animation: a 10s linear infinite;}
-
-@property --a{ syntax: '<angle>'; inherits: false; initial-value: 0deg;}
-
-@keyframes a{
-    from {
-    --a:0deg;
-    }
-    to {
-    --a:360deg;
-    }
+    $('body').append(tooltipStyles);
 }
-` : ''}
-            </style>
-        `;
-
-        $('body').append(tooltipStyles);
-    }
 
 function showSettingsDialog() {
     const existingModal = document.querySelector('.custom-tooltips-modal');
