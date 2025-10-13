@@ -443,38 +443,22 @@
         settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
     }
 
-    // Integracja z managerem
-    function integrateWithAddonManager() {
-        // Czekaj na załadowanie managera i dodatku
-        const checkForManager = setInterval(() => {
-            const addonContainer = document.getElementById('addon-shop_hotkey');
-            if (!addonContainer) return;
+// Integracja z managerem
+function integrateWithAddonManager() {
+    const addonContainer = document.getElementById('addon-shop_hotkey');
+    if (!addonContainer) return;
 
-            // Sprawdź czy przycisk już istnieje
-            if (addonContainer.querySelector('#shop-hotkey-settings-btn')) {
-                clearInterval(checkForManager);
-                return;
-            }
-
-            // Szukaj kontenera z nazwą dodatku
-            const addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
-            if (addonNameContainer) {
-                addManagerSettingsButton(addonNameContainer);
-                clearInterval(checkForManager);
-            }
-        }, 500);
-
-        // Timeout po 30 sekundach
-        setTimeout(() => {
-            clearInterval(checkForManager);
-            console.warn('Shop Hotkey: Nie znaleziono managera dodatków');
-        }, 30000);
+    // Sprawdź czy przycisk już istnieje
+    if (addonContainer.querySelector('#shop-hotkey-settings-btn')) {
+        return;
     }
 
-    // Sprawdzenie czy jesteśmy w sklepie
-    function isInShop() {
-        return document.querySelector('.shop-content') !== null;
+    // Szukaj kontenera z nazwą dodatku
+    const addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
+    if (addonNameContainer) {
+        addManagerSettingsButton(addonNameContainer);
     }
+}
 
     // Kliknięcie przycisku torby
     function clickQuickSellButton(buttonNumber) {
