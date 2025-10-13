@@ -120,6 +120,8 @@ let config = {
     legbonEnabled: localStorage.getItem('customTooltipsLegbonEnabled') !== 'false',
     upgradeBonusColor: localStorage.getItem('customTooltipsUpgradeBonusColor') || '#4CAF50',
     upgradeBonusEnabled: localStorage.getItem('customTooltipsUpgradeBonusEnabled') !== 'false',
+    itemDescColor: localStorage.getItem('customTooltipsItemDescColor') || '#cccccc',
+    itemDescEnabled: localStorage.getItem('customTooltipsItemDescEnabled') !== 'false',
     selectedFont: localStorage.getItem('customTooltipsSelectedFont') || 'Domyślna'
 };
 
@@ -143,6 +145,8 @@ function saveConfig() {
     localStorage.setItem('customTooltipsLegbonEnabled', config.legbonEnabled.toString());
     localStorage.setItem('customTooltipsUpgradeBonusColor', config.upgradeBonusColor);
     localStorage.setItem('customTooltipsUpgradeBonusEnabled', config.upgradeBonusEnabled.toString());
+    localStorage.setItem('customTooltipsItemDescColor', config.itemDescColor);
+    localStorage.setItem('customTooltipsItemDescEnabled', config.itemDescEnabled.toString());
     localStorage.setItem('customTooltipsSelectedFont', config.selectedFont);
 }
 
@@ -168,6 +172,8 @@ function saveConfig() {
         legbonEnabled: config.legbonEnabled,
         upgradeBonusColor: config.upgradeBonusColor,
         upgradeBonusEnabled: config.upgradeBonusEnabled,
+        itemDescColor: config.itemDescColor,
+        itemDescEnabled: config.itemDescEnabled,
         selectedFont: config.selectedFont
     }
 };
@@ -355,6 +361,13 @@ if (typeof data.settings.upgradeBonusEnabled === 'boolean') {
 
 if (typeof data.settings.selectedFont === 'string' && fontPresets[data.settings.selectedFont]) {
     config.selectedFont = data.settings.selectedFont;
+}
+
+if (data.settings.itemDescColor && hexRegex.test(data.settings.itemDescColor)) {
+    config.itemDescColor = data.settings.itemDescColor;
+}
+if (typeof data.settings.itemDescEnabled === 'boolean') {
+    config.itemDescEnabled = data.settings.itemDescEnabled;
 }
 
             saveConfig();
@@ -781,6 +794,8 @@ function applyTooltipStyles() {
     const legendaryLabelColor = config.legendaryLabelEnabled ? config.legendaryLabelColor : '#ffffff';
     const legbonColor = config.legbonEnabled ? config.legbonColor : '#00ff88';
     const upgradeBonusColor = config.upgradeBonusEnabled ? config.upgradeBonusColor : '#4CAF50';
+    const itemDescColor = config.itemDescEnabled ? config.itemDescColor : '#cccccc';
+
 
     const fontFamily = fontPresets[config.selectedFont] || '';
     const fontFamilyCSS = fontFamily ? `font-family: ${fontFamily} !important;` : '';
@@ -803,6 +818,7 @@ function applyTooltipStyles() {
         .tip-wrapper[data-type=t_item] .item-tip-section .legendary {color: ${legendaryNameColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryNameColor}42 !important;}
         .tip-wrapper[data-type=t_item] .tip-item-stat-legbon {color: ${legbonColor} !important; font-weight: 600 !important;}
         .tip-wrapper[data-type=t_item] .tip-item-stat-bonus {color: ${upgradeBonusColor} !important; font-weight: 600 !important;}
+        .tip-wrapper[data-type=t_item] .tip-item-stat-opis {color: ${itemDescColor} !important;}
         .tip-wrapper[data-type=t_item] .item-head .item-type{padding-left: 48px !important; margin-left: 0px !important;}
         .tip-wrapper.normal-tip .damage, .tip-wrapper.sticky-tip .damage {color: ${damageColor} !important; font-weight: 999 !important;}
         .tip-wrapper[data-type=t_item] .item-tip-section.s-7{color: white !important; font-weight: 700 !important;}
@@ -966,6 +982,17 @@ function showSettingsDialog() {
     </div>
     <div class="tooltip-setting-description">Kolor wzmocnienia przedmiotu (działa tylko na przedmiotach ulepszonych na+5!)</div>
 </div>
+<div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">
+        <input type="checkbox" class="tooltip-checkbox" id="item-desc-enabled" ${config.itemDescEnabled ? 'checked' : ''}>
+        Kolor opisów przedmiotów
+    </label>
+    <div class="tooltip-color-input-wrapper">
+        <input type="text" class="tooltip-color-input" id="item-desc-color-text" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
+        <input type="color" class="tooltip-color-picker" id="item-desc-color" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
+    </div>
+    <div class="tooltip-setting-description">Kolor opisów lore przedmiotów (długie teksty opisowe)</div>
+</div>
 
                 <div class="tooltip-setting-group">
     <label class="tooltip-setting-label">
@@ -1059,9 +1086,10 @@ function showSettingsDialog() {
         setupCheckboxToggle('text-enabled', 'text-color-text', 'text-color', 'textEnabled');
         setupCheckboxToggle('damage-enabled', 'damage-color-text', 'damage-color', 'damageEnabled');
         setupCheckboxToggle('legendary-label-enabled', 'legendary-label-color-text', 'legendary-label-color', 'legendaryLabelEnabled');
-setupCheckboxToggle('legendary-name-enabled', 'legendary-name-color-text', 'legendary-name-color', 'legendaryNameEnabled');
-setupCheckboxToggle('legbon-enabled', 'legbon-color-text', 'legbon-color', 'legbonEnabled');
-setupCheckboxToggle('upgrade-bonus-enabled', 'upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusEnabled');
+        setupCheckboxToggle('legendary-name-enabled', 'legendary-name-color-text', 'legendary-name-color', 'legendaryNameEnabled');
+        setupCheckboxToggle('legbon-enabled', 'legbon-color-text', 'legbon-color', 'legbonEnabled');
+        setupCheckboxToggle('upgrade-bonus-enabled', 'upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusEnabled');
+        setupCheckboxToggle('item-desc-enabled', 'item-desc-color-text', 'item-desc-color', 'itemDescEnabled');
 
 // Gradient checkbox
 document.getElementById('gradient-enabled').addEventListener('change', (e) => {
@@ -1093,9 +1121,10 @@ document.getElementById('gradient-enabled').addEventListener('change', (e) => {
         setupColorSync('text-color-text', 'text-color', 'textColor');
         setupColorSync('damage-color-text', 'damage-color', 'damageColor');
         setupColorSync('legendary-label-color-text', 'legendary-label-color', 'legendaryLabelColor');
-setupColorSync('legendary-name-color-text', 'legendary-name-color', 'legendaryNameColor');
-setupColorSync('legbon-color-text', 'legbon-color', 'legbonColor');
-setupColorSync('upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusColor');
+        setupColorSync('legendary-name-color-text', 'legendary-name-color', 'legendaryNameColor');
+        setupColorSync('legbon-color-text', 'legbon-color', 'legbonColor');
+        setupColorSync('upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusColor');
+        setupColorSync('item-desc-color-text', 'item-desc-color', 'itemDescColor');
 
         // Gradient colors
         document.querySelectorAll('.gradient-color-text').forEach(input => {
@@ -1167,6 +1196,8 @@ config.legbonColor = '#00ff88';
 config.legbonEnabled = true;
 config.upgradeBonusColor = '#4CAF50';
 config.upgradeBonusEnabled = true;
+config.itemDescColor = '#cccccc';
+config.itemDescEnabled = true;
 config.selectedFont = 'Domyślna';
 
             // Odśwież interfejs
@@ -1216,7 +1247,12 @@ document.getElementById('upgrade-bonus-color-text').value = config.upgradeBonusC
 document.getElementById('upgrade-bonus-color').value = config.upgradeBonusColor;
 document.getElementById('upgrade-bonus-enabled').checked = true;
 
+document.getElementById('item-desc-color-text').value = config.itemDescColor;
+document.getElementById('item-desc-color').value = config.itemDescColor;
+document.getElementById('item-desc-enabled').checked = true;
+
 document.getElementById('gradient-enabled').checked = true;
+
             document.getElementById('font-select').value = 'Domyślna';
 
             showNotification('Ustawienia zresetowane do domyślnych (białe)', 'info');
