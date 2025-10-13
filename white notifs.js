@@ -166,7 +166,6 @@ function generateCSS() {
         }
     `;
     
-}
 
     if (config.bigMessages.enabled) {
         if (config.bigMessages.rgbEffect) {
