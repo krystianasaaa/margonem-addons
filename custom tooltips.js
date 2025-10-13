@@ -109,8 +109,6 @@ let config = {
     textEnabled: localStorage.getItem('customTooltipsTextEnabled') !== 'false',
     damageColor: localStorage.getItem('customTooltipsDamageColor') || '#cccccc',
     damageEnabled: localStorage.getItem('customTooltipsDamageEnabled') !== 'false',
-    bonusColor: localStorage.getItem('customTooltipsBonusColor') || '#ffd700',
-    bonusEnabled: localStorage.getItem('customTooltipsBonusEnabled') !== 'false',
     gradientColors: JSON.parse(localStorage.getItem('customTooltipsGradientColors') ||
         '["#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8", "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"]'),
     gradientEnabled: localStorage.getItem('customTooltipsGradientEnabled') !== 'false',
@@ -135,8 +133,6 @@ function saveConfig() {
     localStorage.setItem('customTooltipsTextEnabled', config.textEnabled.toString());
     localStorage.setItem('customTooltipsDamageColor', config.damageColor);
     localStorage.setItem('customTooltipsDamageEnabled', config.damageEnabled.toString());
-    localStorage.setItem('customTooltipsBonusColor', config.bonusColor);
-    localStorage.setItem('customTooltipsBonusEnabled', config.bonusEnabled.toString());
     localStorage.setItem('customTooltipsGradientColors', JSON.stringify(config.gradientColors));
     localStorage.setItem('customTooltipsGradientEnabled', config.gradientEnabled.toString());
     localStorage.setItem('customTooltipsLegendaryNameColor', config.legendaryNameColor);
@@ -162,8 +158,6 @@ function saveConfig() {
         textEnabled: config.textEnabled,
         damageColor: config.damageColor,
         damageEnabled: config.damageEnabled,
-        bonusColor: config.bonusColor,
-        bonusEnabled: config.bonusEnabled,
         gradientColors: config.gradientColors,
         gradientEnabled: config.gradientEnabled,
         legendaryNameColor: config.legendaryNameColor,
@@ -319,12 +313,6 @@ if (data.settings.damageColor && hexRegex.test(data.settings.damageColor)) {
 }
 if (typeof data.settings.damageEnabled === 'boolean') {
     config.damageEnabled = data.settings.damageEnabled;
-}
-if (data.settings.bonusColor && hexRegex.test(data.settings.bonusColor)) {
-    config.bonusColor = data.settings.bonusColor;
-}
-if (typeof data.settings.bonusEnabled === 'boolean') {
-    config.bonusEnabled = data.settings.bonusEnabled;
 }
 
 if (Array.isArray(data.settings.gradientColors) && data.settings.gradientColors.length === 10) {
@@ -787,7 +775,6 @@ const borderColor = config.borderEnabled ? config.borderColor : '#ffffff';
 const glowColor = config.glowEnabled ? config.glowColor : '#e0e0e0';
 const textColor = config.textEnabled ? config.textColor : '#ffffff';
 const damageColor = config.damageEnabled ? config.damageColor : '#cccccc';
-const bonusColor = config.bonusEnabled ? config.bonusColor : '#ffd700';
 const legendaryNameColor = config.legendaryNameEnabled ? config.legendaryNameColor : '#ff6b35';
 const legendaryLabelColor = config.legendaryLabelEnabled ? config.legendaryLabelColor : '#ffffff';
 const legbonColor = config.legbonEnabled ? config.legbonColor : '#00ff88';
@@ -824,7 +811,6 @@ const fontFamilyCSS = fontFamily ? `font-family: ${fontFamily} !important;` : ''
             .tip-wrapper[data-type=t_item] .prc-icon{width:0px; height:0px !important;}
             .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .value-item{color:white; font-size:10px;}
             .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .lvl-next{float:none;}
-            .tip-wrapper[data-type=t_item] .item-tip-section .green{font-size:8px; color: ${bonusColor} !important;}
             .tip-wrapper[data-type=t_other] .clan-in-tip{color:#d5d5d5;}
             .tip-wrapper .content .info-wrapper .nick{color:#d5d5d5;}
             .tip-wrapper normal-tip{box-shadow: ${glowColor} 0px 0px 0px 5px;}
@@ -931,18 +917,6 @@ function showSettingsDialog() {
                         <input type="color" class="tooltip-color-picker" id="damage-color" value="${config.damageColor}" ${!config.damageEnabled ? 'disabled' : ''}>
                     </div>
                     <div class="tooltip-setting-description">Kolor statystyk na przedmiotach</div>
-                </div>
-
-                <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">
-                        <input type="checkbox" class="tooltip-checkbox" id="bonus-enabled" ${config.bonusEnabled ? 'checked' : ''}>
-                        Kolor bonusu legendarnego
-                    </label>
-                    <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="bonus-color-text" value="${config.bonusColor}" ${!config.bonusEnabled ? 'disabled' : ''}>
-                        <input type="color" class="tooltip-color-picker" id="bonus-color" value="${config.bonusColor}" ${!config.bonusEnabled ? 'disabled' : ''}>
-                    </div>
-                    <div class="tooltip-setting-description">Kolor bonusów na legendarnych przedmiotach</div>
                 </div>
                 <div class="tooltip-setting-group">
     <label class="tooltip-setting-label">
@@ -1083,7 +1057,6 @@ function showSettingsDialog() {
         setupCheckboxToggle('glow-enabled', 'glow-color-text', 'glow-color', 'glowEnabled');
         setupCheckboxToggle('text-enabled', 'text-color-text', 'text-color', 'textEnabled');
         setupCheckboxToggle('damage-enabled', 'damage-color-text', 'damage-color', 'damageEnabled');
-        setupCheckboxToggle('bonus-enabled', 'bonus-color-text', 'bonus-color', 'bonusEnabled');
         setupCheckboxToggle('legendary-label-enabled', 'legendary-label-color-text', 'legendary-label-color', 'legendaryLabelEnabled');
 setupCheckboxToggle('legendary-name-enabled', 'legendary-name-color-text', 'legendary-name-color', 'legendaryNameEnabled');
 setupCheckboxToggle('legbon-enabled', 'legbon-color-text', 'legbon-color', 'legbonEnabled');
@@ -1118,7 +1091,6 @@ document.getElementById('gradient-enabled').addEventListener('change', (e) => {
         setupColorSync('glow-color-text', 'glow-color', 'glowColor');
         setupColorSync('text-color-text', 'text-color', 'textColor');
         setupColorSync('damage-color-text', 'damage-color', 'damageColor');
-        setupColorSync('bonus-color-text', 'bonus-color', 'bonusColor');
         setupColorSync('legendary-label-color-text', 'legendary-label-color', 'legendaryLabelColor');
 setupColorSync('legendary-name-color-text', 'legendary-name-color', 'legendaryNameColor');
 setupColorSync('legbon-color-text', 'legbon-color', 'legbonColor');
@@ -1181,8 +1153,6 @@ config.textColor = '#ffffff';
 config.textEnabled = true;
 config.damageColor = '#cccccc';
 config.damageEnabled = true;
-config.bonusColor = '#ffd700';
-config.bonusEnabled = true;
 config.gradientColors = [
     "#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8",
     "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"
@@ -1222,12 +1192,6 @@ config.selectedFont = 'Domyślna';
             document.getElementById('damage-enabled').checked = true;
             document.getElementById('damage-color-text').disabled = false;
             document.getElementById('damage-color').disabled = false;
-
-            document.getElementById('bonus-color-text').value = config.bonusColor;
-            document.getElementById('bonus-color').value = config.bonusColor;
-            document.getElementById('bonus-enabled').checked = true;
-            document.getElementById('bonus-color-text').disabled = false;
-            document.getElementById('bonus-color').disabled = false;
 
             document.querySelectorAll('.gradient-color-text').forEach((input, index) => {
                 input.value = config.gradientColors[index];
