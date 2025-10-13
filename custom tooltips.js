@@ -836,7 +836,7 @@ function applyTooltipStyles() {
         ${config.gradientEnabled ? `
         .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]{--a:0deg; background: linear-gradient(var(--a), #000, #272727) !important; box-shadow: inset 100px 100px 100px 184px #0000007a !important;}
 
-        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:before, .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:after {content: '' !important; position: absolute !important; left: -2px !important; top: -2px !important; background: linear-gradient(var(--a), ${gradientColorsStr}) !important; background-size: 400% !important; width: calc(100% + 4px) !important; height: calc(100% + 4px) !important; z-index: -1 !important; animation: a 10s linear infinite !important;}
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:before, .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:after {content: '' !important; position: absolute !important; left: -2px !important; top: -2px !important; background: linear-gradient(var(--a), ${gradientColorsStr}) !important; background-size: 400% !important; width: calc(100% + 4px) !important; height: calc(100% + 4px) !important; z-index: -1 !important; animation: a 7s linear infinite !important;}
 
         @property --a{ syntax: '<angle>'; inherits: false; initial-value: 0deg;}
 
