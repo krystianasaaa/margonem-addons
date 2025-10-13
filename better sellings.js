@@ -32,7 +32,7 @@
                 delay: parseInt(localStorage.getItem('shopHotkey_delay')) || defaultSettings.delay
             };
         } catch (error) {
-            console.error('Shop Hotkey: Błąd ładowania ustawień:', error);
+            console.error('otkey: Błąd ładowania ustawień:', error);
             settings = {...defaultSettings};
         }
     }
@@ -47,7 +47,7 @@
             localStorage.setItem('shopHotkey_mode', settings.mode);
             localStorage.setItem('shopHotkey_delay', settings.delay.toString());
         } catch (error) {
-            console.error('Shop Hotkey: Błąd zapisywania ustawień:', error);
+            console.error('otkey: Błąd zapisywania ustawień:', error);
         }
     }
 
@@ -109,7 +109,7 @@
                 background: #333;
                 border-radius: 4px 4px 0 0;
             ">
-                ⚙️ Shop Hotkey - Settings
+                 Shop Hotkey - Settings
             </div>
 
             <div style="padding: 15px; max-height: calc(80vh - 60px); overflow-y: auto;">
