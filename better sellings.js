@@ -443,41 +443,37 @@
         settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
     }
 
-// Integracja z managerem
-function integrateWithAddonManager() {
-    // Sprawdź czy już jest
-    const tryAddButton = () => {
-        const addonContainer = document.getElementById('addon-shop_hotkey');
-        if (!addonContainer) return false;
+    function integrateWithAddonManager() {
+        // Czekaj na załadowanie managera i dodatku
+        const checkForManager = setInterval(() => {
+            const addonContainer = document.getElementById('addon-shop_hotkey');
+            if (!addonContainer) return;
 
-        if (addonContainer.querySelector('#shop-hotkey-settings-btn')) {
-            return true;
-        }
+            // Sprawdź czy przycisk już istnieje
+            if (addonContainer.querySelector('#shop-hotkey-settings-btn')) {
+                clearInterval(checkForManager);
+                return;
+            }
 
-        const addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
-        if (addonNameContainer) {
-            addManagerSettingsButton(addonNameContainer);
-            return true;
-        }
-        
-        return false;
-    };
+            // Szukaj kontenera z nazwą dodatku
+            const addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
+            if (addonNameContainer) {
+                addManagerSettingsButton(addonNameContainer);
+                clearInterval(checkForManager);
+            }
+        }, 500);
 
-    // Spróbuj od razu
-    if (tryAddButton()) return;
+        // Timeout po 30 sekundach
+        setTimeout(() => {
+            clearInterval(checkForManager);
+            console.warn('Shop Hotkey: Nie znaleziono managera dodatków');
+        }, 30000);
+    }
 
-    // Obserwuj zmiany w DOM
-    const observer = new MutationObserver(() => {
-        if (tryAddButton()) {
-            observer.disconnect();
-        }
-    });
-
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-}
+    // Sprawdzenie czy jesteśmy w sklepie
+    function isInShop() {
+        return document.querySelector('.shop-content') !== null;
+    }
 
     // Kliknięcie przycisku torby
     function clickQuickSellButton(buttonNumber) {
