@@ -109,6 +109,7 @@ let config = {
     textEnabled: localStorage.getItem('customTooltipsTextEnabled') !== 'false',
     damageColor: localStorage.getItem('customTooltipsDamageColor') || '#cccccc',
     damageEnabled: localStorage.getItem('customTooltipsDamageEnabled') !== 'false',
+    legendaryAnimation: localStorage.getItem('customTooltipsLegendaryAnimation') || 'gradient',
     gradientColors: JSON.parse(localStorage.getItem('customTooltipsGradientColors') ||
         '["#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8", "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"]'),
     gradientEnabled: localStorage.getItem('customTooltipsGradientEnabled') !== 'false',
@@ -135,6 +136,7 @@ function saveConfig() {
     localStorage.setItem('customTooltipsTextEnabled', config.textEnabled.toString());
     localStorage.setItem('customTooltipsDamageColor', config.damageColor);
     localStorage.setItem('customTooltipsDamageEnabled', config.damageEnabled.toString());
+    localStorage.setItem('customTooltipsLegendaryAnimation', config.legendaryAnimation);
     localStorage.setItem('customTooltipsGradientColors', JSON.stringify(config.gradientColors));
     localStorage.setItem('customTooltipsGradientEnabled', config.gradientEnabled.toString());
     localStorage.setItem('customTooltipsLegendaryNameColor', config.legendaryNameColor);
@@ -162,6 +164,7 @@ function saveConfig() {
         textEnabled: config.textEnabled,
         damageColor: config.damageColor,
         damageEnabled: config.damageEnabled,
+        legendaryAnimation: config.legendaryAnimation,
         gradientColors: config.gradientColors,
         gradientEnabled: config.gradientEnabled,
         legendaryNameColor: config.legendaryNameColor,
@@ -319,6 +322,10 @@ if (data.settings.damageColor && hexRegex.test(data.settings.damageColor)) {
 }
 if (typeof data.settings.damageEnabled === 'boolean') {
     config.damageEnabled = data.settings.damageEnabled;
+}
+const validAnimations = ['gradient', 'wave', 'pulse', 'slide', 'glow', 'spin'];
+if (data.settings.legendaryAnimation && validAnimations.includes(data.settings.legendaryAnimation)) {
+    config.legendaryAnimation = data.settings.legendaryAnimation;
 }
 
 if (Array.isArray(data.settings.gradientColors) && data.settings.gradientColors.length === 10) {
@@ -774,7 +781,7 @@ const styles = `
 }
 `;
 
-// Znajdź tę funkcję w swoim skrypcie i zastąp ją tą wersją:
+
 
 function applyTooltipStyles() {
     const existingStyle = document.getElementById('custom-tooltips-style');
@@ -785,7 +792,6 @@ function applyTooltipStyles() {
     if (!config.enabled) return;
 
     const gradientColorsStr = config.gradientColors.join(', ');
-
     const borderColor = config.borderEnabled ? config.borderColor : '#ffffff';
     const glowColor = config.glowEnabled ? config.glowColor : '#e0e0e0';
     const textColor = config.textEnabled ? config.textColor : '#ffffff';
@@ -795,14 +801,190 @@ function applyTooltipStyles() {
     const legbonColor = config.legbonEnabled ? config.legbonColor : '#00ff88';
     const upgradeBonusColor = config.upgradeBonusEnabled ? config.upgradeBonusColor : '#4CAF50';
     const itemDescColor = config.itemDescEnabled ? config.itemDescColor : '#cccccc';
-
-
     const fontFamily = fontPresets[config.selectedFont] || '';
     const fontFamilyCSS = fontFamily ? `font-family: ${fontFamily} !important;` : '';
 
+    // ANIMACJE LEGENDARNE
+    let legendaryAnimationCSS = '';
+
+        if (config.gradientEnabled) {
+        switch(config.legendaryAnimation) {
+            case 'gradient':
+                // Oryginalny obracający się gradient
+                legendaryAnimationCSS = `
+                    .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+                        --a: 0deg;
+                        background: linear-gradient(var(--a), #000, #272727) !important;
+                        box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+                    }
+                    .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before,
+                    .tip-wrapper[data-item-type=legendary]:after, .tip-wrapper[data-item-type=t-leg]:after {
+                        content: '' !important;
+                        position: absolute !important;
+                        left: -2px !important;
+                        top: -2px !important;
+                        background: linear-gradient(var(--a), ${gradientColorsStr}) !important;
+                        background-size: 400% !important;
+                        width: calc(100% + 4px) !important;
+                        height: calc(100% + 4px) !important;
+                        z-index: -1 !important;
+                        animation: legGradientRotate 7s linear infinite !important;
+                    }
+                    @property --a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+                    @keyframes legGradientRotate {
+                        from { --a: 0deg; }
+                        to { --a: 360deg; }
+                    }
+                `;
+                break;
+
+            case 'wave':
+                // Fala przechodząca z góry na dół
+                legendaryAnimationCSS = `
+                    .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+                        background: linear-gradient(0deg, #000, #272727) !important;
+                        box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+                        overflow: hidden !important;
+                    }
+                    .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+                        content: '' !important;
+                        position: absolute !important;
+                        left: -2px !important;
+                        top: -2px !important;
+                        width: calc(100% + 4px) !important;
+                        height: calc(300% + 4px) !important;
+                        background: linear-gradient(180deg, ${gradientColorsStr}, ${gradientColorsStr}, ${gradientColorsStr}) !important;
+                        z-index: -1 !important;
+                        animation: legWave 6s linear infinite !important;
+                    }
+                    @keyframes legWave {
+                        0% { transform: translateY(-66.666%); }
+                        100% { transform: translateY(0%); }
+                    }
+                `;
+                break;
+
+            case 'pulse':
+                // Pulsowanie kolorów
+                legendaryAnimationCSS = `
+                    .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+                        --pulse-index: 0;
+                        background: #000 !important;
+                        box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+                    }
+                    .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+                        content: '' !important;
+                        position: absolute !important;
+                        left: -2px !important;
+                        top: -2px !important;
+                        width: calc(100% + 4px) !important;
+                        height: calc(100% + 4px) !important;
+                        z-index: -1 !important;
+                        animation: legPulse 10s linear infinite !important;
+                    }
+                    @keyframes legPulse {
+                        0% { background: ${config.gradientColors[0]}; }
+                        10% { background: ${config.gradientColors[1]}; }
+                        20% { background: ${config.gradientColors[2]}; }
+                        30% { background: ${config.gradientColors[3]}; }
+                        40% { background: ${config.gradientColors[4]}; }
+                        50% { background: ${config.gradientColors[5]}; }
+                        60% { background: ${config.gradientColors[6]}; }
+                        70% { background: ${config.gradientColors[7]}; }
+                        80% { background: ${config.gradientColors[8]}; }
+                        90% { background: ${config.gradientColors[9]}; }
+                        100% { background: ${config.gradientColors[0]}; }
+                    }
+                `;
+                break;
+
+            case 'slide':
+                // Przesuwanie gradientu poziomo
+                legendaryAnimationCSS = `
+                    .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+                        background: #000 !important;
+                        box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+                        overflow: hidden !important;
+                    }
+                    .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+                        content: '' !important;
+                        position: absolute !important;
+                        left: -2px !important;
+                        top: -2px !important;
+                        width: calc(200% + 4px) !important;
+                        height: calc(100% + 4px) !important;
+                        background: linear-gradient(90deg, ${gradientColorsStr}, ${gradientColorsStr}) !important;
+                        z-index: -1 !important;
+                        animation: legSlide 8s linear infinite !important;
+                    }
+                    @keyframes legSlide {
+                        0% { transform: translateX(0%); }
+                        100% { transform: translateX(-50%); }
+                    }
+                `;
+                break;
+
+            case 'glow':
+                // Pulsujące świecenie - POPRAWIONE
+                legendaryAnimationCSS = `
+                    .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+                        background: #000 !important;
+                        animation: legGlowShadow 2s ease-in-out infinite alternate !important;
+                    }
+                    .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+                        content: '' !important;
+                        position: absolute !important;
+                        left: -2px !important;
+                        top: -2px !important;
+                        width: calc(100% + 4px) !important;
+                        height: calc(100% + 4px) !important;
+                        background: linear-gradient(135deg, ${gradientColorsStr}) !important;
+                        z-index: -1 !important;
+                        animation: legGlowOpacity 2s ease-in-out infinite alternate !important;
+                    }
+                    @keyframes legGlowShadow {
+                        0% {
+                            box-shadow: 0 0 10px ${config.gradientColors[0]},
+                                        0 0 20px ${config.gradientColors[2]},
+                                        inset 100px 100px 100px 184px #0000007a;
+                        }
+                        100% {
+                            box-shadow: 0 0 25px ${config.gradientColors[5]},
+                                        0 0 45px ${config.gradientColors[7]},
+                                        inset 100px 100px 100px 184px #0000007a;
+                        }
+                    }
+                    @keyframes legGlowOpacity {
+                        0% { opacity: 0.5; }
+                        100% { opacity: 1; }
+                    }
+                `;
+                break;
+
+            case 'spin':
+                // Statyczny gradient pionowy (bez animacji) - ZMIENIONE
+                legendaryAnimationCSS = `
+                    .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+                        background: #000 !important;
+                        box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+                    }
+                    .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+                        content: '' !important;
+                        position: absolute !important;
+                        left: -2px !important;
+                        top: -2px !important;
+                        width: calc(100% + 4px) !important;
+                        height: calc(100% + 4px) !important;
+                        background: linear-gradient(180deg, ${gradientColorsStr}) !important;
+                        z-index: -1 !important;
+                    }
+                `;
+                break;
+        }
+    }
+
     const tooltipStyles = `
         <style id="custom-tooltips-style">
-
         /*ANIMOWANE-TIPY - WSZYSTKO Z !important*/
         .item-type{text-align:center !important;}
         .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
@@ -848,23 +1030,8 @@ function applyTooltipStyles() {
         .item-tip-section.s-3 {text-align: center !important;}
         .item-tip-section.s-2.no-border {text-align: center !important;}
 
-        /*lega tip*/
-        ${config.gradientEnabled ? `
-        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]{--a:0deg; background: linear-gradient(var(--a), #000, #272727) !important; box-shadow: inset 100px 100px 100px 184px #0000007a !important;}
-
-        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:before, .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:after {content: '' !important; position: absolute !important; left: -2px !important; top: -2px !important; background: linear-gradient(var(--a), ${gradientColorsStr}) !important; background-size: 400% !important; width: calc(100% + 4px) !important; height: calc(100% + 4px) !important; z-index: -1 !important; animation: a 7s linear infinite !important;}
-
-        @property --a{ syntax: '<angle>'; inherits: false; initial-value: 0deg;}
-
-        @keyframes a{
-            from {
-            --a:0deg;
-            }
-            to {
-            --a:360deg;
-            }
-        }
-        ` : ''}
+        /*lega tip - ANIMACJE*/
+        ${legendaryAnimationCSS}
         </style>
     `;
 
@@ -992,6 +1159,40 @@ function showSettingsDialog() {
         <input type="color" class="tooltip-color-picker" id="item-desc-color" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
     </div>
     <div class="tooltip-setting-description">Kolor opisów przedmiotów(w tym eventy itp itd)</div>
+</div>
+<div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">
+        Wybierz animację legendarnych przedmiotów
+    </label>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="gradient" ${config.legendaryAnimation === 'gradient' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Obracający się gradient </span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="wave" ${config.legendaryAnimation === 'wave' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Fala z góry na dół</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="pulse" ${config.legendaryAnimation === 'pulse' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Pulsowanie kolorami</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="slide" ${config.legendaryAnimation === 'slide' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Przesuwanie poziome</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="glow" ${config.legendaryAnimation === 'glow' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Pulsujące świecenie</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="spin" ${config.legendaryAnimation === 'spin' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Gradient bez animacji</span>
+        </label>
+    </div>
+    <div class="tooltip-setting-description" style="margin-top: 8px;">
+        Wybierz typ animacji dla obramowania legendarnych przedmiotów
+    </div>
 </div>
 
                 <div class="tooltip-setting-group">
@@ -1151,6 +1352,11 @@ const fontSelect = document.getElementById('font-select');
 fontSelect.addEventListener('change', (e) => {
     config.selectedFont = e.target.value;
 });
+        document.querySelectorAll('input[name="legendary-animation"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                config.legendaryAnimation = e.target.value;
+            });
+        });
 
         // Zamknij
         document.getElementById('tooltip-close').addEventListener('click', () => {
@@ -1199,6 +1405,7 @@ config.upgradeBonusEnabled = true;
 config.itemDescColor = '#cccccc';
 config.itemDescEnabled = true;
 config.selectedFont = 'Domyślna';
+config.legendaryAnimation = 'gradient';
 
             // Odśwież interfejs
             document.getElementById('border-color-text').value = config.borderColor;
@@ -1253,7 +1460,10 @@ document.getElementById('item-desc-enabled').checked = true;
 
 document.getElementById('gradient-enabled').checked = true;
 
-            document.getElementById('font-select').value = 'Domyślna';
+document.getElementById('font-select').value = 'Domyślna';
+
+document.querySelector('input[name="legendary-animation"][value="gradient"]').checked = true;
+
 
             showNotification('Ustawienia zresetowane do domyślnych (białe)', 'info');
         });
