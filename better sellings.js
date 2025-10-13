@@ -1,13 +1,18 @@
 (function() {
     'use strict';
 
-    
+    // Zabezpieczenie przed wielokrotnym uruchomieniem
+    if (window.shopHotkeyRunning) {
+        return;
+    }
+    window.shopHotkeyRunning = true;
+
     const defaultSettings = {
         key1: 'Digit1',
         key2: 'Digit2',
         key3: 'Digit3',
         acceptKey: 'Enter',
-        mode: 'auto', // 'auto' lub 'manual' gowno
+        mode: 'auto',
         delay: 100
     };
 
@@ -17,24 +22,33 @@
 
     // Ładowanie ustawień
     function loadSettings() {
-        settings = {
-            key1: GM_getValue('key1', defaultSettings.key1),
-            key2: GM_getValue('key2', defaultSettings.key2),
-            key3: GM_getValue('key3', defaultSettings.key3),
-            acceptKey: GM_getValue('acceptKey', defaultSettings.acceptKey),
-            mode: GM_getValue('mode', defaultSettings.mode),
-            delay: GM_getValue('delay', defaultSettings.delay)
-        };
+        try {
+            settings = {
+                key1: localStorage.getItem('shopHotkey_key1') || defaultSettings.key1,
+                key2: localStorage.getItem('shopHotkey_key2') || defaultSettings.key2,
+                key3: localStorage.getItem('shopHotkey_key3') || defaultSettings.key3,
+                acceptKey: localStorage.getItem('shopHotkey_acceptKey') || defaultSettings.acceptKey,
+                mode: localStorage.getItem('shopHotkey_mode') || defaultSettings.mode,
+                delay: parseInt(localStorage.getItem('shopHotkey_delay')) || defaultSettings.delay
+            };
+        } catch (error) {
+            console.error('Shop Hotkey: Błąd ładowania ustawień:', error);
+            settings = {...defaultSettings};
+        }
     }
 
     // Zapisywanie ustawień
     function saveSettings() {
-        GM_setValue('key1', settings.key1);
-        GM_setValue('key2', settings.key2);
-        GM_setValue('key3', settings.key3);
-        GM_setValue('acceptKey', settings.acceptKey);
-        GM_setValue('mode', settings.mode);
-        GM_setValue('delay', settings.delay);
+        try {
+            localStorage.setItem('shopHotkey_key1', settings.key1);
+            localStorage.setItem('shopHotkey_key2', settings.key2);
+            localStorage.setItem('shopHotkey_key3', settings.key3);
+            localStorage.setItem('shopHotkey_acceptKey', settings.acceptKey);
+            localStorage.setItem('shopHotkey_mode', settings.mode);
+            localStorage.setItem('shopHotkey_delay', settings.delay.toString());
+        } catch (error) {
+            console.error('Shop Hotkey: Błąd zapisywania ustawień:', error);
+        }
     }
 
     // Konwersja kodu klawisza na czytelną nazwę
@@ -62,44 +76,55 @@
     // Tworzenie panelu ustawień
     function createSettingsPanel() {
         const panel = document.createElement('div');
-        panel.innerHTML = `
-            <div style="
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(0, 0, 0, 0.92);
-                border: 1px solid #333;
-                border-radius: 8px;
-                padding: 18px;
-                z-index: 999999;
-                color: #ffffff;
-                font-family: Arial, sans-serif;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
-                min-width: 280px;
-                max-width: 320px;
-                backdrop-filter: blur(5px);
-            ">
-                <h4 style="
-                    margin: 0 0 15px 0;
-                    text-align: center;
-                    color: #fff;
-                    font-size: 15px;
-                    font-weight: bold;
-                ">⚙️ Konfiguracja sprzedaży</h4>
+        panel.id = 'shop-hotkey-settings-panel';
+        panel.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 0;
+            z-index: 10000;
+            display: none;
+            min-width: 350px;
+            max-height: 80vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        `;
 
+        panel.innerHTML = `
+            <div id="shop-panel-header" style="
+                color: #fff;
+                font-size: 14px;
+                margin-bottom: 12px;
+                text-align: center;
+                font-weight: bold;
+                padding: 15px 15px 8px 15px;
+                border-bottom: 1px solid #444;
+                cursor: move;
+                user-select: none;
+                background: #333;
+                border-radius: 4px 4px 0 0;
+            ">
+                ⚙️ Shop Hotkey - Settings
+            </div>
+
+            <div style="padding: 15px; max-height: calc(80vh - 60px); overflow-y: auto;">
                 <!-- Wybór trybu -->
-                <div style="margin-bottom: 15px; padding: 10px; background: #111; border-radius: 6px; border: 1px solid #333;">
-                    <div style="margin-bottom: 8px; font-size: 12px; color: #ccc; font-weight: bold;" Tryb pracy:</div>
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(157,78,221,0.1); border: 1px solid #7b2cbf; border-radius: 6px;">
+                    <div style="margin-bottom: 8px; font-size: 12px; color: #ccc; font-weight: bold;">Tryb pracy:</div>
                     <div style="display: flex; gap: 8px;">
-                        <label style="flex: 1; display: flex; align-items: center; cursor: pointer; font-size: 11px;">
-                            <input type="radio" name="mode" value="auto" ${settings.mode === 'auto' ? 'checked' : ''} style="margin-right: 6px;">
-                            <span style="color: #27ae60;"> Auto</span>
-                        </label>
-                        <label style="flex: 1; display: flex; align-items: center; cursor: pointer; font-size: 11px;">
-                            <input type="radio" name="mode" value="manual" ${settings.mode === 'manual' ? 'checked' : ''} style="margin-right: 6px;">
-                            <span style="color: #3498db;"> Manual</span>
-                        </label>
+<label style="flex: 1; display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #ccc;">
+    <input type="radio" name="mode" value="auto" ${settings.mode === 'auto' ? 'checked' : ''} style="margin-right: 6px;">
+    <span style="color: #27ae60;">Auto</span>
+</label>
+<label style="flex: 1; display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #ccc;">
+    <input type="radio" name="mode" value="manual" ${settings.mode === 'manual' ? 'checked' : ''} style="margin-right: 6px;">
+    <span style="color: #3498db;">Manual</span>
+</label>
                     </div>
                     <div style="margin-top: 6px; font-size: 10px; color: #666; line-height: 1.3;">
                         <div id="mode-description">
@@ -194,29 +219,29 @@
                     Kliknij pole i naciśnij klawisz
                 </div>
 
-                <div style="text-align: center; margin-top: 15px;">
-                    <button id="save-settings" style="
+                <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
+                    <button id="close-shop-settings" style="
+                        flex: 1;
+                        padding: 8px 12px;
+                        background: #555;
+                        color: #ccc;
+                        border: none;
+                        border-radius: 3px;
+                        cursor: pointer;
+                        font-size: 11px;
+                    ">Zamknij</button>
+
+                    <button id="save-shop-settings" style="
+                        flex: 1;
+                        padding: 8px 12px;
                         background: #27ae60;
                         color: white;
                         border: none;
-                        padding: 8px 16px;
-                        border-radius: 4px;
-                        margin-right: 8px;
+                        border-radius: 3px;
                         cursor: pointer;
-                        font-size: 12px;
+                        font-size: 11px;
                         font-weight: bold;
-                    ">✓ Zapisz</button>
-
-                    <button id="cancel-settings" style="
-                        background: #e74c3c;
-                        color: white;
-                        border: none;
-                        padding: 8px 16px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-size: 12px;
-                        font-weight: bold;
-                    ">✗ Anuluj</button>
+                    ">Zapisz</button>
                 </div>
             </div>
         `;
@@ -224,86 +249,61 @@
         return panel;
     }
 
-    // Dodanie ikony ustawień do sklepu
-    function addSettingsButton() {
-        if (!isInShop() || document.getElementById('shop-settings-btn')) return;
+    // Dodanie przycisku ustawień do managera
+    function addManagerSettingsButton(container) {
+        const helpIcon = container.querySelector('.kwak-addon-help-icon');
+        if (!helpIcon) return;
 
-        const filtersSection = document.querySelector('.show-items-filter');
-        if (!filtersSection) return;
-
-        const settingsBtn = document.createElement('div');
-        settingsBtn.id = 'shop-settings-btn';
+        const settingsBtn = document.createElement('span');
+        settingsBtn.id = 'shop-hotkey-settings-btn';
+        settingsBtn.innerHTML = '⚙️';
         settingsBtn.style.cssText = `
-position: absolute;
-right: 155px;
-top: 25px;
-width: 28px;
-height: 28px;
-background: #222;
-border: 1px solid #444;
-border-radius: 50%;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 14px;
-color: #fff;
-z-index: 1000;
-transition: all 0.2s ease;
-padding-left: 1px;
-padding-top: 1px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 2px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            display: inline-block;
         `;
 
-        settingsBtn.innerHTML = '⚙️';
+        settingsBtn.onmouseover = () => settingsBtn.style.opacity = '1';
+        settingsBtn.onmouseout = () => settingsBtn.style.opacity = '0.7';
 
-        settingsBtn.addEventListener('mouseenter', () => {
-            settingsBtn.style.transform = 'scale(1.1)';
-            settingsBtn.style.filter = 'brightness(1.2)';
+        helpIcon.insertAdjacentElement('afterend', settingsBtn);
+
+        createSettingsPanelElement();
+
+        settingsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleSettingsPanel();
         });
-
-        settingsBtn.addEventListener('mouseleave', () => {
-            settingsBtn.style.transform = 'scale(1)';
-            settingsBtn.style.filter = 'brightness(1)';
-        });
-
-        settingsBtn.addEventListener('click', showSettings);
-
-        filtersSection.style.position = 'relative';
-        filtersSection.appendChild(settingsBtn);
     }
 
-    // Pokazanie panelu ustawień
-    function showSettings() {
-        if (settingsPanel) return;
+    // Tworzenie elementu panelu ustawień
+    function createSettingsPanelElement() {
+        if (document.getElementById('shop-hotkey-settings-panel')) return;
 
-        isConfiguring = true;
         settingsPanel = createSettingsPanel();
         document.body.appendChild(settingsPanel);
 
+        setupPanelListeners();
+        makePanelDraggable();
+    }
+
+    // Konfiguracja listenerów panelu
+    function setupPanelListeners() {
+        if (!settingsPanel) return;
+
         // Obsługa zmiany trybu
-        const modeRadios = document.querySelectorAll('input[name="mode"]');
+        const modeRadios = settingsPanel.querySelectorAll('input[name="mode"]');
         modeRadios.forEach(radio => {
             radio.addEventListener('change', () => {
                 settings.mode = radio.value;
                 updateModeDisplay();
             });
         });
-
-        function updateModeDisplay() {
-            const acceptRow = document.getElementById('accept-key-row');
-            const delayRow = document.getElementById('delay-row');
-            const modeDesc = document.getElementById('mode-description');
-
-            if (settings.mode === 'auto') {
-                acceptRow.style.display = 'none';
-                delayRow.style.display = 'grid';
-                modeDesc.innerHTML = '• Jeden klawisz wybiera i sprzedaje automatycznie';
-            } else {
-                acceptRow.style.display = 'grid';
-                delayRow.style.display = 'none';
-                modeDesc.innerHTML = '• Klawisz wybiera torbę, Enter akceptuje sprzedaż';
-            }
-        }
 
         // Obsługa wprowadzania klawiszy
         const keyInputs = [
@@ -314,7 +314,7 @@ padding-top: 1px;
         ];
 
         keyInputs.forEach(({ id, setting }) => {
-            const input = document.getElementById(id);
+            const input = settingsPanel.querySelector(`#${id}`);
             if (!input) return;
 
             input.addEventListener('click', () => {
@@ -336,48 +336,139 @@ padding-top: 1px;
         });
 
         // Obsługa pola opóźnienia
-        const delayInput = document.getElementById('delay-input');
+        const delayInput = settingsPanel.querySelector('#delay-input');
         if (delayInput) {
             delayInput.addEventListener('input', () => {
                 settings.delay = parseInt(delayInput.value) || 100;
             });
         }
 
-        // Przyciski zapisz/anuluj
-        document.getElementById('save-settings').addEventListener('click', () => {
+        // Przyciski
+        settingsPanel.querySelector('#save-shop-settings').addEventListener('click', (e) => {
+            e.preventDefault();
             saveSettings();
-            closeSettings();
-            // Odśwież przycisk ustawień
-            const oldBtn = document.getElementById('shop-settings-btn');
-            if (oldBtn) {
-                oldBtn.remove();
-                setTimeout(addSettingsButton, 100);
-            }
+            toggleSettingsPanel();
         });
 
-        document.getElementById('cancel-settings').addEventListener('click', () => {
+        settingsPanel.querySelector('#close-shop-settings').addEventListener('click', (e) => {
+            e.preventDefault();
             loadSettings();
-            closeSettings();
+            toggleSettingsPanel();
         });
 
         // Zamknięcie na ESC
         const escHandler = (e) => {
-            if (e.key === 'Escape') {
+            if (e.key === 'Escape' && settingsPanel.style.display === 'block') {
                 loadSettings();
-                closeSettings();
-                document.removeEventListener('keydown', escHandler);
+                toggleSettingsPanel();
             }
         };
         document.addEventListener('keydown', escHandler);
     }
 
-    // Zamknięcie panelu ustawień
-    function closeSettings() {
-        if (settingsPanel) {
-            settingsPanel.remove();
-            settingsPanel = null;
+    // Funkcja aktualizacji wyświetlania trybu
+    function updateModeDisplay() {
+        if (!settingsPanel) return;
+
+        const acceptRow = settingsPanel.querySelector('#accept-key-row');
+        const delayRow = settingsPanel.querySelector('#delay-row');
+        const modeDesc = settingsPanel.querySelector('#mode-description');
+
+        if (settings.mode === 'auto') {
+            acceptRow.style.display = 'none';
+            delayRow.style.display = 'grid';
+            modeDesc.innerHTML = '• Jeden klawisz wybiera i sprzedaje automatycznie';
+        } else {
+            acceptRow.style.display = 'grid';
+            delayRow.style.display = 'none';
+            modeDesc.innerHTML = '• Klawisz wybiera torbę, Enter akceptuje sprzedaż';
         }
-        isConfiguring = false;
+    }
+
+    // Funkcja przeciągania panelu
+    function makePanelDraggable() {
+        if (!settingsPanel) return;
+
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        const header = settingsPanel.querySelector('#shop-panel-header');
+
+        header.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            const rect = settingsPanel.getBoundingClientRect();
+            dragOffsetX = e.clientX - rect.left;
+            dragOffsetY = e.clientY - rect.top;
+            e.preventDefault();
+
+            header.style.background = '#444';
+            settingsPanel.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - settingsPanel.offsetWidth);
+            const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - settingsPanel.offsetHeight);
+
+            settingsPanel.style.left = `${x}px`;
+            settingsPanel.style.top = `${y}px`;
+            settingsPanel.style.transform = 'none';
+
+            localStorage.setItem('shopHotkeyPanelPosition', JSON.stringify({x, y}));
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                header.style.background = '#333';
+                settingsPanel.style.cursor = 'default';
+            }
+        });
+
+        // Przywróć zapisaną pozycję
+        const savedPosition = JSON.parse(localStorage.getItem('shopHotkeyPanelPosition') || 'null');
+        if (savedPosition) {
+            settingsPanel.style.left = `${savedPosition.x}px`;
+            settingsPanel.style.top = `${savedPosition.y}px`;
+            settingsPanel.style.transform = 'none';
+        }
+    }
+
+    // Przełączanie widoczności panelu
+    function toggleSettingsPanel() {
+        if (!settingsPanel) return;
+
+        settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Integracja z managerem
+    function integrateWithAddonManager() {
+        // Czekaj na załadowanie managera i dodatku
+        const checkForManager = setInterval(() => {
+            const addonContainer = document.getElementById('addon-shop_hotkey');
+            if (!addonContainer) return;
+
+            // Sprawdź czy przycisk już istnieje
+            if (addonContainer.querySelector('#shop-hotkey-settings-btn')) {
+                clearInterval(checkForManager);
+                return;
+            }
+
+            // Szukaj kontenera z nazwą dodatku
+            const addonNameContainer = addonContainer.querySelector('.kwak-addon-name-container');
+            if (addonNameContainer) {
+                addManagerSettingsButton(addonNameContainer);
+                clearInterval(checkForManager);
+            }
+        }, 500);
+
+        // Timeout po 30 sekundach
+        setTimeout(() => {
+            clearInterval(checkForManager);
+            console.warn('Shop Hotkey: Nie znaleziono managera dodatków');
+        }, 30000);
     }
 
     // Sprawdzenie czy jesteśmy w sklepie
@@ -389,7 +480,7 @@ padding-top: 1px;
     function clickQuickSellButton(buttonNumber) {
         if (!isInShop()) return false;
 
-        const buttons = document.querySelectorAll('.great-merchamp .button.btn-num:not(#shop-settings-btn)');
+        const buttons = document.querySelectorAll('.great-merchamp .button.btn-num');
 
         if (buttons.length >= buttonNumber && buttonNumber > 0) {
             const button = buttons[buttonNumber - 1];
@@ -440,7 +531,6 @@ padding-top: 1px;
         let actionPerformed = false;
 
         if (settings.mode === 'auto') {
-            // Tryb automatyczny - jeden klawisz wybiera i sprzedaje
             if (event.code === settings.key1) {
                 actionPerformed = quickSellAndAccept(1);
             } else if (event.code === settings.key2) {
@@ -449,7 +539,6 @@ padding-top: 1px;
                 actionPerformed = quickSellAndAccept(3);
             }
         } else {
-            // Tryb manualny - klawisz wybiera, Enter akceptuje
             if (event.code === settings.key1) {
                 actionPerformed = clickQuickSellButton(1);
             } else if (event.code === settings.key2) {
@@ -467,33 +556,17 @@ padding-top: 1px;
         }
     }
 
-    // Observer do wykrywania otwarcia sklepu
-    function checkForShop(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach(function(node) {
-                    if (node.nodeType === 1 &&
-                        (node.classList?.contains('shop-content') ||
-                         node.querySelector?.('.shop-content'))) {
-
-                        setTimeout(addSettingsButton, 500);
-                    }
-                });
-            }
-        });
-    }
-
     // Inicjalizacja
     function init() {
         loadSettings();
 
         document.addEventListener('keydown', handleKeyPress);
 
-        const observer = new MutationObserver(checkForShop);
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        if (isInShop()) {
-            setTimeout(addSettingsButton, 1000);
+        // Integracja z managerem
+        try {
+            integrateWithAddonManager();
+        } catch (error) {
+            console.warn('Addon manager integration failed:', error);
         }
     }
 
