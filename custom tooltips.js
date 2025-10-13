@@ -6,38 +6,177 @@
     }
     window.customTooltipsRunning = true;
 
-    // Domyślna konfiguracja - BIAŁY jako domyślny
-    let config = {
-        enabled: localStorage.getItem('customTooltipsEnabled') !== 'false',
-        borderColor: localStorage.getItem('customTooltipsBorderColor') || '#ffffff',
-        glowColor: localStorage.getItem('customTooltipsGlowColor') || '#e0e0e0',
-        textColor: localStorage.getItem('customTooltipsTextColor') || '#ffffff',
-        damageColor: localStorage.getItem('customTooltipsDamageColor') || '#cccccc',
-        gradientColors: JSON.parse(localStorage.getItem('customTooltipsGradientColors') ||
-            '["#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8", "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"]')
-    };
+// ===== TUTAJ DODAJ SWOJE CZCIONKI =====
+const fontPresets = {
+    'Domyślna': '',
+    'Arial': 'Arial, sans-serif',
+    'Times New Roman': 'Times New Roman, serif',
+    'Courier New': 'Courier New, monospace',
+    'Georgia': 'Georgia, serif',
+    'Verdana': 'Verdana, sans-serif',
+    'Tahoma': 'Tahoma, sans-serif',
+    'Trebuchet MS': 'Trebuchet MS, sans-serif',
+    'Impact': 'Impact, sans-serif',
+    'Comic Sans MS': 'Comic Sans MS, cursive',
+    'Montserrat': 'Montserrat',
+    'Trebuchet MS': 'Trebuchet MS, sans-serif',
+    'Impact': 'Impact, fantasy',
+        'Palatino': 'Palatino Linotype, serif',
+        'Tahoma': 'Tahoma, sans-serif',
+        'Lucida Console': 'Lucida Console, monospace',
+        'Garamond': 'Garamond, serif',
+        'Bookman': 'Bookman Old Style, serif',
+        'Arial Black': 'Arial Black, sans-serif',
+        'Brush Script': 'Brush Script MT, cursive',
+        'Papyrus': 'Papyrus, fantasy',
+        'Copperplate': 'Copperplate Gothic, fantasy',
+        'Lucida Handwriting': 'Lucida Handwriting, cursive',
+        'Chiller': 'Chiller, fantasy',
+        'Old English': 'Old English Text MT, serif',
+        'Blackadder': 'Blackadder ITC, fantasy',
+        'Segoe UI': 'Segoe UI, sans-serif',
+        'Calibri': 'Calibri, sans-serif',
+        'Century Gothic': 'Century Gothic, sans-serif',
+        'Franklin Gothic': 'Franklin Gothic Medium, sans-serif',
+        'Book Antiqua': 'Book Antiqua, serif',
+        'Baskerville': 'Baskerville Old Face, serif',
+        'Consolas': 'Consolas, monospace',
+        'Bradley Hand': 'Bradley Hand ITC, cursive',
+        'Algerian': 'Algerian, fantasy',
+        'Bodoni': 'Bodoni MT, serif',
+        'Britannic': 'Britannic Bold, sans-serif',
+        'Broadway': 'Broadway, fantasy',
+        'Cambria': 'Cambria, serif',
+        'Candara': 'Candara, sans-serif',
+        'Castellar': 'Castellar, fantasy',
+        'Centaur': 'Centaur, serif',
+        'Colonna': 'Colonna MT, fantasy',
+        'Cooper': 'Cooper Black, fantasy',
+        'Corbel': 'Corbel, sans-serif',
+        'Curlz': 'Curlz MT, cursive',
+        'Didot': 'Didot, serif',
+        'Elephant': 'Elephant, fantasy',
+        'Engravers': 'Engravers MT, serif',
+        'Felix': 'Felix Titling, fantasy',
+        'Footlight': 'Footlight MT Light, serif',
+        'Forte': 'Forte, cursive',
+        'Freestyle': 'Freestyle Script, cursive',
+        'French Script': 'French Script MT, cursive',
+        'Gabriola': 'Gabriola, cursive',
+        'Gill Sans': 'Gill Sans MT, sans-serif',
+        'Goudy': 'Goudy Old Style, serif',
+        'Haettenschweiler': 'Haettenschweiler, fantasy',
+        'Harrington': 'Harrington, cursive',
+        'High Tower': 'High Tower Text, serif',
+        'Jokerman': 'Jokerman, fantasy',
+        'Juice': 'Juice ITC, cursive',
+        'Kunstler': 'Kunstler Script, cursive',
+        'Lucida Bright': 'Lucida Bright, serif',
+        'Lucida Sans': 'Lucida Sans, sans-serif',
+        'Magneto': 'Magneto, fantasy',
+        'Maiandra': 'Maiandra GD, fantasy',
+        'Matura': 'Matura MT Script Capitals, cursive',
+        'Mistral': 'Mistral, cursive',
+        'Modern': 'Modern No. 20, serif',
+        'Monotype Corsiva': 'Monotype Corsiva, cursive',
+        'Niagara': 'Niagara Solid, fantasy',
+        'OCR A': 'OCR A Extended, monospace',
+        'Onyx': 'Onyx, fantasy',
+        'Perpetua': 'Perpetua, serif',
+        'Playbill': 'Playbill, fantasy',
+        'Poor Richard': 'Poor Richard, serif',
+        'Ravie': 'Ravie, fantasy',
+        'Rockwell': 'Rockwell, serif',
+        'Script': 'Script MT Bold, cursive',
+        'Showcard': 'Showcard Gothic, fantasy',
+        'Snap': 'Snap ITC, fantasy',
+        'Stencil': 'Stencil, fantasy',
+        'Tempus Sans': 'Tempus Sans ITC, sans-serif',
+        'Vivaldi': 'Vivaldi, cursive',
+        'Vladimir': 'Vladimir Script, cursive',
+        'Wide Latin': 'Wide Latin, fantasy'
 
-    function saveConfig() {
-        localStorage.setItem('customTooltipsEnabled', config.enabled.toString());
-        localStorage.setItem('customTooltipsBorderColor', config.borderColor);
-        localStorage.setItem('customTooltipsGlowColor', config.glowColor);
-        localStorage.setItem('customTooltipsTextColor', config.textColor);
-        localStorage.setItem('customTooltipsDamageColor', config.damageColor);
-        localStorage.setItem('customTooltipsGradientColors', JSON.stringify(config.gradientColors));
-    }
+};
+// ==========================================
+
+let config = {
+    enabled: localStorage.getItem('customTooltipsEnabled') !== 'false',
+    borderColor: localStorage.getItem('customTooltipsBorderColor') || '#ffffff',
+    borderEnabled: localStorage.getItem('customTooltipsBorderEnabled') !== 'false',
+    glowColor: localStorage.getItem('customTooltipsGlowColor') || '#e0e0e0',
+    glowEnabled: localStorage.getItem('customTooltipsGlowEnabled') !== 'false',
+    textColor: localStorage.getItem('customTooltipsTextColor') || '#ffffff',
+    textEnabled: localStorage.getItem('customTooltipsTextEnabled') !== 'false',
+    damageColor: localStorage.getItem('customTooltipsDamageColor') || '#cccccc',
+    damageEnabled: localStorage.getItem('customTooltipsDamageEnabled') !== 'false',
+    bonusColor: localStorage.getItem('customTooltipsBonusColor') || '#ffd700',
+    bonusEnabled: localStorage.getItem('customTooltipsBonusEnabled') !== 'false',
+    gradientColors: JSON.parse(localStorage.getItem('customTooltipsGradientColors') ||
+        '["#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8", "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"]'),
+    gradientEnabled: localStorage.getItem('customTooltipsGradientEnabled') !== 'false',
+    legendaryNameColor: localStorage.getItem('customTooltipsLegendaryNameColor') || '#ff6b35',
+    legendaryNameEnabled: localStorage.getItem('customTooltipsLegendaryNameEnabled') !== 'false',
+    legendaryLabelColor: localStorage.getItem('customTooltipsLegendaryLabelColor') || '#ffffff',
+    legendaryLabelEnabled: localStorage.getItem('customTooltipsLegendaryLabelEnabled') !== 'false',
+    legbonColor: localStorage.getItem('customTooltipsLegbonColor') || '#00ff88',
+    legbonEnabled: localStorage.getItem('customTooltipsLegbonEnabled') !== 'false',
+    upgradeBonusColor: localStorage.getItem('customTooltipsUpgradeBonusColor') || '#4CAF50',
+    upgradeBonusEnabled: localStorage.getItem('customTooltipsUpgradeBonusEnabled') !== 'false',
+    selectedFont: localStorage.getItem('customTooltipsSelectedFont') || 'Domyślna'
+};
+
+function saveConfig() {
+    localStorage.setItem('customTooltipsEnabled', config.enabled.toString());
+    localStorage.setItem('customTooltipsBorderColor', config.borderColor);
+    localStorage.setItem('customTooltipsBorderEnabled', config.borderEnabled.toString());
+    localStorage.setItem('customTooltipsGlowColor', config.glowColor);
+    localStorage.setItem('customTooltipsGlowEnabled', config.glowEnabled.toString());
+    localStorage.setItem('customTooltipsTextColor', config.textColor);
+    localStorage.setItem('customTooltipsTextEnabled', config.textEnabled.toString());
+    localStorage.setItem('customTooltipsDamageColor', config.damageColor);
+    localStorage.setItem('customTooltipsDamageEnabled', config.damageEnabled.toString());
+    localStorage.setItem('customTooltipsBonusColor', config.bonusColor);
+    localStorage.setItem('customTooltipsBonusEnabled', config.bonusEnabled.toString());
+    localStorage.setItem('customTooltipsGradientColors', JSON.stringify(config.gradientColors));
+    localStorage.setItem('customTooltipsGradientEnabled', config.gradientEnabled.toString());
+    localStorage.setItem('customTooltipsLegendaryNameColor', config.legendaryNameColor);
+    localStorage.setItem('customTooltipsLegendaryNameEnabled', config.legendaryNameEnabled.toString());
+    localStorage.setItem('customTooltipsLegendaryLabelColor', config.legendaryLabelColor);
+    localStorage.setItem('customTooltipsLegendaryLabelEnabled', config.legendaryLabelEnabled.toString());
+    localStorage.setItem('customTooltipsLegbonColor', config.legbonColor);
+    localStorage.setItem('customTooltipsLegbonEnabled', config.legbonEnabled.toString());
+    localStorage.setItem('customTooltipsUpgradeBonusColor', config.upgradeBonusColor);
+    localStorage.setItem('customTooltipsUpgradeBonusEnabled', config.upgradeBonusEnabled.toString());
+    localStorage.setItem('customTooltipsSelectedFont', config.selectedFont);
+}
 
     // NOWE FUNKCJE - Import/Export
     function exportSettings() {
-        const settingsData = {
-            version: "1.0",
-            settings: {
-                borderColor: config.borderColor,
-                glowColor: config.glowColor,
-                textColor: config.textColor,
-                damageColor: config.damageColor,
-                gradientColors: config.gradientColors
-            }
-        };
+    const settingsData = {
+    settings: {
+        borderColor: config.borderColor,
+        borderEnabled: config.borderEnabled,
+        glowColor: config.glowColor,
+        glowEnabled: config.glowEnabled,
+        textColor: config.textColor,
+        textEnabled: config.textEnabled,
+        damageColor: config.damageColor,
+        damageEnabled: config.damageEnabled,
+        bonusColor: config.bonusColor,
+        bonusEnabled: config.bonusEnabled,
+        gradientColors: config.gradientColors,
+        gradientEnabled: config.gradientEnabled,
+        legendaryNameColor: config.legendaryNameColor,
+        legendaryNameEnabled: config.legendaryNameEnabled,
+        legendaryLabelColor: config.legendaryLabelColor,
+        legendaryLabelEnabled: config.legendaryLabelEnabled,
+        legbonColor: config.legbonColor,
+        legbonEnabled: config.legbonEnabled,
+        upgradeBonusColor: config.upgradeBonusColor,
+        upgradeBonusEnabled: config.upgradeBonusEnabled,
+        selectedFont: config.selectedFont
+    }
+};
 
         const dataStr = JSON.stringify(settingsData, null, 2);
 
@@ -62,8 +201,8 @@
         const importModal = document.createElement('div');
         importModal.className = 'custom-tooltips-modal';
         importModal.innerHTML = `
-            <div class="custom-tooltips-dialog" style="width: 500px;">
-                <div class="custom-tooltips-header">
+            <div class="custom-tooltips-dialog" id="import-dialog" style="width: 500px;">
+                <div class="custom-tooltips-header" id="import-header">
                     <h3>Importuj ustawienia</h3>
                     <button class="custom-tooltips-close" id="import-close">×</button>
                 </div>
@@ -82,10 +221,9 @@
                         font-family: 'Courier New', monospace;
                         font-size: 11px;
                         resize: vertical;
-                    " placeholder='{"version":"1.0","settings":{...}}'></textarea>
+                    " placeholder='{"settings":{...}}'></textarea>
                 </div>
                 <div class="tooltip-buttons">
-                    <button class="tooltip-btn tooltip-btn-secondary" id="import-cancel">Anuluj</button>
                     <button class="tooltip-btn tooltip-btn-primary" id="import-confirm">Importuj</button>
                 </div>
             </div>
@@ -96,11 +234,35 @@
         const textarea = document.getElementById('import-textarea');
         textarea.focus();
 
-        document.getElementById('import-close').addEventListener('click', () => {
-            importModal.remove();
+        // Przeciąganie okna importu
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        const dialog = document.getElementById('import-dialog');
+        const header = document.getElementById('import-header');
+
+        header.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            dragOffsetX = e.clientX - dialog.getBoundingClientRect().left;
+            dragOffsetY = e.clientY - dialog.getBoundingClientRect().top;
+            e.preventDefault();
         });
 
-        document.getElementById('import-cancel').addEventListener('click', () => {
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - dialog.offsetWidth);
+            const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - dialog.offsetHeight);
+            dialog.style.position = 'fixed';
+            dialog.style.left = `${x}px`;
+            dialog.style.top = `${y}px`;
+            dialog.style.transform = 'none';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        document.getElementById('import-close').addEventListener('click', () => {
             importModal.remove();
         });
 
@@ -134,25 +296,78 @@
             // Walidacja kolorów
             const hexRegex = /^#[0-9A-F]{6}$/i;
 
-            if (data.settings.borderColor && hexRegex.test(data.settings.borderColor)) {
-                config.borderColor = data.settings.borderColor;
-            }
-            if (data.settings.glowColor && hexRegex.test(data.settings.glowColor)) {
-                config.glowColor = data.settings.glowColor;
-            }
-            if (data.settings.textColor && hexRegex.test(data.settings.textColor)) {
-                config.textColor = data.settings.textColor;
-            }
-            if (data.settings.damageColor && hexRegex.test(data.settings.damageColor)) {
-                config.damageColor = data.settings.damageColor;
-            }
+if (data.settings.borderColor && hexRegex.test(data.settings.borderColor)) {
+    config.borderColor = data.settings.borderColor;
+}
+if (typeof data.settings.borderEnabled === 'boolean') {
+    config.borderEnabled = data.settings.borderEnabled;
+}
+if (data.settings.glowColor && hexRegex.test(data.settings.glowColor)) {
+    config.glowColor = data.settings.glowColor;
+}
+if (typeof data.settings.glowEnabled === 'boolean') {
+    config.glowEnabled = data.settings.glowEnabled;
+}
+if (data.settings.textColor && hexRegex.test(data.settings.textColor)) {
+    config.textColor = data.settings.textColor;
+}
+if (typeof data.settings.textEnabled === 'boolean') {
+    config.textEnabled = data.settings.textEnabled;
+}
+if (data.settings.damageColor && hexRegex.test(data.settings.damageColor)) {
+    config.damageColor = data.settings.damageColor;
+}
+if (typeof data.settings.damageEnabled === 'boolean') {
+    config.damageEnabled = data.settings.damageEnabled;
+}
+if (data.settings.bonusColor && hexRegex.test(data.settings.bonusColor)) {
+    config.bonusColor = data.settings.bonusColor;
+}
+if (typeof data.settings.bonusEnabled === 'boolean') {
+    config.bonusEnabled = data.settings.bonusEnabled;
+}
 
-            if (Array.isArray(data.settings.gradientColors) && data.settings.gradientColors.length === 10) {
-                const validGradient = data.settings.gradientColors.every(color => hexRegex.test(color));
-                if (validGradient) {
-                    config.gradientColors = data.settings.gradientColors;
-                }
-            }
+if (Array.isArray(data.settings.gradientColors) && data.settings.gradientColors.length === 10) {
+    const validGradient = data.settings.gradientColors.every(color => hexRegex.test(color));
+    if (validGradient) {
+        config.gradientColors = data.settings.gradientColors;
+    }
+}
+if (typeof data.settings.gradientEnabled === 'boolean') {
+    config.gradientEnabled = data.settings.gradientEnabled;
+}
+
+if (data.settings.legendaryNameColor && hexRegex.test(data.settings.legendaryNameColor)) {
+    config.legendaryNameColor = data.settings.legendaryNameColor;
+}
+if (typeof data.settings.legendaryNameEnabled === 'boolean') {
+    config.legendaryNameEnabled = data.settings.legendaryNameEnabled;
+}
+
+if (data.settings.legendaryLabelColor && hexRegex.test(data.settings.legendaryLabelColor)) {
+    config.legendaryLabelColor = data.settings.legendaryLabelColor;
+}
+if (typeof data.settings.legendaryLabelEnabled === 'boolean') {
+    config.legendaryLabelEnabled = data.settings.legendaryLabelEnabled;
+}
+
+if (data.settings.legbonColor && hexRegex.test(data.settings.legbonColor)) {
+    config.legbonColor = data.settings.legbonColor;
+}
+if (typeof data.settings.legbonEnabled === 'boolean') {
+    config.legbonEnabled = data.settings.legbonEnabled;
+}
+
+if (data.settings.upgradeBonusColor && hexRegex.test(data.settings.upgradeBonusColor)) {
+    config.upgradeBonusColor = data.settings.upgradeBonusColor;
+}
+if (typeof data.settings.upgradeBonusEnabled === 'boolean') {
+    config.upgradeBonusEnabled = data.settings.upgradeBonusEnabled;
+}
+
+if (typeof data.settings.selectedFont === 'string' && fontPresets[data.settings.selectedFont]) {
+    config.selectedFont = data.settings.selectedFont;
+}
 
             saveConfig();
             applyTooltipStyles();
@@ -321,11 +536,21 @@ const styles = `
 
     /* Etykiety */
     .tooltip-setting-label {
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 8px;
         margin-bottom: 5px;
         font-weight: normal;
         color: #ccc;
         font-size: 12px;
+    }
+
+    /* Checkbox */
+    .tooltip-checkbox {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: #5865F2;
     }
 
     /* Wrapper inputów kolorów */
@@ -351,6 +576,11 @@ const styles = `
         border-color: #888;
     }
 
+    .tooltip-color-input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
     /* Color pickery */
     .tooltip-color-picker {
         width: 40px;
@@ -361,6 +591,11 @@ const styles = `
         background: transparent;
     }
 
+    .tooltip-color-picker:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
     /* Opisy */
     .tooltip-setting-description {
         font-size: 10px;
@@ -369,6 +604,22 @@ const styles = `
         line-height: 1.4;
     }
 
+/* Select dla czcionki */
+.tooltip-font-select {
+    width: 100%;
+    padding: 8px;
+    background: #555;
+    border: 1px solid #666;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.tooltip-font-select:focus {
+    outline: none;
+    border-color: #888;
+}
     /* Siatka gradientów - ZMIENIONA NA PIONOWĄ */
     .tooltip-gradient-inputs {
         display: flex;
@@ -486,6 +737,40 @@ const styles = `
     #tooltip-import-file {
         display: none;
     }
+
+.tooltip-checkbox {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #555;
+    border-radius: 3px;
+    background: #2a2a2a;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.tooltip-checkbox:hover {
+    border-color: #4CAF50;
+}
+
+.tooltip-checkbox:checked {
+    background: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.tooltip-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
 `;
 
     function applyTooltipStyles() {
@@ -498,66 +783,85 @@ const styles = `
 
         const gradientColorsStr = config.gradientColors.join(', ');
 
+const borderColor = config.borderEnabled ? config.borderColor : '#ffffff';
+const glowColor = config.glowEnabled ? config.glowColor : '#e0e0e0';
+const textColor = config.textEnabled ? config.textColor : '#ffffff';
+const damageColor = config.damageEnabled ? config.damageColor : '#cccccc';
+const bonusColor = config.bonusEnabled ? config.bonusColor : '#ffd700';
+const legendaryNameColor = config.legendaryNameEnabled ? config.legendaryNameColor : '#ff6b35';
+const legendaryLabelColor = config.legendaryLabelEnabled ? config.legendaryLabelColor : '#ffffff';
+const legbonColor = config.legbonEnabled ? config.legbonColor : '#00ff88';
+const upgradeBonusColor = config.upgradeBonusEnabled ? config.upgradeBonusColor : '#4CAF50';
+
+const fontFamily = fontPresets[config.selectedFont] || '';
+const fontFamilyCSS = fontFamily ? `font-family: ${fontFamily} !important;` : '';
+
         const tooltipStyles = `
             <style id="custom-tooltips-style">
+
             /*ANIMOWANE-TIPY*/
             .item-type{text-align:center;}
-            .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${config.borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${config.glowColor} 0px 1px 24px -4px !important;}
-            .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${config.borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500;}
-            .tip-wrapper .content {padding: 5px;background: rgba(15, 15, 15,.85);word-break: break-word; font-family: 'Montserrat';}
+            .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
+            .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500;}
+            .tip-wrapper .content {padding: 5px;background: rgba(15, 15, 15,.85);word-break: break-word; ${fontFamilyCSS}}
             .tip-wrapper[data-type=t_item] .item-head {border:1px solid #1e1e1e66;border-radius: 2px; background: hsl(0deg 0% 4.87% / 10%);}
             .tip-wrapper[data-type=t_item] .item-head .cl-icon {border: 1px solid rgba(15, 15, 15,.3);}
             .tip-wrapper[data-type=t_item] .item-tip-section {border-bottom: 1px solid rgba(15, 15, 15,.5);}
-            .tip-wrapper .content .info-wrapper .nick {color:#79e1c5; font-family: Cinzel; font-size: 11px; text-shadow: 0 0 4px black; border: 1px solid ${config.borderColor};border-radius: 2px;background: ${config.borderColor}20;}
-            .tip-wrapper[data-type=t_other] .line {border-bottom:1px solid ${config.borderColor}; background: none;}
-            .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${config.borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${config.glowColor} 0px 1px 24px -4px !important; !important;}
-            .tip-wrapper[data-type=t_item] .item-head .legendary, .tip-wrapper[data-type=t_item] .item-tip-section .legendary {color: ${config.textColor} !important;text-align: center;font-size: 13px;font-weight: 700; text-shadow: 1px 1px ${config.textColor}42;}
+            .tip-wrapper .content .info-wrapper .nick {color:#79e1c5; font-family: Cinzel; font-size: 11px; text-shadow: 0 0 4px black; border: 1px solid ${borderColor};border-radius: 2px;background: ${borderColor}20;}
+            .tip-wrapper[data-type=t_other] .line {border-bottom:1px solid ${borderColor}; background: none;}
+            .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important; !important;}
+            .tip-wrapper[data-type=t_item] .item-head .legendary {color: ${legendaryLabelColor} !important; text-align: center; font-size: 13px; font-weight: 700; text-shadow: 1px 1px ${legendaryLabelColor}42;}
+            .tip-wrapper[data-type=t_item] .item-tip-section .legendary {color: ${legendaryNameColor} !important; text-align: center; font-size: 13px; font-weight: 700; text-shadow: 1px 1px ${legendaryNameColor}42;}
+            .tip-wrapper[data-type=t_item] .tip-item-stat-legbon {color: ${legbonColor} !important; font-weight: 600;}
+            .tip-wrapper[data-type=t_item] .tip-item-stat-bonus {color: ${upgradeBonusColor} !important; font-weight: 600;}
             .tip-wrapper[data-type=t_item] .item-head .item-type{padding-left: 48px !important; margin-left: 0px !important;}
-            .tip-wrapper.normal-tip .damage, .tip-wrapper.sticky-tip .damage {color: ${config.damageColor} !important;font-weight: 999;}
+            .tip-wrapper.normal-tip .damage, .tip-wrapper.sticky-tip .damage {color: ${damageColor} !important;font-weight: 999;}
             .tip-wrapper[data-type=t_item] .item-tip-section.s-7{color: white; font-weight: 700;}
-            .tip-wrapper[data-type=t_item] i.looter{color: ${config.textColor} !important;text-align: center;}
-            .tip-wrapper[data-type=t_item] .item-tip-section.s-5{color: ${config.textColor} !important;text-align: center;font-weight: 600;}
-            .tip-wrapper[data-item-type=t-upgraded], .tip-wrapper[data-item-type=upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${config.borderColor}, 0 0 0 2px #111911, 0 0 0 3px #2b2727, 0 0 0 4px #59595a, 0 0 0 5px ${config.textColor}, 0 0 0 6px #5a585b, 0 0 0 7px #2c2625;}
-            .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{color: ${config.textColor};}
+            .tip-wrapper[data-type=t_item] i.looter{color: ${textColor} !important;text-align: center;}
+            .tip-wrapper[data-type=t_item] .item-tip-section.s-5{color: ${textColor} !important;text-align: center;font-weight: 600;}
+            .tip-wrapper[data-item-type=t-upgraded], .tip-wrapper[data-item-type=upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #111911, 0 0 0 3px #2b2727, 0 0 0 4px #59595a, 0 0 0 5px ${textColor}, 0 0 0 6px #5a585b, 0 0 0 7px #2c2625;}
+            .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{color: ${textColor};}
             .tip-wrapper[data-type=t_item] .prc-icon{width:0px; height:0px !important;}
             .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .value-item{color:white; font-size:10px;}
             .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .lvl-next{float:none;}
-            .tip-wrapper[data-type=t_item] .item-tip-section .green{font-size:8px;}
+            .tip-wrapper[data-type=t_item] .item-tip-section .green{font-size:8px; color: ${bonusColor} !important;}
             .tip-wrapper[data-type=t_other] .clan-in-tip{color:#d5d5d5;}
             .tip-wrapper .content .info-wrapper .nick{color:#d5d5d5;}
-            .tip-wrapper normal-tip{box-shadow: ${config.glowColor} 0px 0px 0px 5px;}
-            .item-tip-section.s-4>span {color: ${config.textColor} !important; font-weight: bold;}
-            .tip-wrapper[data-item-type=heroic], .tip-wrapper[data-item-type=t-her]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${config.borderColor}, 0 0 0 2px #191311, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #00000000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${config.glowColor}70 !important;}
-            .tip-wrapper[data-item-type=t-uniupg]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${config.borderColor}, 0 0 0 2px #191311, 0 0 0 3px rgb(0 0 0 / 0%), 0 0 0 4px #5a595900, 0 0 0 5px #00ff0000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${config.glowColor}70 !important;}
-            .tip-wrapper[data-item-type=t-upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${config.borderColor}, 0 0 0 2px #191311, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #00ff0000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${config.glowColor}70 !important;}
-            .tip-wrapper[data-item-type=normal], .tip-wrapper[data-item-type=t-norm]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${config.borderColor}, 0 0 0 2px ${config.borderColor}fa, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #07a19d00, 0 0 0 6px #5a585b00, 0 0 0 7px rgb(44 38 37 / 0%), 0px 1px 5px 4px ${config.glowColor}70 !important;}
+            .tip-wrapper normal-tip{box-shadow: ${glowColor} 0px 0px 0px 5px;}
+            .item-tip-section.s-4>span {color: ${textColor} !important; font-weight: bold;}
+            .tip-wrapper[data-item-type=heroic], .tip-wrapper[data-item-type=t-her]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #00000000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
+            .tip-wrapper[data-item-type=t-uniupg]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px rgb(0 0 0 / 0%), 0 0 0 4px #5a595900, 0 0 0 5px #00ff0000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
+            .tip-wrapper[data-item-type=t-upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #191311, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #00ff0000, 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500, 0px 1px 5px 4px ${glowColor}70 !important;}
+            .tip-wrapper[data-item-type=normal], .tip-wrapper[data-item-type=t-norm]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px ${borderColor}fa, 0 0 0 3px #2b272700, 0 0 0 4px #5a595900, 0 0 0 5px #07a19d00, 0 0 0 6px #5a585b00, 0 0 0 7px rgb(44 38 37 / 0%), 0px 1px 5px 4px ${glowColor}70 !important;}
             .tip-wrapper[data-type=t_item] .item-head .heroic, .tip-wrapper[data-type=t_item] .item-tip-section .heroic{font-weight: 700;}
             .tip-wrapper[data-type=t_item] .item-head .unique, .tip-wrapper[data-type=t_item] .item-tip-section .unique{font-weight: 700;}
             .tip-wrapper[data-type=t_item] .item-head .common, .tip-wrapper[data-type=t_item] .item-tip-section .common{font-weight: 700;}
             .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{font-weight: 700;}
             .tip-wrapper[data-type=t_item] .item-expired{font-size: 7px !important;}
-            .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${config.borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${config.glowColor} 0px 1px 5px 4px;}
-            .tip-wrapper.own{color: #ffffff; box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${config.borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500;}
+            .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 5px 4px;}
+            .tip-wrapper.own{color: #ffffff; box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500;}
             .tip-wrapper[data-type=t_item] .item-expired{display:block !important;}
             .item-tip-section.s-1.no-border {text-align: center;}
             .item-tip-section.s-3 {text-align: center;}
             .item-tip-section.s-2.no-border {text-align: center;}
 
-            /*lega tip*/
-            .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]{--a:0deg; background: linear-gradient(var(--a), #000, #272727); box-shadow: inset 100px 100px 100px 184px #0000007a;}
+/*lega tip*/
+${config.gradientEnabled ? `
+.tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]{--a:0deg; background: linear-gradient(var(--a), #000, #272727); box-shadow: inset 100px 100px 100px 184px #0000007a;}
 
-            .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:before, .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:after {content: ''; position: absolute; left: -2px; top: -2px; background: linear-gradient(var(--a), ${gradientColorsStr}); background-size: 400%; width: calc(100% + 4px); height: calc(100% + 4px); z-index: -1; animation: a 10s linear infinite;}
+.tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:before, .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg]:after {content: ''; position: absolute; left: -2px; top: -2px; background: linear-gradient(var(--a), ${gradientColorsStr}); background-size: 400%; width: calc(100% + 4px); height: calc(100% + 4px); z-index: -1; animation: a 10s linear infinite;}
 
-            @property --a{ syntax: '<angle>'; inherits: false; initial-value: 0deg;}
+@property --a{ syntax: '<angle>'; inherits: false; initial-value: 0deg;}
 
-            @keyframes a{
-                from {
-                --a:0deg;
-                }
-                to {
-                --a:360deg;
-                }
-            }
+@keyframes a{
+    from {
+    --a:0deg;
+    }
+    to {
+    --a:360deg;
+    }
+}
+` : ''}
             </style>
         `;
 
@@ -576,50 +880,124 @@ function showSettingsDialog() {
     modal.innerHTML = `
         <div class="custom-tooltips-dialog">
             <div class="custom-tooltips-header" id="tooltip-header">
-                <h3>Tooltips Styler - Settings</h3>
+                <h3>Custom Tooltips - Settings</h3>
                 <button class="custom-tooltips-close" id="tooltip-close">×</button>
             </div>
 
             <div class="custom-tooltips-content" id="tooltip-scroll-content">
                 <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">Kolor ramki</label>
+                    <label class="tooltip-setting-label">
+                        <input type="checkbox" class="tooltip-checkbox" id="border-enabled" ${config.borderEnabled ? 'checked' : ''}>
+                        Kolor ramki
+                    </label>
                     <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="border-color-text" value="${config.borderColor}">
-                        <input type="color" class="tooltip-color-picker" id="border-color" value="${config.borderColor}">
+                        <input type="text" class="tooltip-color-input" id="border-color-text" value="${config.borderColor}" ${!config.borderEnabled ? 'disabled' : ''}>
+                        <input type="color" class="tooltip-color-picker" id="border-color" value="${config.borderColor}" ${!config.borderEnabled ? 'disabled' : ''}>
                     </div>
-                    <div class="tooltip-setting-description">Główny kolor obramowania tooltipów(itemy i widgety)</div>
+                    <div class="tooltip-setting-description">Główny kolor obramowania tooltipów (itemy i widgety)</div>
                 </div>
 
                 <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">Kolor świecenia</label>
+                    <label class="tooltip-setting-label">
+                        <input type="checkbox" class="tooltip-checkbox" id="glow-enabled" ${config.glowEnabled ? 'checked' : ''}>
+                        Kolor świecenia
+                    </label>
                     <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="glow-color-text" value="${config.glowColor}">
-                        <input type="color" class="tooltip-color-picker" id="glow-color" value="${config.glowColor}">
+                        <input type="text" class="tooltip-color-input" id="glow-color-text" value="${config.glowColor}" ${!config.glowEnabled ? 'disabled' : ''}>
+                        <input type="color" class="tooltip-color-picker" id="glow-color" value="${config.glowColor}" ${!config.glowEnabled ? 'disabled' : ''}>
                     </div>
                     <div class="tooltip-setting-description">Kolor efektu świecenia wokół ramki</div>
                 </div>
 
                 <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">Kolor nazwy i podpisów</label>
+                    <label class="tooltip-setting-label">
+                        <input type="checkbox" class="tooltip-checkbox" id="text-enabled" ${config.textEnabled ? 'checked' : ''}>
+                        Kolor podpisów
+                    </label>
                     <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="text-color-text" value="${config.textColor}">
-                        <input type="color" class="tooltip-color-picker" id="text-color" value="${config.textColor}">
+                        <input type="text" class="tooltip-color-input" id="text-color-text" value="${config.textColor}" ${!config.textEnabled ? 'disabled' : ''}>
+                        <input type="color" class="tooltip-color-picker" id="text-color" value="${config.textColor}" ${!config.textEnabled ? 'disabled' : ''}>
                     </div>
-                    <div class="tooltip-setting-description">Kolor nazwy i podpisów przedmiotów legendarnych </div>
+                    <div class="tooltip-setting-description">Kolor podpisów przedmiotów (działa tylko na legach!)</div>
                 </div>
 
                 <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">Kolor statystyk</label>
+                    <label class="tooltip-setting-label">
+                        <input type="checkbox" class="tooltip-checkbox" id="damage-enabled" ${config.damageEnabled ? 'checked' : ''}>
+                        Kolor statystyk
+                    </label>
                     <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="damage-color-text" value="${config.damageColor}">
-                        <input type="color" class="tooltip-color-picker" id="damage-color" value="${config.damageColor}">
+                        <input type="text" class="tooltip-color-input" id="damage-color-text" value="${config.damageColor}" ${!config.damageEnabled ? 'disabled' : ''}>
+                        <input type="color" class="tooltip-color-picker" id="damage-color" value="${config.damageColor}" ${!config.damageEnabled ? 'disabled' : ''}>
                     </div>
                     <div class="tooltip-setting-description">Kolor statystyk na przedmiotach</div>
                 </div>
 
                 <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">Kolory gradientu (animacja legendarnych przedmiotów)</label>
-                    <div class="tooltip-setting-description" style="margin-bottom: 10px;">Zmień kolory animowanej ramki dla legendarnych przedmiotów</div>
+                    <label class="tooltip-setting-label">
+                        <input type="checkbox" class="tooltip-checkbox" id="bonus-enabled" ${config.bonusEnabled ? 'checked' : ''}>
+                        Kolor bonusu legendarnego
+                    </label>
+                    <div class="tooltip-color-input-wrapper">
+                        <input type="text" class="tooltip-color-input" id="bonus-color-text" value="${config.bonusColor}" ${!config.bonusEnabled ? 'disabled' : ''}>
+                        <input type="color" class="tooltip-color-picker" id="bonus-color" value="${config.bonusColor}" ${!config.bonusEnabled ? 'disabled' : ''}>
+                    </div>
+                    <div class="tooltip-setting-description">Kolor bonusów na legendarnych przedmiotach</div>
+                </div>
+                <div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">
+        <input type="checkbox" class="tooltip-checkbox" id="legendary-label-enabled" ${config.legendaryLabelEnabled ? 'checked' : ''}>
+        Kolor nazwy legi
+    </label>
+    <div class="tooltip-color-input-wrapper">
+        <input type="text" class="tooltip-color-input" id="legendary-label-color-text" value="${config.legendaryLabelColor}" ${!config.legendaryLabelEnabled ? 'disabled' : ''}>
+        <input type="color" class="tooltip-color-picker" id="legendary-label-color" value="${config.legendaryLabelColor}" ${!config.legendaryLabelEnabled ? 'disabled' : ''}>
+    </div>
+    <div class="tooltip-setting-description">Kolor nazwy przedmiotu legendarnego(działa tylko na legach!)</div>
+</div>
+
+<div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">
+        <input type="checkbox" class="tooltip-checkbox" id="legendary-name-enabled" ${config.legendaryNameEnabled ? 'checked' : ''}>
+        Kolor napisu "Legendarny"
+    </label>
+    <div class="tooltip-color-input-wrapper">
+        <input type="text" class="tooltip-color-input" id="legendary-name-color-text" value="${config.legendaryNameColor}" ${!config.legendaryNameEnabled ? 'disabled' : ''}>
+        <input type="color" class="tooltip-color-picker" id="legendary-name-color" value="${config.legendaryNameColor}" ${!config.legendaryNameEnabled ? 'disabled' : ''}>
+    </div>
+    <div class="tooltip-setting-description">Kolor napisu "Legendarny"(działa tylko na legach!)</div>
+</div>
+
+<div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">
+        <input type="checkbox" class="tooltip-checkbox" id="legbon-enabled" ${config.legbonEnabled ? 'checked' : ''}>
+        Kolor bonusu legendarnego
+    </label>
+    <div class="tooltip-color-input-wrapper">
+        <input type="text" class="tooltip-color-input" id="legbon-color-text" value="${config.legbonColor}" ${!config.legbonEnabled ? 'disabled' : ''}>
+        <input type="color" class="tooltip-color-picker" id="legbon-color" value="${config.legbonColor}" ${!config.legbonEnabled ? 'disabled' : ''}>
+    </div>
+    <div class="tooltip-setting-description">Kolor bonusu legendarnego</div>
+</div>
+
+<div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">
+        <input type="checkbox" class="tooltip-checkbox" id="upgrade-bonus-enabled" ${config.upgradeBonusEnabled ? 'checked' : ''}>
+        Kolor wzmocnienia przedmiotu
+    </label>
+    <div class="tooltip-color-input-wrapper">
+        <input type="text" class="tooltip-color-input" id="upgrade-bonus-color-text" value="${config.upgradeBonusColor}" ${!config.upgradeBonusEnabled ? 'disabled' : ''}>
+        <input type="color" class="tooltip-color-picker" id="upgrade-bonus-color" value="${config.upgradeBonusColor}" ${!config.upgradeBonusEnabled ? 'disabled' : ''}>
+    </div>
+    <div class="tooltip-setting-description">Kolor wzmocnienia przedmiotu (działa tylko na przedmiotach ulepszonych na+5!)</div>
+</div>
+
+                <div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">
+        <input type="checkbox" class="tooltip-checkbox" id="gradient-enabled" ${config.gradientEnabled ? 'checked' : ''}>
+        Kolory gradientu (animacja legendarnych przedmiotów)
+    </label>
+    <div class="tooltip-setting-description" style="margin-bottom: 10px;">Zmień kolory animowanej ramki dla legendarnych przedmiotów(to są klatki animacji)</div>
                     <div class="tooltip-gradient-inputs">
                         ${config.gradientColors.map((color, index) => `
                             <div class="tooltip-gradient-item">
@@ -630,6 +1008,18 @@ function showSettingsDialog() {
                         `).join('')}
                     </div>
                 </div>
+
+<div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">Wybierz czcionkę</label>
+    <select class="tooltip-font-select" id="font-select">
+        ${Object.keys(fontPresets).map(fontName =>
+            `<option value="${fontName}" ${config.selectedFont === fontName ? 'selected' : ''}>${fontName}</option>`
+        ).join('')}
+    </select>
+    <div class="tooltip-setting-description" style="margin-top: 5px;">
+        Wybierz czcionkę dla tooltipów
+    </div>
+</div>
             </div>
 
             <div class="tooltip-buttons">
@@ -675,6 +1065,35 @@ function showSettingsDialog() {
             isDragging = false;
         });
 
+        // Obsługa checkboxów
+        function setupCheckboxToggle(checkboxId, textId, pickerId, configKey) {
+            const checkbox = document.getElementById(checkboxId);
+            const textInput = document.getElementById(textId);
+            const colorPicker = document.getElementById(pickerId);
+
+            checkbox.addEventListener('change', (e) => {
+                const isEnabled = e.target.checked;
+                config[configKey] = isEnabled;
+                textInput.disabled = !isEnabled;
+                colorPicker.disabled = !isEnabled;
+            });
+        }
+
+        setupCheckboxToggle('border-enabled', 'border-color-text', 'border-color', 'borderEnabled');
+        setupCheckboxToggle('glow-enabled', 'glow-color-text', 'glow-color', 'glowEnabled');
+        setupCheckboxToggle('text-enabled', 'text-color-text', 'text-color', 'textEnabled');
+        setupCheckboxToggle('damage-enabled', 'damage-color-text', 'damage-color', 'damageEnabled');
+        setupCheckboxToggle('bonus-enabled', 'bonus-color-text', 'bonus-color', 'bonusEnabled');
+        setupCheckboxToggle('legendary-label-enabled', 'legendary-label-color-text', 'legendary-label-color', 'legendaryLabelEnabled');
+setupCheckboxToggle('legendary-name-enabled', 'legendary-name-color-text', 'legendary-name-color', 'legendaryNameEnabled');
+setupCheckboxToggle('legbon-enabled', 'legbon-color-text', 'legbon-color', 'legbonEnabled');
+setupCheckboxToggle('upgrade-bonus-enabled', 'upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusEnabled');
+
+// Gradient checkbox
+document.getElementById('gradient-enabled').addEventListener('change', (e) => {
+    config.gradientEnabled = e.target.checked;
+});
+
         // Synchronizacja kolorów między text input a color picker
         function setupColorSync(textId, pickerId, configKey) {
             const textInput = document.getElementById(textId);
@@ -699,6 +1118,11 @@ function showSettingsDialog() {
         setupColorSync('glow-color-text', 'glow-color', 'glowColor');
         setupColorSync('text-color-text', 'text-color', 'textColor');
         setupColorSync('damage-color-text', 'damage-color', 'damageColor');
+        setupColorSync('bonus-color-text', 'bonus-color', 'bonusColor');
+        setupColorSync('legendary-label-color-text', 'legendary-label-color', 'legendaryLabelColor');
+setupColorSync('legendary-name-color-text', 'legendary-name-color', 'legendaryNameColor');
+setupColorSync('legbon-color-text', 'legbon-color', 'legbonColor');
+setupColorSync('upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusColor');
 
         // Gradient colors
         document.querySelectorAll('.gradient-color-text').forEach(input => {
@@ -720,6 +1144,12 @@ function showSettingsDialog() {
             });
         });
 
+// Font select
+const fontSelect = document.getElementById('font-select');
+fontSelect.addEventListener('change', (e) => {
+    config.selectedFont = e.target.value;
+});
+
         // Zamknij
         document.getElementById('tooltip-close').addEventListener('click', () => {
             modal.remove();
@@ -731,35 +1161,73 @@ function showSettingsDialog() {
             }
         });
 
-        // NOWE - Przycisk Eksportu
+        // Przycisk Eksportu
         document.getElementById('tooltip-export').addEventListener('click', () => {
             exportSettings();
         });
 
-        // NOWE - Przycisk Importu
+        // Przycisk Importu
         document.getElementById('tooltip-import').addEventListener('click', () => {
             showImportDialog();
         });
 
         // Reset do białego
         document.getElementById('tooltip-reset').addEventListener('click', () => {
-            config.borderColor = '#ffffff';
-            config.glowColor = '#e0e0e0';
-            config.textColor = '#ffffff';
-            config.damageColor = '#cccccc';
-            config.gradientColors = [
-                "#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8",
-                "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"
-            ];
+  config.borderColor = '#ffffff';
+config.borderEnabled = true;
+config.glowColor = '#e0e0e0';
+config.glowEnabled = true;
+config.textColor = '#ffffff';
+config.textEnabled = true;
+config.damageColor = '#cccccc';
+config.damageEnabled = true;
+config.bonusColor = '#ffd700';
+config.bonusEnabled = true;
+config.gradientColors = [
+    "#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8",
+    "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"
+];
+config.gradientEnabled = true;
+config.legendaryNameColor = '#ff6b35';
+config.legendaryNameEnabled = true;
+config.legendaryLabelColor = '#ffffff';
+config.legendaryLabelEnabled = true;
+config.legbonColor = '#00ff88';
+config.legbonEnabled = true;
+config.upgradeBonusColor = '#4CAF50';
+config.upgradeBonusEnabled = true;
+config.selectedFont = 'Domyślna';
 
+            // Odśwież interfejs
             document.getElementById('border-color-text').value = config.borderColor;
             document.getElementById('border-color').value = config.borderColor;
+            document.getElementById('border-enabled').checked = true;
+            document.getElementById('border-color-text').disabled = false;
+            document.getElementById('border-color').disabled = false;
+
             document.getElementById('glow-color-text').value = config.glowColor;
             document.getElementById('glow-color').value = config.glowColor;
+            document.getElementById('glow-enabled').checked = true;
+            document.getElementById('glow-color-text').disabled = false;
+            document.getElementById('glow-color').disabled = false;
+
             document.getElementById('text-color-text').value = config.textColor;
             document.getElementById('text-color').value = config.textColor;
+            document.getElementById('text-enabled').checked = true;
+            document.getElementById('text-color-text').disabled = false;
+            document.getElementById('text-color').disabled = false;
+
             document.getElementById('damage-color-text').value = config.damageColor;
             document.getElementById('damage-color').value = config.damageColor;
+            document.getElementById('damage-enabled').checked = true;
+            document.getElementById('damage-color-text').disabled = false;
+            document.getElementById('damage-color').disabled = false;
+
+            document.getElementById('bonus-color-text').value = config.bonusColor;
+            document.getElementById('bonus-color').value = config.bonusColor;
+            document.getElementById('bonus-enabled').checked = true;
+            document.getElementById('bonus-color-text').disabled = false;
+            document.getElementById('bonus-color').disabled = false;
 
             document.querySelectorAll('.gradient-color-text').forEach((input, index) => {
                 input.value = config.gradientColors[index];
@@ -767,6 +1235,24 @@ function showSettingsDialog() {
             document.querySelectorAll('.gradient-color-picker').forEach((picker, index) => {
                 picker.value = config.gradientColors[index];
             });
+document.getElementById('legendary-label-color-text').value = config.legendaryLabelColor;
+document.getElementById('legendary-label-color').value = config.legendaryLabelColor;
+document.getElementById('legendary-label-enabled').checked = true;
+
+document.getElementById('legendary-name-color-text').value = config.legendaryNameColor;
+document.getElementById('legendary-name-color').value = config.legendaryNameColor;
+document.getElementById('legendary-name-enabled').checked = true;
+
+document.getElementById('legbon-color-text').value = config.legbonColor;
+document.getElementById('legbon-color').value = config.legbonColor;
+document.getElementById('legbon-enabled').checked = true;
+
+document.getElementById('upgrade-bonus-color-text').value = config.upgradeBonusColor;
+document.getElementById('upgrade-bonus-color').value = config.upgradeBonusColor;
+document.getElementById('upgrade-bonus-enabled').checked = true;
+
+document.getElementById('gradient-enabled').checked = true;
+            document.getElementById('font-select').value = 'Domyślna';
 
             showNotification('Ustawienia zresetowane do domyślnych (białe)', 'info');
         });
