@@ -975,6 +975,717 @@ function applyTooltipStyles() {
                 `;
                 break;
 
+            case 'electric':
+                // Animacja burzy elektrycznej - błyskawice krążące po ramce
+                legendaryAnimationCSS = `
+                    .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+                        --electric-angle: 0deg;
+                        background: linear-gradient(var(--electric-angle), #000, #272727) !important;
+                        box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+                    }
+
+                    /* Warstwa 1 - główne błyskawice */
+                    .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+                        content: '' !important;
+                        position: absolute !important;
+                        left: -2px !important;
+                        top: -2px !important;
+                        width: calc(100% + 4px) !important;
+                        height: calc(100% + 4px) !important;
+                        background: conic-gradient(
+                            from var(--electric-angle),
+                            transparent 0%,
+                            ${config.gradientColors[0]} 3%,
+                            transparent 6%,
+                            transparent 10%,
+                            ${config.gradientColors[2]} 14%,
+                            ${config.gradientColors[3]} 16%,
+                            transparent 19%,
+                            transparent 25%,
+                            ${config.gradientColors[4]} 29%,
+                            transparent 32%,
+                            transparent 38%,
+                            ${config.gradientColors[5]} 42%,
+                            ${config.gradientColors[6]} 45%,
+                            transparent 48%,
+                            transparent 55%,
+                            ${config.gradientColors[7]} 59%,
+                            transparent 62%,
+                            transparent 70%,
+                            ${config.gradientColors[8]} 74%,
+                            ${config.gradientColors[9]} 77%,
+                            transparent 80%,
+                            transparent 88%,
+                            ${config.gradientColors[1]} 92%,
+                            transparent 95%,
+                            transparent 100%
+                        ) !important;
+                        z-index: -1 !important;
+                        animation: electricRotate 4s linear infinite, electricPulse 0.2s ease-in-out infinite !important;
+                        filter: brightness(2.5) blur(0.5px) drop-shadow(0 0 8px ${config.gradientColors[3]}) drop-shadow(0 0 15px ${config.gradientColors[5]}) !important;
+                    }
+
+                    /* Warstwa 2 - dodatkowe błyskawice (opóźnione) */
+                    .tip-wrapper[data-item-type=legendary]:after, .tip-wrapper[data-item-type=t-leg]:after {
+                        content: '' !important;
+                        position: absolute !important;
+                        left: -2px !important;
+                        top: -2px !important;
+                        width: calc(100% + 4px) !important;
+                        height: calc(100% + 4px) !important;
+                        background: conic-gradient(
+                            from calc(var(--electric-angle) + 180deg),
+                            transparent 0%,
+                            ${config.gradientColors[1]} 4%,
+                            transparent 7%,
+                            transparent 15%,
+                            ${config.gradientColors[3]} 19%,
+                            transparent 22%,
+                            transparent 32%,
+                            ${config.gradientColors[5]} 37%,
+                            ${config.gradientColors[6]} 40%,
+                            transparent 43%,
+                            transparent 52%,
+                            ${config.gradientColors[7]} 57%,
+                            transparent 60%,
+                            transparent 72%,
+                            ${config.gradientColors[9]} 77%,
+                            transparent 80%,
+                            transparent 90%,
+                            ${config.gradientColors[2]} 94%,
+                            transparent 97%,
+                            transparent 100%
+                        ) !important;
+                        z-index: -1 !important;
+                        animation: electricRotate 4s linear infinite 2s, electricPulse 0.15s ease-in-out infinite 0.1s !important;
+                        filter: brightness(2.2) blur(0.5px) drop-shadow(0 0 10px ${config.gradientColors[7]}) drop-shadow(0 0 18px ${config.gradientColors[9]}) !important;
+                    }
+
+                    @property --electric-angle {
+                        syntax: '<angle>';
+                        inherits: false;
+                        initial-value: 0deg;
+                    }
+
+                    /* Obrót błyskawic */
+                    @keyframes electricRotate {
+                        from {
+                            --electric-angle: 0deg;
+                        }
+                        to {
+                            --electric-angle: 360deg;
+                        }
+                    }
+
+                    /* Szybkie migotanie jak elektryczność */
+                    @keyframes electricPulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.7; }
+                    }
+                `;
+                break;
+                case 'rainbow':
+    // Tęczowa ramka przelatująca po obwodzie
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            --rainbow-pos: 0%;
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0%,
+                transparent calc(var(--rainbow-pos) - 5%),
+                #ff0000 var(--rainbow-pos),
+                #ff7700 calc(var(--rainbow-pos) + 2%),
+                #ffff00 calc(var(--rainbow-pos) + 4%),
+                #00ff00 calc(var(--rainbow-pos) + 6%),
+                #0099ff calc(var(--rainbow-pos) + 8%),
+                #9933ff calc(var(--rainbow-pos) + 10%),
+                transparent calc(var(--rainbow-pos) + 15%),
+                transparent 100%
+            ) !important;
+            z-index: -1 !important;
+            animation: rainbowRotate 3s linear infinite !important;
+            filter: blur(1px) drop-shadow(0 0 10px currentColor) !important;
+        }
+        @property --rainbow-pos {
+            syntax: '<percentage>';
+            inherits: false;
+            initial-value: 0%;
+        }
+        @keyframes rainbowRotate {
+            from { --rainbow-pos: 0%; }
+            to { --rainbow-pos: 100%; }
+        }
+    `;
+    break;
+
+case 'neon':
+    // Neonowe migające krawędzie
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background: linear-gradient(90deg,
+                ${config.gradientColors[0]} 0%,
+                ${config.gradientColors[2]} 25%,
+                ${config.gradientColors[4]} 50%,
+                ${config.gradientColors[6]} 75%,
+                ${config.gradientColors[0]} 100%
+            ) !important;
+            z-index: -1 !important;
+            animation: neonFlicker 0.5s ease-in-out infinite alternate, neonGlow 2s ease-in-out infinite !important;
+            filter: drop-shadow(0 0 15px ${config.gradientColors[3]}) drop-shadow(0 0 25px ${config.gradientColors[5]}) !important;
+        }
+        @keyframes neonFlicker {
+            0%, 100% { opacity: 1; }
+            25% { opacity: 0.8; }
+            50% { opacity: 0.95; }
+            75% { opacity: 0.85; }
+        }
+        @keyframes neonGlow {
+            0%, 100% { filter: brightness(1.5) drop-shadow(0 0 15px ${config.gradientColors[3]}); }
+            50% { filter: brightness(2.5) drop-shadow(0 0 30px ${config.gradientColors[5]}); }
+        }
+    `;
+    break;
+
+case 'plasma':
+    // Efekt plazmy - wirujące plamy kolorów
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            --plasma-angle: 0deg;
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background:
+                radial-gradient(ellipse at 20% 30%, ${config.gradientColors[0]} 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, ${config.gradientColors[3]} 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 80%, ${config.gradientColors[5]} 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 20%, ${config.gradientColors[7]} 0%, transparent 50%),
+                linear-gradient(var(--plasma-angle), ${config.gradientColors[2]}, ${config.gradientColors[9]}) !important;
+            z-index: -1 !important;
+            animation: plasmaRotate 6s linear infinite, plasmaPulse 2s ease-in-out infinite alternate !important;
+            filter: blur(2px) brightness(1.5) !important;
+        }
+        @property --plasma-angle {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: 0deg;
+        }
+        @keyframes plasmaRotate {
+            from { --plasma-angle: 0deg; }
+            to { --plasma-angle: 360deg; }
+        }
+        @keyframes plasmaPulse {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.02); }
+        }
+    `;
+    break;
+
+case 'fire':
+    // Realistyczne płomienie z wieloma warstwami
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+            overflow: hidden !important;
+        }
+
+        /* Warstwa 1 - główne płomienie (czerwono-pomarańczowe) */
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            bottom: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background:
+                radial-gradient(ellipse at 10% 100%, #ff0000 0%, #ff4500 20%, transparent 40%),
+                radial-gradient(ellipse at 30% 100%, #ff2200 0%, #ff6600 25%, transparent 45%),
+                radial-gradient(ellipse at 50% 100%, #ff1100 0%, #ff5500 22%, transparent 42%),
+                radial-gradient(ellipse at 70% 100%, #ff3300 0%, #ff7700 23%, transparent 43%),
+                radial-gradient(ellipse at 90% 100%, #ff0a00 0%, #ff4400 21%, transparent 41%),
+                linear-gradient(0deg, #ff0000 0%, #ff4500 15%, #ff8800 35%, transparent 60%) !important;
+            z-index: -1 !important;
+            animation:
+                fireFlicker1 0.15s ease-in-out infinite,
+                fireDance1 2s ease-in-out infinite,
+                fireIntensity1 1.5s ease-in-out infinite alternate !important;
+            filter: blur(2px) !important;
+        }
+
+        /* Warstwa 2 - środkowe płomienie (pomarańczowo-żółte) */
+        .tip-wrapper[data-item-type=legendary]:after, .tip-wrapper[data-item-type=t-leg]:after {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            bottom: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background:
+                radial-gradient(ellipse at 15% 100%, #ff6600 0%, #ffaa00 25%, transparent 50%),
+                radial-gradient(ellipse at 40% 100%, #ff7700 0%, #ffbb00 28%, transparent 52%),
+                radial-gradient(ellipse at 60% 100%, #ff6600 0%, #ffaa00 26%, transparent 51%),
+                radial-gradient(ellipse at 85% 100%, #ff7700 0%, #ffbb00 27%, transparent 50%),
+                linear-gradient(0deg, #ff6600 0%, #ffaa00 20%, #ffdd00 40%, transparent 65%) !important;
+            z-index: -1 !important;
+            animation:
+                fireFlicker2 0.12s ease-in-out infinite 0.05s,
+                fireDance2 1.8s ease-in-out infinite 0.3s,
+                fireIntensity2 1.3s ease-in-out infinite alternate 0.2s !important;
+            filter: blur(1.5px) !important;
+            mix-blend-mode: screen !important;
+        }
+
+        /* Animacje migotania - szybkie, losowe zmiany */
+        @keyframes fireFlicker1 {
+            0% { opacity: 0.85; }
+            25% { opacity: 0.95; }
+            50% { opacity: 0.9; }
+            75% { opacity: 0.92; }
+            100% { opacity: 0.88; }
+        }
+
+        @keyframes fireFlicker2 {
+            0% { opacity: 0.75; }
+            20% { opacity: 0.85; }
+            40% { opacity: 0.8; }
+            60% { opacity: 0.82; }
+            80% { opacity: 0.78; }
+            100% { opacity: 0.8; }
+        }
+
+        /* Taniec płomieni - ruchy w bok */
+        @keyframes fireDance1 {
+            0%, 100% {
+                transform: translateX(0px) scaleY(1) scaleX(1);
+            }
+            25% {
+                transform: translateX(1px) scaleY(1.02) scaleX(0.98);
+            }
+            50% {
+                transform: translateX(-1px) scaleY(0.98) scaleX(1.02);
+            }
+            75% {
+                transform: translateX(1px) scaleY(1.01) scaleX(0.99);
+            }
+        }
+
+        @keyframes fireDance2 {
+            0%, 100% {
+                transform: translateX(0px) scaleY(1) scaleX(1);
+            }
+            30% {
+                transform: translateX(-1px) scaleY(1.03) scaleX(0.97);
+            }
+            60% {
+                transform: translateX(1px) scaleY(0.97) scaleX(1.03);
+            }
+            80% {
+                transform: translateX(-0.5px) scaleY(1.01) scaleX(0.99);
+            }
+        }
+
+        /* Zmiana intensywności płomieni */
+        @keyframes fireIntensity1 {
+            0% {
+                filter: blur(2px) brightness(1.2);
+            }
+            100% {
+                filter: blur(2.5px) brightness(1.5);
+            }
+        }
+
+        @keyframes fireIntensity2 {
+            0% {
+                filter: blur(1.5px) brightness(1.3);
+            }
+            100% {
+                filter: blur(2px) brightness(1.6);
+            }
+        }
+    `;
+    break;
+
+case 'matrix':
+    // Efekt Matrixa - spadające linie kodu
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+            overflow: hidden !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -100% !important;
+            width: calc(100% + 4px) !important;
+            height: 200% !important;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent 0px,
+                transparent 2px,
+                ${config.gradientColors[2]} 2px,
+                ${config.gradientColors[2]} 4px,
+                transparent 4px,
+                transparent 10px
+            ), linear-gradient(180deg,
+                transparent 0%,
+                ${config.gradientColors[0]} 30%,
+                ${config.gradientColors[4]} 70%,
+                transparent 100%
+            ) !important;
+            z-index: -1 !important;
+            animation: matrixFall 3s linear infinite !important;
+            opacity: 0.9 !important;
+            filter: drop-shadow(0 0 10px ${config.gradientColors[2]}) !important;
+        }
+        @keyframes matrixFall {
+            0% { transform: translateY(0%); }
+            100% { transform: translateY(50%); }
+        }
+    `;
+    break;
+    case 'lightning':
+    // Błyskawice uderzające w ramkę
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background: linear-gradient(135deg,
+                ${config.gradientColors[0]} 0%,
+                ${config.gradientColors[3]} 50%,
+                ${config.gradientColors[0]} 100%
+            ) !important;
+            z-index: -1 !important;
+            animation: lightningStrike 0.8s ease-in-out infinite !important;
+            filter: brightness(1.5) drop-shadow(0 0 15px ${config.gradientColors[5]}) !important;
+        }
+        @keyframes lightningStrike {
+            0%, 100% { opacity: 0.3; }
+            10% { opacity: 1; }
+            15% { opacity: 0.5; }
+            20% { opacity: 1; }
+            25% { opacity: 0.3; }
+        }
+    `;
+    break;
+
+case 'waterfall':
+    // Spadająca kaskada wody
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+            overflow: hidden !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -100% !important;
+            width: calc(100% + 4px) !important;
+            height: 300% !important;
+            background:
+                linear-gradient(180deg,
+                    transparent 0%,
+                    ${config.gradientColors[0]}33 10%,
+                    ${config.gradientColors[2]}66 20%,
+                    ${config.gradientColors[4]}99 30%,
+                    ${config.gradientColors[4]}66 40%,
+                    ${config.gradientColors[2]}33 50%,
+                    transparent 60%
+                ),
+                repeating-linear-gradient(
+                    180deg,
+                    transparent 0px,
+                    ${config.gradientColors[0]}22 5px,
+                    transparent 10px
+                ) !important;
+            z-index: -1 !important;
+            animation: waterfallFlow 3s linear infinite !important;
+            filter: blur(1px) !important;
+        }
+        @keyframes waterfallFlow {
+            from { transform: translateY(0%); }
+            to { transform: translateY(33.333%); }
+        }
+    `;
+    break;
+
+case 'frost':
+    // Zamarzanie - lodowe kryształy
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background:
+                radial-gradient(circle at 20% 30%, ${config.gradientColors[0]} 0%, transparent 3%),
+                radial-gradient(circle at 80% 20%, ${config.gradientColors[2]} 0%, transparent 2%),
+                radial-gradient(circle at 40% 70%, ${config.gradientColors[4]} 0%, transparent 4%),
+                radial-gradient(circle at 60% 50%, ${config.gradientColors[6]} 0%, transparent 3%),
+                radial-gradient(circle at 90% 80%, ${config.gradientColors[8]} 0%, transparent 2%),
+                radial-gradient(circle at 10% 90%, ${config.gradientColors[9]} 0%, transparent 3%),
+                linear-gradient(135deg, ${config.gradientColors[0]}44, ${config.gradientColors[5]}66) !important;
+            z-index: -1 !important;
+            animation: frostGrow 2s ease-in-out infinite alternate !important;
+            filter: blur(0.5px) brightness(1.8) !important;
+        }
+        @keyframes frostGrow {
+            0% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+    `;
+    break;
+
+case 'cosmic':
+    // Kosmiczne gwiazdy i mgławice
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+            overflow: hidden !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background:
+                radial-gradient(circle at 15% 25%, ${config.gradientColors[0]} 0%, transparent 15%),
+                radial-gradient(circle at 85% 30%, ${config.gradientColors[3]} 0%, transparent 18%),
+                radial-gradient(circle at 30% 75%, ${config.gradientColors[6]} 0%, transparent 20%),
+                radial-gradient(circle at 70% 80%, ${config.gradientColors[9]} 0%, transparent 16%),
+                linear-gradient(135deg, ${config.gradientColors[1]}22, ${config.gradientColors[7]}44) !important;
+            z-index: -1 !important;
+            animation: cosmicTwinkle 3s ease-in-out infinite !important;
+            filter: blur(2px) brightness(1.5) !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:after, .tip-wrapper[data-item-type=t-leg]:after {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background:
+                radial-gradient(circle at 50% 20%, ${config.gradientColors[2]}88 0%, transparent 1%),
+                radial-gradient(circle at 25% 60%, ${config.gradientColors[5]}88 0%, transparent 1%),
+                radial-gradient(circle at 75% 50%, ${config.gradientColors[8]}88 0%, transparent 1%) !important;
+            z-index: -1 !important;
+            animation: cosmicShine 2s ease-in-out infinite alternate !important;
+        }
+        @keyframes cosmicTwinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        @keyframes cosmicShine {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.5); }
+        }
+    `;
+    break;
+
+case 'shadow':
+    // Mroczne cienie pełzające po ramce
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+            overflow: hidden !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -50% !important;
+            top: -2px !important;
+            width: 200% !important;
+            height: calc(100% + 4px) !important;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                ${config.gradientColors[0]}88 20%,
+                ${config.gradientColors[3]}cc 25%,
+                ${config.gradientColors[6]}88 30%,
+                transparent 40%,
+                transparent 60%,
+                ${config.gradientColors[8]}88 70%,
+                ${config.gradientColors[9]}cc 75%,
+                ${config.gradientColors[2]}88 80%,
+                transparent 100%
+            ) !important;
+            z-index: -1 !important;
+            animation: shadowCrawl 4s linear infinite !important;
+            filter: blur(3px) !important;
+        }
+        @keyframes shadowCrawl {
+            from { transform: translateX(0%); }
+            to { transform: translateX(50%); }
+        }
+    `;
+    break;
+
+case 'zigzag':
+    // Zygzakowaty piorun biegnący po obwodzie
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            --zigzag-offset: 0%;
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -2px !important;
+            width: calc(100% + 4px) !important;
+            height: calc(100% + 4px) !important;
+            background: repeating-conic-gradient(
+                from 0deg,
+                transparent 0%,
+                transparent calc(var(--zigzag-offset) - 2%),
+                ${config.gradientColors[0]} calc(var(--zigzag-offset) - 1%),
+                ${config.gradientColors[3]} var(--zigzag-offset),
+                ${config.gradientColors[6]} calc(var(--zigzag-offset) + 1%),
+                transparent calc(var(--zigzag-offset) + 2%),
+                transparent calc(var(--zigzag-offset) + 8%)
+            ) !important;
+            z-index: -1 !important;
+            animation: zigzagMove 2s linear infinite !important;
+            filter: brightness(2) drop-shadow(0 0 8px ${config.gradientColors[5]}) !important;
+        }
+        @property --zigzag-offset {
+            syntax: '<percentage>';
+            inherits: false;
+            initial-value: 0%;
+        }
+        @keyframes zigzagMove {
+            from { --zigzag-offset: 0%; }
+            to { --zigzag-offset: 100%; }
+        }
+    `;
+    break;
+
+case 'bubble':
+    // Pływające bąbelki
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+            overflow: hidden !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            bottom: -100% !important;
+            width: calc(100% + 4px) !important;
+            height: 300% !important;
+            background:
+                radial-gradient(circle at 20% 90%, ${config.gradientColors[0]}aa 0%, transparent 4%),
+                radial-gradient(circle at 40% 70%, ${config.gradientColors[2]}aa 0%, transparent 5%),
+                radial-gradient(circle at 60% 85%, ${config.gradientColors[4]}aa 0%, transparent 3%),
+                radial-gradient(circle at 80% 75%, ${config.gradientColors[6]}aa 0%, transparent 6%),
+                radial-gradient(circle at 30% 50%, ${config.gradientColors[8]}aa 0%, transparent 4%),
+                radial-gradient(circle at 70% 60%, ${config.gradientColors[9]}aa 0%, transparent 5%),
+                linear-gradient(180deg, transparent 0%, ${config.gradientColors[5]}33 100%) !important;
+            z-index: -1 !important;
+            animation: bubbleRise 6s linear infinite !important;
+        }
+        @keyframes bubbleRise {
+            from { transform: translateY(0%); }
+            to { transform: translateY(-66.666%); }
+        }
+    `;
+    break;
+
+case 'scanner':
+    // Skanujący promień (jak w filmach sci-fi)
+    legendaryAnimationCSS = `
+        .tip-wrapper[data-item-type=legendary], .tip-wrapper[data-item-type=t-leg] {
+            background: #000 !important;
+            box-shadow: inset 100px 100px 100px 184px #0000007a !important;
+            overflow: hidden !important;
+        }
+        .tip-wrapper[data-item-type=legendary]:before, .tip-wrapper[data-item-type=t-leg]:before {
+            content: '' !important;
+            position: absolute !important;
+            left: -2px !important;
+            top: -100% !important;
+            width: calc(100% + 4px) !important;
+            height: 300% !important;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                transparent 45%,
+                ${config.gradientColors[0]}00 46%,
+                ${config.gradientColors[0]}44 47%,
+                ${config.gradientColors[3]}cc 49%,
+                ${config.gradientColors[6]}ff 50%,
+                ${config.gradientColors[3]}cc 51%,
+                ${config.gradientColors[0]}44 53%,
+                ${config.gradientColors[0]}00 54%,
+                transparent 55%,
+                transparent 100%
+            ) !important;
+            z-index: -1 !important;
+            animation: scannerMove 3s linear infinite !important;
+            filter: drop-shadow(0 0 10px ${config.gradientColors[5]}) !important;
+        }
+        @keyframes scannerMove {
+            from { transform: translateY(0%); }
+            to { transform: translateY(33.333%); }
+        }
+    `;
+    break;
             case 'spin':
                 // Statyczny gradient pionowy (bez animacji) - ZMIENIONE
                 legendaryAnimationCSS = `
@@ -1211,12 +1922,68 @@ function showSettingsDialog() {
             <span style="color: #ccc; font-size: 12px;">Pulsujące świecenie</span>
         </label>
         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+    <input type="radio" name="legendary-animation" value="electric" ${config.legendaryAnimation === 'electric' ? 'checked' : ''} style="cursor: pointer;">
+    <span style="color: #ccc; font-size: 12px;">Disco(EPILEPSJA)</span>
+</label>
+<label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="rainbow" ${config.legendaryAnimation === 'rainbow' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Tęcza</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="neon" ${config.legendaryAnimation === 'neon' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Neonowe miganie(EPILEPSJA)</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="plasma" ${config.legendaryAnimation === 'plasma' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Efekt plazmy</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="fire" ${config.legendaryAnimation === 'fire' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Płomienie</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="matrix" ${config.legendaryAnimation === 'matrix' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Matrix</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="lightning" ${config.legendaryAnimation === 'lightning' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Błyskawice(EPILEPSJA)</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="waterfall" ${config.legendaryAnimation === 'waterfall' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Wodospad</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="frost" ${config.legendaryAnimation === 'frost' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Notificator</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="cosmic" ${config.legendaryAnimation === 'cosmic' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Mgła</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="shadow" ${config.legendaryAnimation === 'shadow' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Pełzające cienie</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="zigzag" ${config.legendaryAnimation === 'zigzag' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">70's Party(EPILEPSJA)</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="bubble" ${config.legendaryAnimation === 'bubble' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Bąbelki</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="legendary-animation" value="scanner" ${config.legendaryAnimation === 'scanner' ? 'checked' : ''} style="cursor: pointer;">
+            <span style="color: #ccc; font-size: 12px;">Scanner</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="radio" name="legendary-animation" value="spin" ${config.legendaryAnimation === 'spin' ? 'checked' : ''} style="cursor: pointer;">
             <span style="color: #ccc; font-size: 12px;">Gradient bez animacji</span>
         </label>
     </div>
     <div class="tooltip-setting-description" style="margin-top: 8px;">
-        Wybierz typ animacji dla obramowania legendarnych przedmiotów
+        Wybierz typ animacji dla obramowania legendarnych przedmiotów !!!KAŻDA ANIMACJA JEST SPECYFICZNA, WIĘC CZASAMI TRZEBA UŻYC INNYCH KOLORÓW!!!
     </div>
 </div>
 
