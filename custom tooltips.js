@@ -1064,7 +1064,7 @@ function showSettingsDialog() {
     modal.innerHTML = `
         <div class="custom-tooltips-dialog">
             <div class="custom-tooltips-header" id="tooltip-header">
-                <h3>Custom Tooltips - Settings</h3>
+                <h3>Tooltips Styler - Settings</h3>
                 <button class="custom-tooltips-close" id="tooltip-close">×</button>
             </div>
 
