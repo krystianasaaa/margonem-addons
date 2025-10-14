@@ -123,6 +123,8 @@ let config = {
     upgradeBonusEnabled: localStorage.getItem('customTooltipsUpgradeBonusEnabled') !== 'false',
     itemDescColor: localStorage.getItem('customTooltipsItemDescColor') || '#cccccc',
     itemDescEnabled: localStorage.getItem('customTooltipsItemDescEnabled') !== 'false',
+    upgradedColor: localStorage.getItem('customTooltipsUpgradedColor') || '#ffffff',
+    upgradedEnabled: localStorage.getItem('customTooltipsUpgradedEnabled') !== 'false',
     selectedFont: localStorage.getItem('customTooltipsSelectedFont') || 'Domyślna'
 };
 
@@ -149,6 +151,8 @@ function saveConfig() {
     localStorage.setItem('customTooltipsUpgradeBonusEnabled', config.upgradeBonusEnabled.toString());
     localStorage.setItem('customTooltipsItemDescColor', config.itemDescColor);
     localStorage.setItem('customTooltipsItemDescEnabled', config.itemDescEnabled.toString());
+    localStorage.setItem('customTooltipsUpgradedColor', config.upgradedColor);
+    localStorage.setItem('customTooltipsUpgradedEnabled', config.upgradedEnabled.toString());
     localStorage.setItem('customTooltipsSelectedFont', config.selectedFont);
 }
 
@@ -177,6 +181,8 @@ function saveConfig() {
         upgradeBonusEnabled: config.upgradeBonusEnabled,
         itemDescColor: config.itemDescColor,
         itemDescEnabled: config.itemDescEnabled,
+        upgradedColor: config.upgradedColor,
+        upgradedEnabled: config.upgradedEnabled,
         selectedFont: config.selectedFont
     }
 };
@@ -375,6 +381,13 @@ if (data.settings.itemDescColor && hexRegex.test(data.settings.itemDescColor)) {
 }
 if (typeof data.settings.itemDescEnabled === 'boolean') {
     config.itemDescEnabled = data.settings.itemDescEnabled;
+}
+
+if (data.settings.upgradedColor && hexRegex.test(data.settings.upgradedColor)) {
+    config.upgradedColor = data.settings.upgradedColor;
+}
+if (typeof data.settings.upgradedEnabled === 'boolean') {
+    config.upgradedEnabled = data.settings.upgradedEnabled;
 }
 
             saveConfig();
@@ -801,6 +814,7 @@ function applyTooltipStyles() {
     const legbonColor = config.legbonEnabled ? config.legbonColor : '#00ff88';
     const upgradeBonusColor = config.upgradeBonusEnabled ? config.upgradeBonusColor : '#4CAF50';
     const itemDescColor = config.itemDescEnabled ? config.itemDescColor : '#cccccc';
+    const upgradedColor = config.upgradedEnabled ? config.upgradedColor : '#ffffff';
     const fontFamily = fontPresets[config.selectedFont] || '';
     const fontFamilyCSS = fontFamily ? `font-family: ${fontFamily} !important;` : '';
 
@@ -996,8 +1010,8 @@ function applyTooltipStyles() {
         .tip-wrapper .content .info-wrapper .nick {color:#79e1c5 !important; font-family: Cinzel !important; font-size: 11px !important; text-shadow: 0 0 4px black !important; border: 1px solid ${borderColor} !important; border-radius: 2px !important; background: ${borderColor}20 !important;}
         .tip-wrapper[data-type=t_other] .line {border-bottom:1px solid ${borderColor} !important; background: none !important;}
         .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
-        .tip-wrapper[data-type=t_item] .item-head .legendary {color: ${legendaryLabelColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryLabelColor}42 !important;}
-        .tip-wrapper[data-type=t_item] .item-tip-section .legendary {color: ${legendaryNameColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryNameColor}42 !important;}
+        .tip-wrapper[data-item-type=legendary] .item-head .legendary, .tip-wrapper[data-item-type=t-leg] .item-head .legendary {color: ${legendaryLabelColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryLabelColor}42 !important;}
+        .tip-wrapper[data-item-type=legendary] .item-tip-section .legendary, .tip-wrapper[data-item-type=t-leg] .item-tip-section .legendary {color: ${legendaryNameColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryNameColor}42 !important;}
         .tip-wrapper[data-type=t_item] .tip-item-stat-legbon {color: ${legbonColor} !important; font-weight: 600 !important;}
         .tip-wrapper[data-type=t_item] .tip-item-stat-bonus {color: ${upgradeBonusColor} !important; font-weight: 600 !important;}
         .tip-wrapper[data-type=t_item] .tip-item-stat-opis {color: ${itemDescColor} !important;}
@@ -1006,8 +1020,8 @@ function applyTooltipStyles() {
         .tip-wrapper[data-type=t_item] .item-tip-section.s-7{color: white !important; font-weight: 700 !important;}
         .tip-wrapper[data-type=t_item] i.looter{color: ${textColor} !important; text-align: center !important;}
         .tip-wrapper[data-type=t_item] .item-tip-section.s-5{color: ${textColor} !important; text-align: center !important; font-weight: 600 !important;}
-        .tip-wrapper[data-item-type=t-upgraded], .tip-wrapper[data-item-type=upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #111911, 0 0 0 3px #2b2727, 0 0 0 4px #59595a, 0 0 0 5px ${textColor}, 0 0 0 6px #5a585b, 0 0 0 7px #2c2625 !important;}
-        .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{color: ${textColor} !important;}
+        .tip-wrapper[data-item-type=t-upgraded], .tip-wrapper[data-item-type=upgraded]{box-shadow: 0 0 0 0 #2b282a, 0 0 0 1px ${borderColor}, 0 0 0 2px #111911, 0 0 0 3px #2b2727, 0 0 0 4px #59595a, 0 0 0 5px ${upgradedColor}, 0 0 0 6px #5a585b, 0 0 0 7px #2c2625 !important;}
+        .tip-wrapper[data-type=t_item] .item-head .upgraded, .tip-wrapper[data-type=t_item] .item-tip-section .upgraded{color: ${upgradedColor} !important;}
         .tip-wrapper[data-type=t_item] .prc-icon{width:0px !important; height:0px !important;}
         .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .value-item{color:white !important; font-size:10px !important;}
         .tip-wrapper[data-type=t_item] .item-tip-section.s-9 .lvl-next{float:none !important;}
@@ -1050,7 +1064,7 @@ function showSettingsDialog() {
     modal.innerHTML = `
         <div class="custom-tooltips-dialog">
             <div class="custom-tooltips-header" id="tooltip-header">
-                <h3>Tooltips Styler - Settings</h3>
+                <h3>Custom Tooltips - Settings</h3>
                 <button class="custom-tooltips-close" id="tooltip-close">×</button>
             </div>
 
@@ -1159,6 +1173,17 @@ function showSettingsDialog() {
         <input type="color" class="tooltip-color-picker" id="item-desc-color" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
     </div>
     <div class="tooltip-setting-description">Kolor opisów przedmiotów(w tym eventy itp itd)</div>
+</div>
+<div class="tooltip-setting-group">
+    <label class="tooltip-setting-label">
+        <input type="checkbox" class="tooltip-checkbox" id="upgraded-enabled" ${config.upgradedEnabled ? 'checked' : ''}>
+        Kolor ulepszonych przedmiotów
+    </label>
+    <div class="tooltip-color-input-wrapper">
+        <input type="text" class="tooltip-color-input" id="upgraded-color-text" value="${config.upgradedColor}" ${!config.upgradedEnabled ? 'disabled' : ''}>
+        <input type="color" class="tooltip-color-picker" id="upgraded-color" value="${config.upgradedColor}" ${!config.upgradedEnabled ? 'disabled' : ''}>
+    </div>
+    <div class="tooltip-setting-description">Kolor nazw ulepszonych przedmiotów</div>
 </div>
 <div class="tooltip-setting-group">
     <label class="tooltip-setting-label">
@@ -1291,6 +1316,8 @@ function showSettingsDialog() {
         setupCheckboxToggle('legbon-enabled', 'legbon-color-text', 'legbon-color', 'legbonEnabled');
         setupCheckboxToggle('upgrade-bonus-enabled', 'upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusEnabled');
         setupCheckboxToggle('item-desc-enabled', 'item-desc-color-text', 'item-desc-color', 'itemDescEnabled');
+        setupCheckboxToggle('upgraded-enabled', 'upgraded-color-text', 'upgraded-color', 'upgradedEnabled');
+
 
 // Gradient checkbox
 document.getElementById('gradient-enabled').addEventListener('change', (e) => {
@@ -1326,6 +1353,7 @@ document.getElementById('gradient-enabled').addEventListener('change', (e) => {
         setupColorSync('legbon-color-text', 'legbon-color', 'legbonColor');
         setupColorSync('upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusColor');
         setupColorSync('item-desc-color-text', 'item-desc-color', 'itemDescColor');
+        setupColorSync('upgraded-color-text', 'upgraded-color', 'upgradedColor');
 
         // Gradient colors
         document.querySelectorAll('.gradient-color-text').forEach(input => {
@@ -1404,6 +1432,8 @@ config.upgradeBonusColor = '#4CAF50';
 config.upgradeBonusEnabled = true;
 config.itemDescColor = '#cccccc';
 config.itemDescEnabled = true;
+config.upgradedColor = '#ffffff';
+config.upgradedEnabled = true;
 config.selectedFont = 'Domyślna';
 config.legendaryAnimation = 'gradient';
 
