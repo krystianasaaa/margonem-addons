@@ -1931,11 +1931,11 @@ function showSettingsDialog() {
         </label>
         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="radio" name="legendary-animation" value="neon" ${config.legendaryAnimation === 'neon' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Neonowe miganie(EPILEPSJA)</span>
+            <span style="color: #ccc; font-size: 12px;">Neon(EPILEPSJA)</span>
         </label>
         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="radio" name="legendary-animation" value="plasma" ${config.legendaryAnimation === 'plasma' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Efekt plazmy</span>
+            <span style="color: #ccc; font-size: 12px;">Plazma</span>
         </label>
         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="radio" name="legendary-animation" value="fire" ${config.legendaryAnimation === 'fire' ? 'checked' : ''} style="cursor: pointer;">
