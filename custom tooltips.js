@@ -103,6 +103,14 @@ let config = {
     enabled: localStorage.getItem('customTooltipsEnabled') !== 'false',
     borderColor: localStorage.getItem('customTooltipsBorderColor') || '#ffffff',
     borderEnabled: localStorage.getItem('customTooltipsBorderEnabled') !== 'false',
+    widgetBorderColor: localStorage.getItem('customTooltipsWidgetBorderColor') || '#ffffff',
+    widgetBorderEnabled: localStorage.getItem('customTooltipsWidgetBorderEnabled') !== 'false',
+    widgetGlowColor: localStorage.getItem('customTooltipsWidgetGlowColor') || '#e0e0e0',
+    widgetGlowEnabled: localStorage.getItem('customTooltipsWidgetGlowEnabled') !== 'false',
+    characterBorderColor: localStorage.getItem('customTooltipsCharacterBorderColor') || '#ffffff',
+    characterBorderEnabled: localStorage.getItem('customTooltipsCharacterBorderEnabled') !== 'false',
+    characterGlowColor: localStorage.getItem('customTooltipsCharacterGlowColor') || '#e0e0e0',
+    characterGlowEnabled: localStorage.getItem('customTooltipsCharacterGlowEnabled') !== 'false',
     glowColor: localStorage.getItem('customTooltipsGlowColor') || '#e0e0e0',
     glowEnabled: localStorage.getItem('customTooltipsGlowEnabled') !== 'false',
     textColor: localStorage.getItem('customTooltipsTextColor') || '#ffffff',
@@ -125,6 +133,8 @@ let config = {
     itemDescEnabled: localStorage.getItem('customTooltipsItemDescEnabled') !== 'false',
     upgradedColor: localStorage.getItem('customTooltipsUpgradedColor') || '#ffffff',
     upgradedEnabled: localStorage.getItem('customTooltipsUpgradedEnabled') !== 'false',
+    nickBorderColor: localStorage.getItem('customTooltipsNickBorderColor') || '#ffffff',
+    nickBorderEnabled: localStorage.getItem('customTooltipsNickBorderEnabled') !== 'false',
     selectedFont: localStorage.getItem('customTooltipsSelectedFont') || 'Domyślna'
 };
 
@@ -132,6 +142,14 @@ function saveConfig() {
     localStorage.setItem('customTooltipsEnabled', config.enabled.toString());
     localStorage.setItem('customTooltipsBorderColor', config.borderColor);
     localStorage.setItem('customTooltipsBorderEnabled', config.borderEnabled.toString());
+    localStorage.setItem('customTooltipsWidgetBorderColor', config.widgetBorderColor);
+    localStorage.setItem('customTooltipsWidgetBorderEnabled', config.widgetBorderEnabled.toString());
+    localStorage.setItem('customTooltipsWidgetGlowColor', config.widgetGlowColor);
+    localStorage.setItem('customTooltipsWidgetGlowEnabled', config.widgetGlowEnabled.toString());
+    localStorage.setItem('customTooltipsCharacterBorderColor', config.characterBorderColor);
+    localStorage.setItem('customTooltipsCharacterBorderEnabled', config.characterBorderEnabled.toString());
+    localStorage.setItem('customTooltipsCharacterGlowColor', config.characterGlowColor);
+    localStorage.setItem('customTooltipsCharacterGlowEnabled', config.characterGlowEnabled.toString());
     localStorage.setItem('customTooltipsGlowColor', config.glowColor);
     localStorage.setItem('customTooltipsGlowEnabled', config.glowEnabled.toString());
     localStorage.setItem('customTooltipsTextColor', config.textColor);
@@ -153,6 +171,8 @@ function saveConfig() {
     localStorage.setItem('customTooltipsItemDescEnabled', config.itemDescEnabled.toString());
     localStorage.setItem('customTooltipsUpgradedColor', config.upgradedColor);
     localStorage.setItem('customTooltipsUpgradedEnabled', config.upgradedEnabled.toString());
+    localStorage.setItem('customTooltipsNickBorderColor', config.nickBorderColor);
+    localStorage.setItem('customTooltipsNickBorderEnabled', config.nickBorderEnabled.toString());
     localStorage.setItem('customTooltipsSelectedFont', config.selectedFont);
 }
 
@@ -162,6 +182,14 @@ function saveConfig() {
     settings: {
         borderColor: config.borderColor,
         borderEnabled: config.borderEnabled,
+        widgetBorderColor: config.widgetBorderColor,
+        widgetBorderEnabled: config.widgetBorderEnabled,
+        widgetGlowColor: config.widgetGlowColor,
+        widgetGlowEnabled: config.widgetGlowEnabled,
+        characterBorderColor: config.characterBorderColor,
+        characterBorderEnabled: config.characterBorderEnabled,
+        characterGlowColor: config.characterGlowColor,
+        characterGlowEnabled: config.characterGlowEnabled,
         glowColor: config.glowColor,
         glowEnabled: config.glowEnabled,
         textColor: config.textColor,
@@ -183,6 +211,8 @@ function saveConfig() {
         itemDescEnabled: config.itemDescEnabled,
         upgradedColor: config.upgradedColor,
         upgradedEnabled: config.upgradedEnabled,
+        nickBorderColor: config.nickBorderColor,
+        nickBorderEnabled: config.nickBorderEnabled,
         selectedFont: config.selectedFont
     }
 };
@@ -311,6 +341,32 @@ if (data.settings.borderColor && hexRegex.test(data.settings.borderColor)) {
 if (typeof data.settings.borderEnabled === 'boolean') {
     config.borderEnabled = data.settings.borderEnabled;
 }
+
+if (data.settings.widgetBorderColor && hexRegex.test(data.settings.widgetBorderColor)) {
+    config.widgetBorderColor = data.settings.widgetBorderColor;
+}
+if (typeof data.settings.widgetBorderEnabled === 'boolean') {
+    config.widgetBorderEnabled = data.settings.widgetBorderEnabled;
+}
+if (data.settings.widgetGlowColor && hexRegex.test(data.settings.widgetGlowColor)) {
+    config.widgetGlowColor = data.settings.widgetGlowColor;
+}
+if (typeof data.settings.widgetGlowEnabled === 'boolean') {
+    config.widgetGlowEnabled = data.settings.widgetGlowEnabled;
+}
+
+if (data.settings.characterBorderColor && hexRegex.test(data.settings.characterBorderColor)) {
+    config.characterBorderColor = data.settings.characterBorderColor;
+}
+if (typeof data.settings.characterBorderEnabled === 'boolean') {
+    config.characterBorderEnabled = data.settings.characterBorderEnabled;
+}
+if (data.settings.characterGlowColor && hexRegex.test(data.settings.characterGlowColor)) {
+    config.characterGlowColor = data.settings.characterGlowColor;
+}
+if (typeof data.settings.characterGlowEnabled === 'boolean') {
+    config.characterGlowEnabled = data.settings.characterGlowEnabled;
+}
 if (data.settings.glowColor && hexRegex.test(data.settings.glowColor)) {
     config.glowColor = data.settings.glowColor;
 }
@@ -389,6 +445,12 @@ if (data.settings.upgradedColor && hexRegex.test(data.settings.upgradedColor)) {
 if (typeof data.settings.upgradedEnabled === 'boolean') {
     config.upgradedEnabled = data.settings.upgradedEnabled;
 }
+if (data.settings.nickBorderColor && hexRegex.test(data.settings.nickBorderColor)) {
+    config.nickBorderColor = data.settings.nickBorderColor;
+}
+if (typeof data.settings.nickBorderEnabled === 'boolean') {
+    config.nickBorderEnabled = data.settings.nickBorderEnabled;
+}
 
             saveConfig();
             applyTooltipStyles();
@@ -459,7 +521,7 @@ const styles = `
         pointer-events: none;
     }
 
-    /* Dialog - CZARNE TŁO, bez przyciemnienia */
+    /* Dialog */
     .custom-tooltips-dialog {
         background: #2a2a2a;
         border: 1px solid #444;
@@ -467,7 +529,7 @@ const styles = `
         padding: 0;
         width: 400px;
         max-width: 90vw;
-        max-height: 80vh;
+        max-height: 90vh;
         color: #ccc;
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         overflow: hidden;
@@ -476,7 +538,7 @@ const styles = `
         pointer-events: all;
     }
 
-    /* Nagłówek - SZARY, nie fioletowy */
+    /* Nagłówek */
     .custom-tooltips-header {
         background: #333;
         padding: 15px;
@@ -487,6 +549,7 @@ const styles = `
         align-items: center;
         border-radius: 4px 4px 0 0;
         border-bottom: 1px solid #444;
+        flex-shrink: 0;
     }
 
     .custom-tooltips-header h3 {
@@ -518,33 +581,81 @@ const styles = `
         color: #fff;
     }
 
-    /* Zawartość */
-    .custom-tooltips-content {
-        overflow-y: auto;
+    /* Style dla zakładek */
+    .tooltip-tab {
         flex: 1;
-        padding: 15px;
-        max-height: calc(80vh - 60px);
-        scrollbar-width: thin;
-        scrollbar-color: #555 #2a2a2a;
+        padding: 12px;
+        background: #1a1a1a;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: #888;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: bold;
+        transition: all 0.2s;
     }
 
-    .custom-tooltips-content::-webkit-scrollbar {
-        width: 8px;
+    .tooltip-tab:hover {
+        background: #252525;
+        color: #ccc;
     }
 
-    .custom-tooltips-content::-webkit-scrollbar-track {
+    .tooltip-tab.active {
         background: #2a2a2a;
-        border-radius: 4px;
+        color: #5865F2;
+        border-bottom-color: #5865F2;
     }
 
-    .custom-tooltips-content::-webkit-scrollbar-thumb {
-        background: #555;
-        border-radius: 4px;
+    .tooltip-tab-content {
+        display: none;
+        padding: 15px;
     }
 
-    .custom-tooltips-content::-webkit-scrollbar-thumb:hover {
-        background: #666;
+    .tooltip-tab-content.active {
+        display: block;
     }
+
+.custom-tooltips-content {
+    flex: 1;
+    min-height: 0; /* WAŻNE! */
+    display: flex;
+    flex-direction: column;
+}
+
+.tooltip-tab-content {
+    display: none;
+    padding: 15px;
+    height: 100%;
+    overflow-y: auto; /* Scroll TUTAJ zamiast w .custom-tooltips-content */
+}
+
+.tooltip-tab-content.active {
+    display: block;
+}
+
+/* Scrollbary dla zakładek */
+.tooltip-tab-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tooltip-tab-content::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.tooltip-tab-content::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.tooltip-tab-content::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.tooltip-tab-content {
+    scrollbar-width: thin;
+    scrollbar-color: #555 #2a2a2a;
+}
 
     /* Grupy ustawień */
     .tooltip-setting-group {
@@ -568,10 +679,37 @@ const styles = `
 
     /* Checkbox */
     .tooltip-checkbox {
-        width: 16px;
-        height: 16px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #555;
+        border-radius: 3px;
+        background: #2a2a2a;
         cursor: pointer;
-        accent-color: #5865F2;
+        position: relative;
+        transition: all 0.2s;
+    }
+
+    .tooltip-checkbox:hover {
+        border-color: #4CAF50;
+    }
+
+    .tooltip-checkbox:checked {
+        background: #4CAF50;
+        border-color: #4CAF50;
+    }
+
+    .tooltip-checkbox:checked::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
     }
 
     /* Wrapper inputów kolorów */
@@ -625,23 +763,24 @@ const styles = `
         line-height: 1.4;
     }
 
-/* Select dla czcionki */
-.tooltip-font-select {
-    width: 100%;
-    padding: 8px;
-    background: #555;
-    border: 1px solid #666;
-    border-radius: 3px;
-    color: #fff;
-    font-size: 12px;
-    cursor: pointer;
-}
+    /* Select dla czcionki */
+    .tooltip-font-select {
+        width: 100%;
+        padding: 8px;
+        background: #555;
+        border: 1px solid #666;
+        border-radius: 3px;
+        color: #fff;
+        font-size: 12px;
+        cursor: pointer;
+    }
 
-.tooltip-font-select:focus {
-    outline: none;
-    border-color: #888;
-}
-    /* Siatka gradientów - ZMIENIONA NA PIONOWĄ */
+    .tooltip-font-select:focus {
+        outline: none;
+        border-color: #888;
+    }
+
+    /* Siatka gradientów */
     .tooltip-gradient-inputs {
         display: flex;
         flex-direction: column;
@@ -695,6 +834,7 @@ const styles = `
         border-radius: 0 0 4px 4px;
         border-top: 1px solid #444;
         flex-wrap: wrap;
+        flex-shrink: 0;
     }
 
     .tooltip-btn {
@@ -758,40 +898,6 @@ const styles = `
     #tooltip-import-file {
         display: none;
     }
-
-.tooltip-checkbox {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #555;
-    border-radius: 3px;
-    background: #2a2a2a;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-}
-
-.tooltip-checkbox:hover {
-    border-color: #4CAF50;
-}
-
-.tooltip-checkbox:checked {
-    background: #4CAF50;
-    border-color: #4CAF50;
-}
-
-.tooltip-checkbox:checked::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-}
 `;
 
 
@@ -807,6 +913,10 @@ function applyTooltipStyles() {
     const gradientColorsStr = config.gradientColors.join(', ');
     const borderColor = config.borderEnabled ? config.borderColor : '#ffffff';
     const glowColor = config.glowEnabled ? config.glowColor : '#e0e0e0';
+    const widgetBorderColor = config.widgetBorderEnabled ? config.widgetBorderColor : '#ffffff';
+    const widgetGlowColor = config.widgetGlowEnabled ? config.widgetGlowColor : '#e0e0e0';
+    const characterBorderColor = config.characterBorderEnabled ? config.characterBorderColor : '#ffffff';
+    const characterGlowColor = config.characterGlowEnabled ? config.characterGlowColor : '#e0e0e0';
     const textColor = config.textEnabled ? config.textColor : '#ffffff';
     const damageColor = config.damageEnabled ? config.damageColor : '#cccccc';
     const legendaryNameColor = config.legendaryNameEnabled ? config.legendaryNameColor : '#ff6b35';
@@ -817,6 +927,7 @@ function applyTooltipStyles() {
     const upgradedColor = config.upgradedEnabled ? config.upgradedColor : '#ffffff';
     const fontFamily = fontPresets[config.selectedFont] || '';
     const fontFamilyCSS = fontFamily ? `font-family: ${fontFamily} !important;` : '';
+    const nickBorderColor = config.nickBorderEnabled ? config.nickBorderColor : '#ffffff';
 
     // ANIMACJE LEGENDARNE
     let legendaryAnimationCSS = '';
@@ -1712,14 +1823,14 @@ case 'scanner':
         <style id="custom-tooltips-style">
         /*ANIMOWANE-TIPY - WSZYSTKO Z !important*/
         .item-type{text-align:center !important;}
-        .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
-        .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500 !important;}
+        .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${characterBorderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${characterGlowColor} 0px 1px 24px -4px !important;}        .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500 !important;}
         .tip-wrapper .content {padding: 5px !important; background: rgba(15, 15, 15,.85) !important; word-break: break-word !important; ${fontFamilyCSS}}
         .tip-wrapper[data-type=t_item] .item-head {border:1px solid #1e1e1e66 !important; border-radius: 2px !important; background: hsl(0deg 0% 4.87% / 10%) !important;}
         .tip-wrapper[data-type=t_item] .item-head .cl-icon {border: 1px solid rgba(15, 15, 15,.3) !important;}
         .tip-wrapper[data-type=t_item] .item-tip-section {border-bottom: 1px solid rgba(15, 15, 15,.5) !important;}
-        .tip-wrapper .content .info-wrapper .nick {color:#79e1c5 !important; font-family: Cinzel !important; font-size: 11px !important; text-shadow: 0 0 4px black !important; border: 1px solid ${borderColor} !important; border-radius: 2px !important; background: ${borderColor}20 !important;}
-        .tip-wrapper[data-type=t_other] .line {border-bottom:1px solid ${borderColor} !important; background: none !important;}
+        .tip-wrapper .content .info-wrapper .nick {color: #79e1c5 !important; font-family: Cinzel !important; font-size: 11px !important; text-shadow: 0 0 4px black !important; border: 1px solid ${nickBorderColor} !important; border-radius: 2px !important; background: ${nickBorderColor}20 !important;}
+        .tip-wrapper[data-type=t_other] {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${widgetBorderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${widgetGlowColor} 0px 1px 24px -4px !important;}
+        .tip-wrapper[data-type=t_other] .line {border-bottom:1px solid ${widgetBorderColor} !important; background: none !important;}
         .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
         .tip-wrapper[data-item-type=legendary] .item-head .legendary, .tip-wrapper[data-item-type=t-leg] .item-head .legendary {color: ${legendaryLabelColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryLabelColor}42 !important;}
         .tip-wrapper[data-item-type=legendary] .item-tip-section .legendary, .tip-wrapper[data-item-type=t-leg] .item-tip-section .legendary {color: ${legendaryNameColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryNameColor}42 !important;}
@@ -1773,251 +1884,347 @@ function showSettingsDialog() {
     modal.className = 'custom-tooltips-modal';
 
     modal.innerHTML = `
-        <div class="custom-tooltips-dialog">
+        <div class="custom-tooltips-dialog" style="width: 380px; height: 700px; max-height: 90vh; display: flex; flex-direction: column;">
             <div class="custom-tooltips-header" id="tooltip-header">
                 <h3>Tooltips Styler - Settings</h3>
                 <button class="custom-tooltips-close" id="tooltip-close">×</button>
             </div>
 
-            <div class="custom-tooltips-content" id="tooltip-scroll-content">
-                <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">
-                        <input type="checkbox" class="tooltip-checkbox" id="border-enabled" ${config.borderEnabled ? 'checked' : ''}>
-                        Kolor ramki
-                    </label>
-                    <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="border-color-text" value="${config.borderColor}" ${!config.borderEnabled ? 'disabled' : ''}>
-                        <input type="color" class="tooltip-color-picker" id="border-color" value="${config.borderColor}" ${!config.borderEnabled ? 'disabled' : ''}>
+            <!-- ZAKŁADKI -->
+            <div style="display: flex; background: #1a1a1a; border-bottom: 1px solid #444; flex-shrink: 0;">
+                <button class="tooltip-tab active" data-tab="items">Itemy</button>
+                <button class="tooltip-tab" data-tab="widgets">Widgety</button>
+                <button class="tooltip-tab" data-tab="character">Postać</button>
+            </div>
+
+            <div class="custom-tooltips-content" id="tooltip-scroll-content" style="flex: 1; overflow-y: auto;">
+                <!-- ZAKŁADKA: ITEMY -->
+                <div class="tooltip-tab-content active" data-tab="items">
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="border-enabled" ${config.borderEnabled ? 'checked' : ''}>
+                            Kolor ramki
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="border-color-text" value="${config.borderColor}" ${!config.borderEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="border-color" value="${config.borderColor}" ${!config.borderEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor obramowania tooltipów przedmiotów</div>
                     </div>
-                    <div class="tooltip-setting-description">Główny kolor obramowania tooltipów (itemy i widgety)</div>
-                </div>
 
-                <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">
-                        <input type="checkbox" class="tooltip-checkbox" id="glow-enabled" ${config.glowEnabled ? 'checked' : ''}>
-                        Kolor świecenia
-                    </label>
-                    <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="glow-color-text" value="${config.glowColor}" ${!config.glowEnabled ? 'disabled' : ''}>
-                        <input type="color" class="tooltip-color-picker" id="glow-color" value="${config.glowColor}" ${!config.glowEnabled ? 'disabled' : ''}>
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="glow-enabled" ${config.glowEnabled ? 'checked' : ''}>
+                            Kolor świecenia
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="glow-color-text" value="${config.glowColor}" ${!config.glowEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="glow-color" value="${config.glowColor}" ${!config.glowEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor efektu świecenia wokół ramki</div>
                     </div>
-                    <div class="tooltip-setting-description">Kolor efektu świecenia wokół ramki</div>
-                </div>
 
-                <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">
-                        <input type="checkbox" class="tooltip-checkbox" id="text-enabled" ${config.textEnabled ? 'checked' : ''}>
-                        Kolor podpisów
-                    </label>
-                    <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="text-color-text" value="${config.textColor}" ${!config.textEnabled ? 'disabled' : ''}>
-                        <input type="color" class="tooltip-color-picker" id="text-color" value="${config.textColor}" ${!config.textEnabled ? 'disabled' : ''}>
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="text-enabled" ${config.textEnabled ? 'checked' : ''}>
+                            Kolor podpisów
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="text-color-text" value="${config.textColor}" ${!config.textEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="text-color" value="${config.textColor}" ${!config.textEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor podpisów przedmiotów (działa tylko na legach!)</div>
                     </div>
-                    <div class="tooltip-setting-description">Kolor podpisów przedmiotów (działa tylko na legach!)</div>
-                </div>
 
-                <div class="tooltip-setting-group">
-                    <label class="tooltip-setting-label">
-                        <input type="checkbox" class="tooltip-checkbox" id="damage-enabled" ${config.damageEnabled ? 'checked' : ''}>
-                        Kolor statystyk
-                    </label>
-                    <div class="tooltip-color-input-wrapper">
-                        <input type="text" class="tooltip-color-input" id="damage-color-text" value="${config.damageColor}" ${!config.damageEnabled ? 'disabled' : ''}>
-                        <input type="color" class="tooltip-color-picker" id="damage-color" value="${config.damageColor}" ${!config.damageEnabled ? 'disabled' : ''}>
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="damage-enabled" ${config.damageEnabled ? 'checked' : ''}>
+                            Kolor statystyk
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="damage-color-text" value="${config.damageColor}" ${!config.damageEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="damage-color" value="${config.damageColor}" ${!config.damageEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor statystyk na przedmiotach</div>
                     </div>
-                    <div class="tooltip-setting-description">Kolor statystyk na przedmiotach</div>
-                </div>
-                <div class="tooltip-setting-group">
-    <label class="tooltip-setting-label">
-        <input type="checkbox" class="tooltip-checkbox" id="legendary-label-enabled" ${config.legendaryLabelEnabled ? 'checked' : ''}>
-        Kolor nazwy legi
-    </label>
-    <div class="tooltip-color-input-wrapper">
-        <input type="text" class="tooltip-color-input" id="legendary-label-color-text" value="${config.legendaryLabelColor}" ${!config.legendaryLabelEnabled ? 'disabled' : ''}>
-        <input type="color" class="tooltip-color-picker" id="legendary-label-color" value="${config.legendaryLabelColor}" ${!config.legendaryLabelEnabled ? 'disabled' : ''}>
-    </div>
-    <div class="tooltip-setting-description">Kolor nazwy przedmiotu legendarnego(działa tylko na legach!)</div>
-</div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="legendary-label-enabled" ${config.legendaryLabelEnabled ? 'checked' : ''}>
+                            Kolor nazwy legi
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="legendary-label-color-text" value="${config.legendaryLabelColor}" ${!config.legendaryLabelEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="legendary-label-color" value="${config.legendaryLabelColor}" ${!config.legendaryLabelEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor nazwy przedmiotu legendarnego (działa tylko na legach!)</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="legendary-name-enabled" ${config.legendaryNameEnabled ? 'checked' : ''}>
+                            Kolor napisu "Legendarny"
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="legendary-name-color-text" value="${config.legendaryNameColor}" ${!config.legendaryNameEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="legendary-name-color" value="${config.legendaryNameColor}" ${!config.legendaryNameEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor napisu "Legendarny" (działa tylko na legach!)</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="legbon-enabled" ${config.legbonEnabled ? 'checked' : ''}>
+                            Kolor bonusu legendarnego
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="legbon-color-text" value="${config.legbonColor}" ${!config.legbonEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="legbon-color" value="${config.legbonColor}" ${!config.legbonEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor bonusu legendarnego</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="upgrade-bonus-enabled" ${config.upgradeBonusEnabled ? 'checked' : ''}>
+                            Kolor wzmocnienia przedmiotu
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="upgrade-bonus-color-text" value="${config.upgradeBonusColor}" ${!config.upgradeBonusEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="upgrade-bonus-color" value="${config.upgradeBonusColor}" ${!config.upgradeBonusEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor wzmocnienia przedmiotu (działa tylko na przedmiotach ulepszonych na +5!)</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="item-desc-enabled" ${config.itemDescEnabled ? 'checked' : ''}>
+                            Kolor opisów przedmiotów
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="item-desc-color-text" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="item-desc-color" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor opisów przedmiotów (w tym eventy itp itd)</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="upgraded-enabled" ${config.upgradedEnabled ? 'checked' : ''}>
+                            Kolor ulepszonych przedmiotów
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="upgraded-color-text" value="${config.upgradedColor}" ${!config.upgradedEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="upgraded-color" value="${config.upgradedColor}" ${!config.upgradedEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor nazw ulepszonych przedmiotów</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            Wybierz animację legendarnych przedmiotów
+                        </label>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="gradient" ${config.legendaryAnimation === 'gradient' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Obracający się gradient</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="wave" ${config.legendaryAnimation === 'wave' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Fala z góry na dół</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="pulse" ${config.legendaryAnimation === 'pulse' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Pulsowanie kolorami</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="slide" ${config.legendaryAnimation === 'slide' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Przesuwanie poziome</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="glow" ${config.legendaryAnimation === 'glow' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Pulsujące świecenie</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="electric" ${config.legendaryAnimation === 'electric' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Disco (EPILEPSJA)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="rainbow" ${config.legendaryAnimation === 'rainbow' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Tęcza</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="neon" ${config.legendaryAnimation === 'neon' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Neon (EPILEPSJA)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="plasma" ${config.legendaryAnimation === 'plasma' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Plazma</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="fire" ${config.legendaryAnimation === 'fire' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Płomienie</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="matrix" ${config.legendaryAnimation === 'matrix' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Matrix</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="lightning" ${config.legendaryAnimation === 'lightning' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Błyskawice (EPILEPSJA)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="waterfall" ${config.legendaryAnimation === 'waterfall' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Wodospad</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="frost" ${config.legendaryAnimation === 'frost' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Notificator</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="cosmic" ${config.legendaryAnimation === 'cosmic' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Mgła</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="shadow" ${config.legendaryAnimation === 'shadow' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Pełzające cienie</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="zigzag" ${config.legendaryAnimation === 'zigzag' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">70's Party (EPILEPSJA)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="bubble" ${config.legendaryAnimation === 'bubble' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Bąbelki</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="scanner" ${config.legendaryAnimation === 'scanner' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Scanner</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="legendary-animation" value="spin" ${config.legendaryAnimation === 'spin' ? 'checked' : ''} style="cursor: pointer;">
+                                <span style="color: #ccc; font-size: 12px;">Gradient bez animacji</span>
+                            </label>
+                        </div>
+                        <div class="tooltip-setting-description" style="margin-top: 8px;">
+                            Wybierz typ animacji dla obramowania legendarnych przedmiotów
+                        </div>
+                    </div>
 
 <div class="tooltip-setting-group">
-    <label class="tooltip-setting-label">
-        <input type="checkbox" class="tooltip-checkbox" id="legendary-name-enabled" ${config.legendaryNameEnabled ? 'checked' : ''}>
-        Kolor napisu "Legendarny"
-    </label>
-    <div class="tooltip-color-input-wrapper">
-        <input type="text" class="tooltip-color-input" id="legendary-name-color-text" value="${config.legendaryNameColor}" ${!config.legendaryNameEnabled ? 'disabled' : ''}>
-        <input type="color" class="tooltip-color-picker" id="legendary-name-color" value="${config.legendaryNameColor}" ${!config.legendaryNameEnabled ? 'disabled' : ''}>
-    </div>
-    <div class="tooltip-setting-description">Kolor napisu "Legendarny"(działa tylko na legach!)</div>
-</div>
-
-<div class="tooltip-setting-group">
-    <label class="tooltip-setting-label">
-        <input type="checkbox" class="tooltip-checkbox" id="legbon-enabled" ${config.legbonEnabled ? 'checked' : ''}>
-        Kolor bonusu legendarnego
-    </label>
-    <div class="tooltip-color-input-wrapper">
-        <input type="text" class="tooltip-color-input" id="legbon-color-text" value="${config.legbonColor}" ${!config.legbonEnabled ? 'disabled' : ''}>
-        <input type="color" class="tooltip-color-picker" id="legbon-color" value="${config.legbonColor}" ${!config.legbonEnabled ? 'disabled' : ''}>
-    </div>
-    <div class="tooltip-setting-description">Kolor bonusu legendarnego</div>
-</div>
-
-<div class="tooltip-setting-group">
-    <label class="tooltip-setting-label">
-        <input type="checkbox" class="tooltip-checkbox" id="upgrade-bonus-enabled" ${config.upgradeBonusEnabled ? 'checked' : ''}>
-        Kolor wzmocnienia przedmiotu
-    </label>
-    <div class="tooltip-color-input-wrapper">
-        <input type="text" class="tooltip-color-input" id="upgrade-bonus-color-text" value="${config.upgradeBonusColor}" ${!config.upgradeBonusEnabled ? 'disabled' : ''}>
-        <input type="color" class="tooltip-color-picker" id="upgrade-bonus-color" value="${config.upgradeBonusColor}" ${!config.upgradeBonusEnabled ? 'disabled' : ''}>
-    </div>
-    <div class="tooltip-setting-description">Kolor wzmocnienia przedmiotu (działa tylko na przedmiotach ulepszonych na+5!)</div>
-</div>
-<div class="tooltip-setting-group">
-    <label class="tooltip-setting-label">
-        <input type="checkbox" class="tooltip-checkbox" id="item-desc-enabled" ${config.itemDescEnabled ? 'checked' : ''}>
-        Kolor opisów przedmiotów
-    </label>
-    <div class="tooltip-color-input-wrapper">
-        <input type="text" class="tooltip-color-input" id="item-desc-color-text" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
-        <input type="color" class="tooltip-color-picker" id="item-desc-color" value="${config.itemDescColor}" ${!config.itemDescEnabled ? 'disabled' : ''}>
-    </div>
-    <div class="tooltip-setting-description">Kolor opisów przedmiotów(w tym eventy itp itd)</div>
-</div>
-<div class="tooltip-setting-group">
-    <label class="tooltip-setting-label">
-        <input type="checkbox" class="tooltip-checkbox" id="upgraded-enabled" ${config.upgradedEnabled ? 'checked' : ''}>
-        Kolor ulepszonych przedmiotów
-    </label>
-    <div class="tooltip-color-input-wrapper">
-        <input type="text" class="tooltip-color-input" id="upgraded-color-text" value="${config.upgradedColor}" ${!config.upgradedEnabled ? 'disabled' : ''}>
-        <input type="color" class="tooltip-color-picker" id="upgraded-color" value="${config.upgradedColor}" ${!config.upgradedEnabled ? 'disabled' : ''}>
-    </div>
-    <div class="tooltip-setting-description">Kolor nazw ulepszonych przedmiotów</div>
-</div>
-<div class="tooltip-setting-group">
-    <label class="tooltip-setting-label">
-        Wybierz animację legendarnych przedmiotów
-    </label>
-    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="gradient" ${config.legendaryAnimation === 'gradient' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Obracający się gradient </span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="wave" ${config.legendaryAnimation === 'wave' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Fala z góry na dół</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="pulse" ${config.legendaryAnimation === 'pulse' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Pulsowanie kolorami</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="slide" ${config.legendaryAnimation === 'slide' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Przesuwanie poziome</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="glow" ${config.legendaryAnimation === 'glow' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Pulsujące świecenie</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-    <input type="radio" name="legendary-animation" value="electric" ${config.legendaryAnimation === 'electric' ? 'checked' : ''} style="cursor: pointer;">
-    <span style="color: #ccc; font-size: 12px;">Disco(EPILEPSJA)</span>
-</label>
-<label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="rainbow" ${config.legendaryAnimation === 'rainbow' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Tęcza</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="neon" ${config.legendaryAnimation === 'neon' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Neon(EPILEPSJA)</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="plasma" ${config.legendaryAnimation === 'plasma' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Plazma</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="fire" ${config.legendaryAnimation === 'fire' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Płomienie</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="matrix" ${config.legendaryAnimation === 'matrix' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Matrix</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="lightning" ${config.legendaryAnimation === 'lightning' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Błyskawice(EPILEPSJA)</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="waterfall" ${config.legendaryAnimation === 'waterfall' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Wodospad</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="frost" ${config.legendaryAnimation === 'frost' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Notificator</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="cosmic" ${config.legendaryAnimation === 'cosmic' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Mgła</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="shadow" ${config.legendaryAnimation === 'shadow' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Pełzające cienie</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="zigzag" ${config.legendaryAnimation === 'zigzag' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">70's Party(EPILEPSJA)</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="bubble" ${config.legendaryAnimation === 'bubble' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Bąbelki</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="scanner" ${config.legendaryAnimation === 'scanner' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Scanner</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="radio" name="legendary-animation" value="spin" ${config.legendaryAnimation === 'spin' ? 'checked' : ''} style="cursor: pointer;">
-            <span style="color: #ccc; font-size: 12px;">Gradient bez animacji</span>
-        </label>
-    </div>
-    <div class="tooltip-setting-description" style="margin-top: 8px;">
-        Wybierz typ animacji dla obramowania legendarnych przedmiotów !!!KAŻDA ANIMACJA JEST SPECYFICZNA, WIĘC CZASAMI TRZEBA UŻYC INNYCH KOLORÓW!!!
-    </div>
-</div>
-
-                <div class="tooltip-setting-group">
     <label class="tooltip-setting-label">
         <input type="checkbox" class="tooltip-checkbox" id="gradient-enabled" ${config.gradientEnabled ? 'checked' : ''}>
         Kolory gradientu (animacja legendarnych przedmiotów)
     </label>
-    <div class="tooltip-setting-description" style="margin-bottom: 10px;">Zmień kolory animowanej ramki dla legendarnych przedmiotów(to są klatki animacji)</div>
-                    <div class="tooltip-gradient-inputs">
-                        ${config.gradientColors.map((color, index) => `
-                            <div class="tooltip-gradient-item">
-                                <span class="tooltip-gradient-number">${index + 1}.</span>
-                                <input type="text" class="gradient-color-text" data-index="${index}" value="${color}">
-                                <input type="color" class="gradient-color-picker" data-index="${index}" value="${color}">
-                            </div>
-                        `).join('')}
+    <div class="tooltip-setting-description" style="margin-bottom: 10px;">Zmień kolory animowanej ramki dla legendarnych przedmiotów</div>
+
+    <!-- WYBÓR LICZBY KOLORÓW -->
+    <div style="margin: 10px 0; padding: 10px; background: #2a2a2a; border-radius: 3px;">
+        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 8px;">
+            Liczba kolorów w animacji:
+        </label>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="number" id="gradient-color-count" min="1" max="20" value="${config.gradientColors.length}"
+                   style="width: 80px; padding: 8px; background: #555; border: 1px solid #666; border-radius: 3px; color: #fff; font-size: 12px; text-align: center;">
+            <button class="tooltip-btn tooltip-btn-secondary" id="apply-color-count" style="flex: 1;">Zastosuj</button>
+        </div>
+        <div class="tooltip-setting-description" style="margin-top: 5px;">
+            Wpisz liczbę od 1 do 20 i kliknij "Zastosuj"
+        </div>
+    </div>
+
+    <div class="tooltip-gradient-inputs" id="gradient-colors-container">
+        ${config.gradientColors.map((color, index) => `
+            <div class="tooltip-gradient-item" data-color-index="${index}">
+                <span class="tooltip-gradient-number">${index + 1}.</span>
+                <input type="text" class="gradient-color-text" data-index="${index}" value="${color}">
+                <input type="color" class="gradient-color-picker" data-index="${index}" value="${color}">
+            </div>
+        `).join('')}
+    </div>
+</div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">Wybierz czcionkę</label>
+                        <select class="tooltip-font-select" id="font-select">
+                            ${Object.keys(fontPresets).map(fontName =>
+                                `<option value="${fontName}" ${config.selectedFont === fontName ? 'selected' : ''}>${fontName}</option>`
+                            ).join('')}
+                        </select>
+                        <div class="tooltip-setting-description" style="margin-top: 5px;">
+                            Wybierz czcionkę dla tooltipów
+                        </div>
                     </div>
                 </div>
 
-<div class="tooltip-setting-group">
-    <label class="tooltip-setting-label">Wybierz czcionkę</label>
-    <select class="tooltip-font-select" id="font-select">
-        ${Object.keys(fontPresets).map(fontName =>
-            `<option value="${fontName}" ${config.selectedFont === fontName ? 'selected' : ''}>${fontName}</option>`
-        ).join('')}
-    </select>
-    <div class="tooltip-setting-description" style="margin-top: 5px;">
-        Wybierz czcionkę dla tooltipów
-    </div>
-</div>
+                <!-- ZAKŁADKA: WIDGETY -->
+                <div class="tooltip-tab-content" data-tab="widgets">
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="widget-border-enabled" ${config.widgetBorderEnabled ? 'checked' : ''}>
+                            Kolor ramki widgetów
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="widget-border-color-text" value="${config.widgetBorderColor}" ${!config.widgetBorderEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="widget-border-color" value="${config.widgetBorderColor}" ${!config.widgetBorderEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor ramki dla tooltipów widgetów</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="widget-glow-enabled" ${config.widgetGlowEnabled ? 'checked' : ''}>
+                            Kolor świecenia widgetów
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="widget-glow-color-text" value="${config.widgetGlowColor}" ${!config.widgetGlowEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="widget-glow-color" value="${config.widgetGlowColor}" ${!config.widgetGlowEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor efektu świecenia dla tooltipów widgetów</div>
+                    </div>
+                </div>
+
+                <!-- ZAKŁADKA: POSTAĆ -->
+                <div class="tooltip-tab-content" data-tab="character">
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="character-border-enabled" ${config.characterBorderEnabled ? 'checked' : ''}>
+                            Kolor ramki postaci
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="character-border-color-text" value="${config.characterBorderColor}" ${!config.characterBorderEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="character-border-color" value="${config.characterBorderColor}" ${!config.characterBorderEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor ramki dla tooltipów postaci (graczy, NPC)</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="character-glow-enabled" ${config.characterGlowEnabled ? 'checked' : ''}>
+                            Kolor świecenia postaci
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="character-glow-color-text" value="${config.characterGlowColor}" ${!config.characterGlowEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="character-glow-color" value="${config.characterGlowColor}" ${!config.characterGlowEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor efektu świecenia dla tooltipów postaci</div>
+                    </div>
+
+                    <div class="tooltip-setting-group">
+                        <label class="tooltip-setting-label">
+                            <input type="checkbox" class="tooltip-checkbox" id="nick-border-enabled" ${config.nickBorderEnabled ? 'checked' : ''}>
+                            Kolor ramki nicku w tooltipie
+                        </label>
+                        <div class="tooltip-color-input-wrapper">
+                            <input type="text" class="tooltip-color-input" id="nick-border-color-text" value="${config.nickBorderColor}" ${!config.nickBorderEnabled ? 'disabled' : ''}>
+                            <input type="color" class="tooltip-color-picker" id="nick-border-color" value="${config.nickBorderColor}" ${!config.nickBorderEnabled ? 'disabled' : ''}>
+                        </div>
+                        <div class="tooltip-setting-description">Kolor ramki wokół nicku w tooltipie</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="tooltip-buttons">
+            <div class="tooltip-buttons" style="flex-shrink: 0;">
                 <button class="tooltip-btn tooltip-btn-success" id="tooltip-export">Eksportuj</button>
                 <button class="tooltip-btn tooltip-btn-info" id="tooltip-import">Importuj</button>
                 <button class="tooltip-btn tooltip-btn-reset" id="tooltip-reset">Reset</button>
@@ -2028,250 +2235,394 @@ function showSettingsDialog() {
 
     document.body.appendChild(modal);
 
-        // Obsługa scrolla - zapobiega przewijaniu strony w tle
-        const scrollContent = document.getElementById('tooltip-scroll-content');
-        scrollContent.addEventListener('wheel', e => e.stopPropagation());
+function refreshGradientInputs() {
+    const container = document.getElementById('gradient-colors-container');
+    container.innerHTML = config.gradientColors.map((color, index) => `
+        <div class="tooltip-gradient-item" data-color-index="${index}">
+            <span class="tooltip-gradient-number">${index + 1}.</span>
+            <input type="text" class="gradient-color-text" data-index="${index}" value="${color}">
+            <input type="color" class="gradient-color-picker" data-index="${index}" value="${color}">
+        </div>
+    `).join('');
 
-        // Przeciąganie okna
-        let isDragging = false;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
-        const dialog = modal.querySelector('.custom-tooltips-dialog');
-        const header = modal.querySelector('#tooltip-header');
+    // Aktualizuj pole z liczbą kolorów
+    const countInput = document.getElementById('gradient-color-count');
+    if (countInput) {
+        countInput.value = config.gradientColors.length;
+    }
 
-        header.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            dragOffsetX = e.clientX - dialog.getBoundingClientRect().left;
-            dragOffsetY = e.clientY - dialog.getBoundingClientRect().top;
-            e.preventDefault();
-        });
+    // Ponownie podepnij eventy
+    container.querySelectorAll('.gradient-color-text').forEach(input => {
+        const index = parseInt(input.getAttribute('data-index'));
+        const picker = container.querySelector(`.gradient-color-picker[data-index="${index}"]`);
 
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - dialog.offsetWidth);
-            const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - dialog.offsetHeight);
-            dialog.style.position = 'fixed';
-            dialog.style.left = `${x}px`;
-            dialog.style.top = `${y}px`;
-            dialog.style.transform = 'none';
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        // Obsługa checkboxów
-        function setupCheckboxToggle(checkboxId, textId, pickerId, configKey) {
-            const checkbox = document.getElementById(checkboxId);
-            const textInput = document.getElementById(textId);
-            const colorPicker = document.getElementById(pickerId);
-
-            checkbox.addEventListener('change', (e) => {
-                const isEnabled = e.target.checked;
-                config[configKey] = isEnabled;
-                textInput.disabled = !isEnabled;
-                colorPicker.disabled = !isEnabled;
-            });
-        }
-
-        setupCheckboxToggle('border-enabled', 'border-color-text', 'border-color', 'borderEnabled');
-        setupCheckboxToggle('glow-enabled', 'glow-color-text', 'glow-color', 'glowEnabled');
-        setupCheckboxToggle('text-enabled', 'text-color-text', 'text-color', 'textEnabled');
-        setupCheckboxToggle('damage-enabled', 'damage-color-text', 'damage-color', 'damageEnabled');
-        setupCheckboxToggle('legendary-label-enabled', 'legendary-label-color-text', 'legendary-label-color', 'legendaryLabelEnabled');
-        setupCheckboxToggle('legendary-name-enabled', 'legendary-name-color-text', 'legendary-name-color', 'legendaryNameEnabled');
-        setupCheckboxToggle('legbon-enabled', 'legbon-color-text', 'legbon-color', 'legbonEnabled');
-        setupCheckboxToggle('upgrade-bonus-enabled', 'upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusEnabled');
-        setupCheckboxToggle('item-desc-enabled', 'item-desc-color-text', 'item-desc-color', 'itemDescEnabled');
-        setupCheckboxToggle('upgraded-enabled', 'upgraded-color-text', 'upgraded-color', 'upgradedEnabled');
-
-
-// Gradient checkbox
-document.getElementById('gradient-enabled').addEventListener('change', (e) => {
-    config.gradientEnabled = e.target.checked;
-});
-
-        // Synchronizacja kolorów między text input a color picker
-        function setupColorSync(textId, pickerId, configKey) {
-            const textInput = document.getElementById(textId);
-            const colorPicker = document.getElementById(pickerId);
-
-            textInput.addEventListener('input', (e) => {
-                const value = e.target.value;
-                if (/^#[0-9A-F]{6}$/i.test(value)) {
-                    colorPicker.value = value;
-                    config[configKey] = value;
-                }
-            });
-
-            colorPicker.addEventListener('input', (e) => {
-                const value = e.target.value;
-                textInput.value = value;
-                config[configKey] = value;
-            });
-        }
-
-        setupColorSync('border-color-text', 'border-color', 'borderColor');
-        setupColorSync('glow-color-text', 'glow-color', 'glowColor');
-        setupColorSync('text-color-text', 'text-color', 'textColor');
-        setupColorSync('damage-color-text', 'damage-color', 'damageColor');
-        setupColorSync('legendary-label-color-text', 'legendary-label-color', 'legendaryLabelColor');
-        setupColorSync('legendary-name-color-text', 'legendary-name-color', 'legendaryNameColor');
-        setupColorSync('legbon-color-text', 'legbon-color', 'legbonColor');
-        setupColorSync('upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusColor');
-        setupColorSync('item-desc-color-text', 'item-desc-color', 'itemDescColor');
-        setupColorSync('upgraded-color-text', 'upgraded-color', 'upgradedColor');
-
-        // Gradient colors
-        document.querySelectorAll('.gradient-color-text').forEach(input => {
-            const index = parseInt(input.getAttribute('data-index'));
-            const picker = document.querySelector(`.gradient-color-picker[data-index="${index}"]`);
-
-            input.addEventListener('input', (e) => {
-                const value = e.target.value;
-                if (/^#[0-9A-F]{6}$/i.test(value)) {
-                    picker.value = value;
-                    config.gradientColors[index] = value;
-                }
-            });
-
-            picker.addEventListener('input', (e) => {
-                const value = e.target.value;
-                input.value = value;
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                picker.value = value;
                 config.gradientColors[index] = value;
-            });
-        });
-
-// Font select
-const fontSelect = document.getElementById('font-select');
-fontSelect.addEventListener('change', (e) => {
-    config.selectedFont = e.target.value;
-});
-        document.querySelectorAll('input[name="legendary-animation"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                config.legendaryAnimation = e.target.value;
-            });
-        });
-
-        // Zamknij
-        document.getElementById('tooltip-close').addEventListener('click', () => {
-            modal.remove();
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.remove();
             }
         });
 
-        // Przycisk Eksportu
-        document.getElementById('tooltip-export').addEventListener('click', () => {
-            exportSettings();
+        picker.addEventListener('input', (e) => {
+            const value = e.target.value;
+            input.value = value;
+            config.gradientColors[index] = value;
         });
+    });
+}
+// Obsługa radio buttonów wyboru ilości kolorów
+let selectedColorCount = config.gradientColors.length;
 
-        // Przycisk Importu
-        document.getElementById('tooltip-import').addEventListener('click', () => {
-            showImportDialog();
+function updateVisibleColors(count) {
+    const allItems = document.querySelectorAll('.tooltip-gradient-item');
+    allItems.forEach((item, index) => {
+        item.style.display = index < count ? 'flex' : 'none';
+    });
+    selectedColorCount = count;
+}
+
+document.querySelectorAll('input[name="gradient-count"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        if (e.target.value === '1') {
+            updateVisibleColors(1);
+        } else if (e.target.value === '2') {
+            updateVisibleColors(2);
+        } else {
+            updateVisibleColors(config.gradientColors.length);
+        }
+    });
+});
+// Przycisk "Zastosuj" - zmienia liczbę kolorów
+document.getElementById('apply-color-count').addEventListener('click', () => {
+    const countInput = document.getElementById('gradient-color-count');
+    let newCount = parseInt(countInput.value);
+
+    // Walidacja
+    if (isNaN(newCount) || newCount < 1) {
+        newCount = 1;
+        countInput.value = 1;
+    }
+    if (newCount > 20) {
+        newCount = 20;
+        countInput.value = 20;
+    }
+
+    const currentCount = config.gradientColors.length;
+
+    if (newCount > currentCount) {
+        // Dodaj brakujące kolory
+        for (let i = currentCount; i < newCount; i++) {
+            config.gradientColors.push('#ffffff');
+        }
+    } else if (newCount < currentCount) {
+        // Usuń nadmiarowe kolory
+        config.gradientColors = config.gradientColors.slice(0, newCount);
+    }
+
+    refreshGradientInputs();
+    showNotification(`Liczba kolorów zmieniona na ${newCount}`, 'success');
+});
+
+// Enter w polu liczby = też zastosuj
+document.getElementById('gradient-color-count').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('apply-color-count').click();
+    }
+});
+
+    // ===== OBSŁUGA ZAKŁADEK =====
+    const tabs = modal.querySelectorAll('.tooltip-tab');
+    const tabContents = modal.querySelectorAll('.tooltip-tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.getAttribute('data-tab');
+
+            // Usuń active ze wszystkich
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(tc => tc.classList.remove('active'));
+
+            // Dodaj active do klikniętej
+            tab.classList.add('active');
+            const targetContent = modal.querySelector(`.tooltip-tab-content[data-tab="${targetTab}"]`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
         });
+    });
 
-        // Reset do białego
-        document.getElementById('tooltip-reset').addEventListener('click', () => {
-  config.borderColor = '#ffffff';
-config.borderEnabled = true;
-config.glowColor = '#e0e0e0';
-config.glowEnabled = true;
-config.textColor = '#ffffff';
-config.textEnabled = true;
-config.damageColor = '#cccccc';
-config.damageEnabled = true;
-config.gradientColors = [
-    "#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8",
-    "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"
-];
-config.gradientEnabled = true;
-config.legendaryNameColor = '#ff6b35';
-config.legendaryNameEnabled = true;
-config.legendaryLabelColor = '#ffffff';
-config.legendaryLabelEnabled = true;
-config.legbonColor = '#00ff88';
-config.legbonEnabled = true;
-config.upgradeBonusColor = '#4CAF50';
-config.upgradeBonusEnabled = true;
-config.itemDescColor = '#cccccc';
-config.itemDescEnabled = true;
-config.upgradedColor = '#ffffff';
-config.upgradedEnabled = true;
-config.selectedFont = 'Domyślna';
-config.legendaryAnimation = 'gradient';
-
-            // Odśwież interfejs
-            document.getElementById('border-color-text').value = config.borderColor;
-            document.getElementById('border-color').value = config.borderColor;
-            document.getElementById('border-enabled').checked = true;
-            document.getElementById('border-color-text').disabled = false;
-            document.getElementById('border-color').disabled = false;
-
-            document.getElementById('glow-color-text').value = config.glowColor;
-            document.getElementById('glow-color').value = config.glowColor;
-            document.getElementById('glow-enabled').checked = true;
-            document.getElementById('glow-color-text').disabled = false;
-            document.getElementById('glow-color').disabled = false;
-
-            document.getElementById('text-color-text').value = config.textColor;
-            document.getElementById('text-color').value = config.textColor;
-            document.getElementById('text-enabled').checked = true;
-            document.getElementById('text-color-text').disabled = false;
-            document.getElementById('text-color').disabled = false;
-
-            document.getElementById('damage-color-text').value = config.damageColor;
-            document.getElementById('damage-color').value = config.damageColor;
-            document.getElementById('damage-enabled').checked = true;
-            document.getElementById('damage-color-text').disabled = false;
-            document.getElementById('damage-color').disabled = false;
-
-            document.querySelectorAll('.gradient-color-text').forEach((input, index) => {
-                input.value = config.gradientColors[index];
-            });
-            document.querySelectorAll('.gradient-color-picker').forEach((picker, index) => {
-                picker.value = config.gradientColors[index];
-            });
-document.getElementById('legendary-label-color-text').value = config.legendaryLabelColor;
-document.getElementById('legendary-label-color').value = config.legendaryLabelColor;
-document.getElementById('legendary-label-enabled').checked = true;
-
-document.getElementById('legendary-name-color-text').value = config.legendaryNameColor;
-document.getElementById('legendary-name-color').value = config.legendaryNameColor;
-document.getElementById('legendary-name-enabled').checked = true;
-
-document.getElementById('legbon-color-text').value = config.legbonColor;
-document.getElementById('legbon-color').value = config.legbonColor;
-document.getElementById('legbon-enabled').checked = true;
-
-document.getElementById('upgrade-bonus-color-text').value = config.upgradeBonusColor;
-document.getElementById('upgrade-bonus-color').value = config.upgradeBonusColor;
-document.getElementById('upgrade-bonus-enabled').checked = true;
-
-document.getElementById('item-desc-color-text').value = config.itemDescColor;
-document.getElementById('item-desc-color').value = config.itemDescColor;
-document.getElementById('item-desc-enabled').checked = true;
-
-document.getElementById('gradient-enabled').checked = true;
-
-document.getElementById('font-select').value = 'Domyślna';
-
-document.querySelector('input[name="legendary-animation"][value="gradient"]').checked = true;
+const scrollContent = document.getElementById('tooltip-scroll-content');
+scrollContent.addEventListener('wheel', e => e.stopPropagation());
 
 
-            showNotification('Ustawienia zresetowane do domyślnych (białe)', 'info');
-        });
+    // Przeciąganie okna
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    const dialog = modal.querySelector('.custom-tooltips-dialog');
+    const header = modal.querySelector('#tooltip-header');
 
-        // Zapisz i zastosuj
-        document.getElementById('tooltip-save').addEventListener('click', () => {
-            saveConfig();
-            applyTooltipStyles();
-            showNotification('Ustawienia zapisane!', 'success');
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        dragOffsetX = e.clientX - dialog.getBoundingClientRect().left;
+        dragOffsetY = e.clientY - dialog.getBoundingClientRect().top;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - dialog.offsetWidth);
+        const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - dialog.offsetHeight);
+        dialog.style.position = 'fixed';
+        dialog.style.left = `${x}px`;
+        dialog.style.top = `${y}px`;
+        dialog.style.transform = 'none';
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Obsługa checkboxów
+    function setupCheckboxToggle(checkboxId, textId, pickerId, configKey) {
+        const checkbox = document.getElementById(checkboxId);
+        const textInput = document.getElementById(textId);
+        const colorPicker = document.getElementById(pickerId);
+
+        checkbox.addEventListener('change', (e) => {
+            const isEnabled = e.target.checked;
+            config[configKey] = isEnabled;
+            textInput.disabled = !isEnabled;
+            colorPicker.disabled = !isEnabled;
         });
     }
+
+    setupCheckboxToggle('border-enabled', 'border-color-text', 'border-color', 'borderEnabled');
+    setupCheckboxToggle('widget-border-enabled', 'widget-border-color-text', 'widget-border-color', 'widgetBorderEnabled');
+    setupCheckboxToggle('widget-glow-enabled', 'widget-glow-color-text', 'widget-glow-color', 'widgetGlowEnabled');
+    setupCheckboxToggle('character-border-enabled', 'character-border-color-text', 'character-border-color', 'characterBorderEnabled');
+    setupCheckboxToggle('character-glow-enabled', 'character-glow-color-text', 'character-glow-color', 'characterGlowEnabled');
+    setupCheckboxToggle('glow-enabled', 'glow-color-text', 'glow-color', 'glowEnabled');
+    setupCheckboxToggle('text-enabled', 'text-color-text', 'text-color', 'textEnabled');
+    setupCheckboxToggle('damage-enabled', 'damage-color-text', 'damage-color', 'damageEnabled');
+    setupCheckboxToggle('legendary-label-enabled', 'legendary-label-color-text', 'legendary-label-color', 'legendaryLabelEnabled');
+    setupCheckboxToggle('legendary-name-enabled', 'legendary-name-color-text', 'legendary-name-color', 'legendaryNameEnabled');
+    setupCheckboxToggle('legbon-enabled', 'legbon-color-text', 'legbon-color', 'legbonEnabled');
+    setupCheckboxToggle('upgrade-bonus-enabled', 'upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusEnabled');
+    setupCheckboxToggle('item-desc-enabled', 'item-desc-color-text', 'item-desc-color', 'itemDescEnabled');
+    setupCheckboxToggle('upgraded-enabled', 'upgraded-color-text', 'upgraded-color', 'upgradedEnabled');
+    setupCheckboxToggle('nick-border-enabled', 'nick-border-color-text', 'nick-border-color', 'nickBorderEnabled');
+
+    // Gradient checkbox
+    document.getElementById('gradient-enabled').addEventListener('change', (e) => {
+        config.gradientEnabled = e.target.checked;
+    });
+
+    // Synchronizacja kolorów między text input a color picker
+    function setupColorSync(textId, pickerId, configKey) {
+        const textInput = document.getElementById(textId);
+        const colorPicker = document.getElementById(pickerId);
+
+        textInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                colorPicker.value = value;
+                config[configKey] = value;
+            }
+        });
+
+        colorPicker.addEventListener('input', (e) => {
+            const value = e.target.value;
+            textInput.value = value;
+            config[configKey] = value;
+        });
+    }
+
+    setupColorSync('border-color-text', 'border-color', 'borderColor');
+    setupColorSync('widget-border-color-text', 'widget-border-color', 'widgetBorderColor');
+    setupColorSync('widget-glow-color-text', 'widget-glow-color', 'widgetGlowColor');
+    setupColorSync('character-border-color-text', 'character-border-color', 'characterBorderColor');
+    setupColorSync('character-glow-color-text', 'character-glow-color', 'characterGlowColor');
+    setupColorSync('glow-color-text', 'glow-color', 'glowColor');
+    setupColorSync('text-color-text', 'text-color', 'textColor');
+    setupColorSync('damage-color-text', 'damage-color', 'damageColor');
+    setupColorSync('legendary-label-color-text', 'legendary-label-color', 'legendaryLabelColor');
+    setupColorSync('legendary-name-color-text', 'legendary-name-color', 'legendaryNameColor');
+    setupColorSync('legbon-color-text', 'legbon-color', 'legbonColor');
+    setupColorSync('upgrade-bonus-color-text', 'upgrade-bonus-color', 'upgradeBonusColor');
+    setupColorSync('item-desc-color-text', 'item-desc-color', 'itemDescColor');
+    setupColorSync('upgraded-color-text', 'upgraded-color', 'upgradedColor');
+    setupColorSync('nick-border-color-text', 'nick-border-color', 'nickBorderColor');
+
+    // Gradient colors - inicjalizacja
+    refreshGradientInputs();
+
+    // Font select
+    const fontSelect = document.getElementById('font-select');
+    fontSelect.addEventListener('change', (e) => {
+        config.selectedFont = e.target.value;
+    });
+
+    // Animacje
+    document.querySelectorAll('input[name="legendary-animation"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            config.legendaryAnimation = e.target.value;
+        });
+    });
+
+    // Zamknij
+    document.getElementById('tooltip-close').addEventListener('click', () => {
+        modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    // Przycisk Eksportu
+    document.getElementById('tooltip-export').addEventListener('click', () => {
+        exportSettings();
+    });
+
+    // Przycisk Importu
+    document.getElementById('tooltip-import').addEventListener('click', () => {
+        showImportDialog();
+    });
+
+    // Reset do białego
+    document.getElementById('tooltip-reset').addEventListener('click', () => {
+        config.borderColor = '#ffffff';
+        config.borderEnabled = true;
+        config.widgetBorderColor = '#ffffff';
+        config.widgetBorderEnabled = true;
+        config.widgetGlowColor = '#e0e0e0';
+        config.widgetGlowEnabled = true;
+        config.characterBorderColor = '#ffffff';
+        config.characterBorderEnabled = true;
+        config.characterGlowColor = '#e0e0e0';
+        config.characterGlowEnabled = true;
+        config.glowColor = '#e0e0e0';
+        config.glowEnabled = true;
+        config.textColor = '#ffffff';
+        config.textEnabled = true;
+        config.damageColor = '#cccccc';
+        config.damageEnabled = true;
+        config.gradientColors = [
+            "#ffffff", "#f0f0f0", "#e8e8e8", "#d0d0d0", "#c8c8c8",
+            "#f8f8f8", "#e0e0e0", "#d8d8d8", "#f5f5f5", "#eeeeee"
+        ];
+        config.gradientEnabled = true;
+        config.legendaryNameColor = '#ff6b35';
+        config.legendaryNameEnabled = true;
+        config.legendaryLabelColor = '#ffffff';
+        config.legendaryLabelEnabled = true;
+        config.legbonColor = '#00ff88';
+        config.legbonEnabled = true;
+        config.upgradeBonusColor = '#4CAF50';
+        config.upgradeBonusEnabled = true;
+        config.itemDescColor = '#cccccc';
+        config.itemDescEnabled = true;
+        config.upgradedColor = '#ffffff';
+        config.upgradedEnabled = true;
+        config.selectedFont = 'Domyślna';
+        config.legendaryAnimation = 'gradient';
+        config.nickBorderColor = '#ffffff';
+        config.nickBorderEnabled = true;
+
+        // Odśwież interfejs
+        document.getElementById('border-color-text').value = config.borderColor;
+        document.getElementById('border-color').value = config.borderColor;
+        document.getElementById('border-enabled').checked = true;
+        document.getElementById('border-color-text').disabled = false;
+        document.getElementById('border-color').disabled = false;
+
+        document.getElementById('widget-border-color-text').value = config.widgetBorderColor;
+        document.getElementById('widget-border-color').value = config.widgetBorderColor;
+        document.getElementById('widget-border-enabled').checked = true;
+        document.getElementById('widget-border-color-text').disabled = false;
+        document.getElementById('widget-border-color').disabled = false;
+
+        document.getElementById('widget-glow-color-text').value = config.widgetGlowColor;
+        document.getElementById('widget-glow-color').value = config.widgetGlowColor;
+        document.getElementById('widget-glow-enabled').checked = true;
+        document.getElementById('widget-glow-color-text').disabled = false;
+        document.getElementById('widget-glow-color').disabled = false;
+
+        document.getElementById('character-border-color-text').value = config.characterBorderColor;
+        document.getElementById('character-border-color').value = config.characterBorderColor;
+        document.getElementById('character-border-enabled').checked = true;
+        document.getElementById('character-border-color-text').disabled = false;
+        document.getElementById('character-border-color').disabled = false;
+
+        document.getElementById('character-glow-color-text').value = config.characterGlowColor;
+        document.getElementById('character-glow-color').value = config.characterGlowColor;
+        document.getElementById('character-glow-enabled').checked = true;
+        document.getElementById('character-glow-color-text').disabled = false;
+        document.getElementById('character-glow-color').disabled = false;
+
+        document.getElementById('glow-color-text').value = config.glowColor;
+        document.getElementById('glow-color').value = config.glowColor;
+        document.getElementById('glow-enabled').checked = true;
+        document.getElementById('glow-color-text').disabled = false;
+        document.getElementById('glow-color').disabled = false;
+
+        document.getElementById('text-color-text').value = config.textColor;
+        document.getElementById('text-color').value = config.textColor;
+        document.getElementById('text-enabled').checked = true;
+        document.getElementById('text-color-text').disabled = false;
+        document.getElementById('text-color').disabled = false;
+
+        document.getElementById('damage-color-text').value = config.damageColor;
+        document.getElementById('damage-color').value = config.damageColor;
+        document.getElementById('damage-enabled').checked = true;
+        document.getElementById('damage-color-text').disabled = false;
+        document.getElementById('damage-color').disabled = false;
+
+        refreshGradientInputs();
+
+        document.getElementById('legendary-label-color-text').value = config.legendaryLabelColor;
+        document.getElementById('legendary-label-color').value = config.legendaryLabelColor;
+        document.getElementById('legendary-label-enabled').checked = true;
+
+        document.getElementById('legendary-name-color-text').value = config.legendaryNameColor;
+        document.getElementById('legendary-name-color').value = config.legendaryNameColor;
+        document.getElementById('legendary-name-enabled').checked = true;
+
+        document.getElementById('legbon-color-text').value = config.legbonColor;
+        document.getElementById('legbon-color').value = config.legbonColor;
+        document.getElementById('legbon-enabled').checked = true;
+
+        document.getElementById('upgrade-bonus-color-text').value = config.upgradeBonusColor;
+        document.getElementById('upgrade-bonus-color').value = config.upgradeBonusColor;
+        document.getElementById('upgrade-bonus-enabled').checked = true;
+
+        document.getElementById('item-desc-color-text').value = config.itemDescColor;
+        document.getElementById('item-desc-color').value = config.itemDescColor;
+        document.getElementById('item-desc-enabled').checked = true;
+
+        document.getElementById('gradient-enabled').checked = true;
+
+        document.getElementById('font-select').value = 'Domyślna';
+
+        document.querySelector('input[name="legendary-animation"][value="gradient"]').checked = true;
+
+        document.getElementById('nick-border-color-text').value = config.nickBorderColor;
+        document.getElementById('nick-border-color').value = config.nickBorderColor;
+        document.getElementById('nick-border-enabled').checked = true;
+
+        showNotification('Ustawienia zresetowane do domyślnych (białe)', 'info');
+    });
+
+    // Zapisz i zastosuj
+    document.getElementById('tooltip-save').addEventListener('click', () => {
+        saveConfig();
+        applyTooltipStyles();
+        showNotification('Ustawienia zapisane!', 'success');
+    });
+}
 
     function addManagerSettingsButton(container) {
         const helpIcon = container.querySelector('.kwak-addon-help-icon');
