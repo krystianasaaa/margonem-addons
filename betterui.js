@@ -10,18 +10,47 @@
     };
 let bonusNames = {};
 
+
+let editableBonuses = {
+    legendarne: {},
+    statystyki: {},
+    interfejs: {}
+};
+
+
+let calculatorRarities = {
+    zwykly: true,
+    unikatowy: true,
+    heroiczny: true,
+    ulepszony: true,
+    legendarny: true
+};
+
 function saveConfig() {
     try {
         window.localStorage.setItem('betterUI_config', JSON.stringify(config));
+        window.localStorage.setItem('betterUI_editableBonuses', JSON.stringify(editableBonuses));
+        window.localStorage.setItem('betterUI_calculatorRarities', JSON.stringify(calculatorRarities));
     } catch (e) {
     }
 }
+
 function loadConfig() {
     try {
         const saved = window.localStorage.getItem('betterUI_config');
         if (saved) {
             const savedConfig = JSON.parse(saved);
             config = { ...config, ...savedConfig };
+        }
+
+        const savedBonuses = window.localStorage.getItem('betterUI_editableBonuses');
+        if (savedBonuses) {
+            editableBonuses = JSON.parse(savedBonuses);
+        }
+
+        const savedRarities = window.localStorage.getItem('betterUI_calculatorRarities');
+        if (savedRarities) {
+            calculatorRarities = JSON.parse(savedRarities);
         }
     } catch (e) {
     }
@@ -31,7 +60,7 @@ function updateBonusNames() {
 
     // Bonusy legendarne
     if (config.bonusyLegendarne) {
-        Object.assign(bonusNames, {
+        const defaultLegendary = {
             'Cios bardzo krytyczny': '💀 POTĘŻNE PIERDOLNIĘCIE 💀',
             'Dotyk anioła': 'Dotyczek',
             'Klątwa': 'Klątewka',
@@ -42,12 +71,16 @@ function updateBonusNames() {
             'Płomienne oczyszczenie': 'Płomienne',
             'Krwawa udręka': 'Krwawa',
             'Przeszywająca skuteczność': 'Przeszywajka'
-        });
+        };
+
+        // POPRAWKA: Scalamy domyślne z custom (custom ma priorytet)
+        const merged = { ...defaultLegendary, ...editableBonuses.legendarne };
+        Object.assign(bonusNames, merged);
     }
 
     // Statystyki przedmiotów
     if (config.statystykiPrzedmiotow) {
-        Object.assign(bonusNames, {
+        const defaultStats = {
             'Cios krytyczny': 'Kryt',
             'Przebicie': 'Przebitka',
             'Głęboka rana': 'GR',
@@ -90,19 +123,25 @@ function updateBonusNames() {
             'Niszczenie odporności magicznych o': 'Niszczara odpów o',
             'podczas ciosu': 'przy hicie',
             'szans na kontratak po ciosie krytycznym': 'na kontre'
-        });
+        };
+
+        const merged = { ...defaultStats, ...editableBonuses.statystyki };
+        Object.assign(bonusNames, merged);
     }
 
     // Interfejs
     if (config.interfejs) {
-        Object.assign(bonusNames, {
+        const defaultInterface = {
             'Punkty Honoru': 'PH',
             'Teleportuje gracza na mapę': 'Tepa na',
             'Wewnętrzny spokój': 'umka dla cweli',
             'Smocze Runy': 'SR',
             'Turkanie energii': 'Przywro energii',
             'Przywracanie energii': 'Przywro energii'
-        });
+        };
+
+        const merged = { ...defaultInterface, ...editableBonuses.interfejs };
+        Object.assign(bonusNames, merged);
     }
 }
 
@@ -410,32 +449,52 @@ const boundPatterns = [
         };
     }
 
-    // Funkcja do dodawania informacji o ulepszeniu do tooltipa
-    function addUpgradeInfo(tooltipContent) {
-        if (!config.kalkulatorUlepszen) {
+function addUpgradeInfo(tooltipContent) {
+    if (!config.kalkulatorUlepszen) {
         return tooltipContent;
- }
+    }
 
-        // Sprawdź czy kalkulator już został dodany
-        if (tooltipContent.includes('Koszt ulepszeń:')) {
-            return tooltipContent;
-        }
+    // Sprawdź czy kalkulator już został dodany
+    if (tooltipContent.includes('Koszt ulepszeń:')) {
+        return tooltipContent;
+    }
 
-        const itemInfo = parseItemInfo(tooltipContent);
+    const itemInfo = parseItemInfo(tooltipContent);
 
-        // Sprawdź czy tooltip zawiera informacje o przedmiocie
-        const isItemTooltip = tooltipContent.includes('item-tip') ||
-                             tooltipContent.includes('Poziom:') ||
-                             tooltipContent.includes('poziom:') ||
-                             tooltipContent.includes('Wymagany') ||
-                             tooltipContent.includes('wymagany') ||
-                             tooltipContent.includes('Typ:') ||
-                             tooltipContent.includes('typ:') ||
-                             /\+\d+/.test(tooltipContent);
+    // NOWE: Sprawdź czy kalkulator jest włączony dla tej rangi
+    const rarityKey = itemInfo.rarity.toLowerCase().replace('e', '').replace('y', 'y'); // normalizuj
+    const rarityMap = {
+        'zwykły': 'zwykly',
+        'zwykłe': 'zwykly',
+        'unikatowy': 'unikatowy',
+        'unikatowe': 'unikatowy',
+        'heroiczny': 'heroiczny',
+        'heroiczne': 'heroiczny',
+        'ulepszony': 'ulepszony',
+        'ulepszonych': 'ulepszony',
+        'legendarny': 'legendarny',
+        'legendarne': 'legendarny'
+    };
 
-        if (!isItemTooltip || !itemInfo.level || itemInfo.currentUpgrade >= 5) {
-            return tooltipContent;
-        }
+    const normalizedRarity = rarityMap[itemInfo.rarity.toLowerCase()] || 'zwykly';
+
+    if (!calculatorRarities[normalizedRarity]) {
+        return tooltipContent; // Kalkulator wyłączony dla tej rangi
+    }
+
+    // Sprawdź czy tooltip zawiera informacje o przedmiocie
+    const isItemTooltip = tooltipContent.includes('item-tip') ||
+                         tooltipContent.includes('Poziom:') ||
+                         tooltipContent.includes('poziom:') ||
+                         tooltipContent.includes('Wymagany') ||
+                         tooltipContent.includes('wymagany') ||
+                         tooltipContent.includes('Typ:') ||
+                         tooltipContent.includes('typ:') ||
+                         /\+\d+/.test(tooltipContent);
+
+    if (!isItemTooltip || !itemInfo.level || itemInfo.currentUpgrade >= 5) {
+        return tooltipContent;
+    }
 
         const result = calculateUpgradeCosts(itemInfo.level, itemInfo.currentUpgrade, itemInfo.count, itemInfo.rarity);
         const costs = result.costs;
@@ -495,12 +554,57 @@ const boundPatterns = [
 function replaceText(text) {
     if (!text || typeof text !== 'string') return text;
 
+    // DODATKOWA BLOKADA: Nie modyfikuj tekstów zawierających charakterystyczne frazy z panelu
+    const settingsPanelPhrases = [
+        'Better UI',
+        'Edytuj bonusy',
+        'Dodaj now',
+        'kwak-',
+        'better-ui-',
+        'bonus-edit-row',
+        'Włącz bonusy',
+        'Włącz statystyki',
+        'Włącz zmiany interfejsu',
+        'Włącz kalkulator'
+    ];
+
+    for (const phrase of settingsPanelPhrases) {
+        if (text.includes(phrase)) {
+            return text;
+        }
+    }
+
     let result = text;
 
-    // Najpierw zastąp nazwy bonusów
-    for (const [original, replacement] of Object.entries(bonusNames)) {
-        if (result.includes(original)) {
-           result = result.replace(new RegExp(original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
+    // NOWA LOGIKA: Zamieniaj tylko POZA nazwą przedmiotu
+    // Nazwa przedmiotu to wszystko przed pierwszym "item-tip-section"
+    const sectionSplit = result.split(/(<div[^>]*class="item-tip-section[^>]*>)/i);
+
+    if (sectionSplit.length > 1) {
+        // Tooltip ma sekcje
+        // [0] = nazwa przedmiotu (NIE ZAMIENIAJ)
+        // [1+] = sekcje i zawartość (ZAMIENIAJ)
+
+        for (let i = 1; i < sectionSplit.length; i++) {
+            for (const [original, replacement] of Object.entries(bonusNames)) {
+                if (sectionSplit[i].includes(original)) {
+                    sectionSplit[i] = sectionSplit[i].replace(
+                        new RegExp(original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                        replacement
+                    );
+                }
+            }
+        }
+        result = sectionSplit.join('');
+    } else {
+        // Nie ma sekcji - zamień wszędzie (stary tooltip lub nie-przedmiot)
+        for (const [original, replacement] of Object.entries(bonusNames)) {
+            if (result.includes(original)) {
+                result = result.replace(
+                    new RegExp(original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                    replacement
+                );
+            }
         }
     }
 
@@ -512,49 +616,71 @@ function replaceText(text) {
     return result;
 }
 
-    function setupEngineHooks() {
-        const originalInnerHTMLSetter = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML').set;
-        Object.defineProperty(Element.prototype, 'innerHTML', {
-            set: function(value) {
-                if (typeof value === 'string' && value.length > 0) {
-                    // Sprawdź czy to tooltip przedmiotu
-                    if (value.includes('item-tip') ||
-                        value.includes('Poziom:') ||
-                        Object.keys(bonusNames).some(bonus => value.includes(bonus))) {
-                        value = replaceText(value);
-                    }
-                }
+function setupEngineHooks() {
+    const originalInnerHTMLSetter = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML').set;
+    Object.defineProperty(Element.prototype, 'innerHTML', {
+        set: function(value) {
+            // BLOKADA: Sprawdź czy element należy do panelu ustawień
+            if (this.id === 'kwak-better-ui-settings-panel' ||
+                this.closest('#kwak-better-ui-settings-panel') ||
+                this.id?.includes('addon-') ||
+                this.className?.includes('kwak-addon') ||
+                this.className?.includes('better-ui-') ||
+                this.className?.includes('bonus-edit-row')) {
                 return originalInnerHTMLSetter.call(this, value);
-            },
-            get: Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML').get,
-            configurable: true
-        });
-
-        const originalTextContentSetter = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent').set;
-        Object.defineProperty(Node.prototype, 'textContent', {
-            set: function(value) {
-                if (typeof value === 'string' && value.length > 0) {
-                    if (Object.keys(bonusNames).some(bonus => value.includes(bonus)) ||
-                        value.includes('Poziom:')) {
-                        value = replaceText(value);
-                    }
-                }
-                return originalTextContentSetter.call(this, value);
-            },
-            get: Object.getOwnPropertyDescriptor(Node.prototype, 'textContent').get,
-            configurable: true
-        });
-
-        const originalCreateTextNode = Document.prototype.createTextNode;
-        Document.prototype.createTextNode = function(data) {
-            if (typeof data === 'string' && (
-                Object.keys(bonusNames).some(bonus => data.includes(bonus)) ||
-                data.includes('Poziom:'))) {
-                data = replaceText(data);
             }
-            return originalCreateTextNode.call(this, data);
-        };
-    }
+
+            if (typeof value === 'string' && value.length > 0) {
+                // Sprawdź czy to tooltip przedmiotu
+                if (value.includes('item-tip') ||
+                    value.includes('Poziom:') ||
+                    Object.keys(bonusNames).some(bonus => value.includes(bonus))) {
+                    value = replaceText(value);
+                }
+            }
+            return originalInnerHTMLSetter.call(this, value);
+        },
+        get: Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML').get,
+        configurable: true
+    });
+
+    const originalTextContentSetter = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent').set;
+    Object.defineProperty(Node.prototype, 'textContent', {
+        set: function(value) {
+            // BLOKADA: Sprawdź czy węzeł należy do panelu ustawień
+            if (this.nodeType === Node.ELEMENT_NODE) {
+                if (this.id === 'kwak-better-ui-settings-panel' ||
+                    this.closest('#kwak-better-ui-settings-panel') ||
+                    this.id?.includes('addon-') ||
+                    this.className?.includes('kwak-addon') ||
+                    this.className?.includes('better-ui-') ||
+                    this.className?.includes('bonus-edit-row')) {
+                    return originalTextContentSetter.call(this, value);
+                }
+            }
+
+            if (typeof value === 'string' && value.length > 0) {
+                if (Object.keys(bonusNames).some(bonus => value.includes(bonus)) ||
+                    value.includes('Poziom:')) {
+                    value = replaceText(value);
+                }
+            }
+            return originalTextContentSetter.call(this, value);
+        },
+        get: Object.getOwnPropertyDescriptor(Node.prototype, 'textContent').get,
+        configurable: true
+    });
+
+    const originalCreateTextNode = Document.prototype.createTextNode;
+    Document.prototype.createTextNode = function(data) {
+        if (typeof data === 'string' && (
+            Object.keys(bonusNames).some(bonus => data.includes(bonus)) ||
+            data.includes('Poziom:'))) {
+            data = replaceText(data);
+        }
+        return originalCreateTextNode.call(this, data);
+    };
+}
 
     function hookMargonemFunctions() {
         const checkInterval = setInterval(() => {
@@ -729,173 +855,559 @@ function createSettingsPanel() {
         background: #2a2a2a;
         border: 1px solid #444;
         border-radius: 4px;
-        padding: 0; /* Zmienione z 15px na 0 */
+        padding: 0;
         z-index: 10000;
         display: none;
-        min-width: 280px;
+        width: 600px;
+        height: 650px;
+        max-height: 90vh;
         font-family: Arial, sans-serif;
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        flex-direction: column;
     `;
 
     panel.innerHTML = `
-        <div id="better-ui-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
-            Better UI - Settings
-        </div>
-
-        <div style="padding: 15px;">
-            <div style="margin-bottom: 15px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                    <span style="color: #ccc; font-size: 12px;">Bonusy Legendarne</span>
-                    <label class="kwak-toggle-switch">
-                        <input type="checkbox" id="bonusy-legendarne" ${config.bonusyLegendarne ? 'checked' : ''}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                    <span style="color: #ccc; font-size: 12px;">Statystyki Przedmiotów</span>
-                    <label class="kwak-toggle-switch">
-                        <input type="checkbox" id="statystyki-przedmiotow" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-                    <span style="color: #ccc; font-size: 12px;">Interfejs(w trakcie naprawy)</span>
-                    <label class="kwak-toggle-switch">
-                        <input type="checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 0;">
-    <span style="color: #ccc; font-size: 12px;">Kalkulator Ulepszeń</span>
-    <label class="kwak-toggle-switch">
-        <input type="checkbox" id="kalkulator-ulepszen" ${config.kalkulatorUlepszen ? 'checked' : ''}>
-        <span class="slider"></span>
-    </label>
+<div id="better-ui-panel-header" style="position: relative; color: #fff; font-size: 14px; text-align: center; font-weight: bold; padding: 15px 40px 8px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
+    Better UI - Settings
+    <button id="better-ui-close-header" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #444; border: none; color: #fff; font-size: 18px; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border-radius: 3px; line-height: 1; padding: 0;">×</button>
 </div>
 
-            <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
-                <button id="close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
-                    Zamknij
-                </button>
-                <button id="reload-game" style="flex: 1; padding: 8px 12px; background: #ff9800; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
-                    Odśwież grę
-                </button>
+        <!-- ZAKŁADKI -->
+
+        <div style="display: flex; background: #1a1a1a; border-bottom: 1px solid #444; flex-shrink: 0;">
+            <button class="better-ui-tab active" data-tab="legendarne">Legendarne</button>
+            <button class="better-ui-tab" data-tab="statystyki">Statystyki</button>
+            <button class="better-ui-tab" data-tab="interfejs">Interfejs</button>
+            <button class="better-ui-tab" data-tab="kalkulator">Kalkulator</button>
+        </div>
+
+        <div id="better-ui-tabs-content" style="flex: 1; min-height: 0; overflow: hidden;">
+            <!-- ZAKŁADKA: LEGENDARNE -->
+            <div class="better-ui-tab-content active" data-tab="legendarne">
+                <div style="margin-bottom: 15px; background: #333; border: 1px solid #444; border-radius: 3px; padding: 12px;">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-weight: normal; color: #ccc; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="bonusy-legendarne" ${config.bonusyLegendarne ? 'checked' : ''}>
+                        Włącz bonusy legendarne
+                    </label>
+                    <div style="font-size: 10px; color: #888; margin-top: 5px; line-height: 1.4;">
+                        Skróty dla bonusów legendarnych
+                    </div>
+                </div>
+
+                <!-- EDYCJA BONUSÓW LEGENDARNYCH -->
+                <div style="margin-bottom: 15px; background: #333; border: 1px solid #444; border-radius: 3px; padding: 12px;">
+                    <div style="color: #ccc; font-size: 12px; font-weight: bold; margin-bottom: 10px;">Edytuj bonusy legendarne:</div>
+                    <div id="legendary-bonuses-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Dynamicznie generowane -->
+                    </div>
+                    <button id="add-legendary-bonus" style="margin-top: 10px; padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; width: 100%;">
+                        + Dodaj nowy bonus
+                    </button>
+                </div>
             </div>
+
+            <!-- ZAKŁADKA: STATYSTYKI -->
+            <div class="better-ui-tab-content" data-tab="statystyki">
+                <div style="margin-bottom: 15px; background: #333; border: 1px solid #444; border-radius: 3px; padding: 12px;">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-weight: normal; color: #ccc; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="statystyki-przedmiotow" ${config.statystykiPrzedmiotow ? 'checked' : ''}>
+                        Włącz statystyki przedmiotów
+                    </label>
+                    <div style="font-size: 10px; color: #888; margin-top: 5px; line-height: 1.4;">
+                        Skróty dla statystyk przedmiotów
+                    </div>
+                </div>
+
+                <!-- EDYCJA STATYSTYK -->
+                <div style="margin-bottom: 15px; background: #333; border: 1px solid #444; border-radius: 3px; padding: 12px;">
+                    <div style="color: #ccc; font-size: 12px; font-weight: bold; margin-bottom: 10px;">Edytuj statystyki:</div>
+                    <div id="stats-bonuses-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Dynamicznie generowane -->
+                    </div>
+                    <button id="add-stat-bonus" style="margin-top: 10px; padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; width: 100%;">
+                        + Dodaj nową statystykę
+                    </button>
+                </div>
+            </div>
+
+            <!-- ZAKŁADKA: INTERFEJS -->
+            <div class="better-ui-tab-content" data-tab="interfejs">
+                <div style="margin-bottom: 15px; background: #333; border: 1px solid #444; border-radius: 3px; padding: 12px;">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-weight: normal; color: #ccc; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="interfejs" ${config.interfejs ? 'checked' : ''}>
+                        Włącz zmiany interfejsu
+                    </label>
+                    <div style="font-size: 10px; color: #888; margin-top: 5px; line-height: 1.4;">
+                        Skróty dla elementów interfejsu
+                    </div>
+                </div>
+
+                <!-- EDYCJA INTERFEJSU -->
+                <div style="margin-bottom: 15px; background: #333; border: 1px solid #444; border-radius: 3px; padding: 12px;">
+                    <div style="color: #ccc; font-size: 12px; font-weight: bold; margin-bottom: 10px;">Edytuj elementy interfejsu:</div>
+                    <div id="interface-bonuses-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Dynamicznie generowane -->
+                    </div>
+                    <button id="add-interface-bonus" style="margin-top: 10px; padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; width: 100%;">
+                        + Dodaj nowy element
+                    </button>
+                </div>
+            </div>
+
+            <!-- ZAKŁADKA: KALKULATOR -->
+            <div class="better-ui-tab-content" data-tab="kalkulator">
+                <div style="margin-bottom: 15px; background: #333; border: 1px solid #444; border-radius: 3px; padding: 12px;">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-weight: normal; color: #ccc; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="kalkulator-ulepszen" ${config.kalkulatorUlepszen ? 'checked' : ''}>
+                        Włącz kalkulator ulepszeń
+                    </label>
+                    <div style="font-size: 10px; color: #888; margin-top: 5px; line-height: 1.4;">
+                        Pokazuje koszty ulepszenia w tooltipie
+                    </div>
+                </div>
+
+                <!-- WYBÓR RANG -->
+                <div style="margin-bottom: 15px; background: #333; border: 1px solid #444; border-radius: 3px; padding: 12px;">
+                    <div style="color: #ccc; font-size: 12px; font-weight: bold; margin-bottom: 10px;">Wyświetlaj kalkulator dla rang:</div>
+
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: normal; color: #ccc; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="calc-rarity-zwykly" ${calculatorRarities.zwykly ? 'checked' : ''}>
+                        Popspolite
+                    </label>
+
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: normal; color: #0099ff; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="calc-rarity-unikatowy" ${calculatorRarities.unikatowy ? 'checked' : ''}>
+                        Unikatowe
+                    </label>
+
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: normal; color: #9900ff; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="calc-rarity-heroiczny" ${calculatorRarities.heroiczny ? 'checked' : ''}>
+                        Heroiczne
+                    </label>
+
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: normal; color: #00ff00; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="calc-rarity-ulepszony" ${calculatorRarities.ulepszony ? 'checked' : ''}>
+                        Ulepszone
+                    </label>
+
+                    <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; color: #ff6600; font-size: 12px; cursor: pointer;">
+                        <input type="checkbox" class="better-ui-checkbox" id="calc-rarity-legendarny" ${calculatorRarities.legendarny ? 'checked' : ''}>
+                        Legendarne
+                    </label>
+
+                    <div style="font-size: 10px; color: #888; margin-top: 10px; line-height: 1.4;">
+                        Kalkulator będzie pokazywany tylko dla zaznaczonych rang
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; padding: 12px 15px; background: #2a2a2a; border-radius: 0 0 4px 4px; border-top: 1px solid #444; flex-shrink: 0;">
+            <button id="close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                Zamknij
+            </button>
+            <button id="reload-game" style="flex: 1; padding: 8px 12px; background: #ff9800; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                Odśwież grę
+            </button>
         </div>
     `;
 
-    // Dodaj style przełączników jak w managerze
-    if (!document.getElementById('kwak-better-ui-toggle-styles')) {
+    // Dodaj style
+    if (!document.getElementById('kwak-better-ui-styles')) {
         const style = document.createElement('style');
-        style.id = 'kwak-better-ui-toggle-styles';
+        style.id = 'kwak-better-ui-styles';
         style.textContent = `
-            .kwak-toggle-switch {
-                position: relative;
-                display: inline-block;
-                width: 44px;
-                height: 24px;
-            }
-
-            .kwak-toggle-switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-
-            .kwak-toggle-switch .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #555;
-                transition: 0.3s;
-                border-radius: 24px;
-                border: 1px solid #666;
-            }
-
-            .kwak-toggle-switch .slider:before {
-                position: absolute;
-                content: "";
-                height: 18px;
+            .better-ui-checkbox {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
                 width: 18px;
-                left: 2px;
-                bottom: 2px;
-                background-color: white;
-                transition: 0.3s;
-                border-radius: 50%;
+                height: 18px;
+                border: 2px solid #555;
+                border-radius: 3px;
+                background: #2a2a2a;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.2s;
+                flex-shrink: 0;
             }
 
-            .kwak-toggle-switch input:checked + .slider {
-                background-color: #4CAF50;
+            .better-ui-checkbox:hover {
                 border-color: #4CAF50;
             }
 
-            .kwak-toggle-switch input:checked + .slider:before {
-                transform: translateX(20px);
+            .better-ui-checkbox:checked {
+                background: #4CAF50;
+                border-color: #4CAF50;
+            }
+
+            .better-ui-checkbox:checked::after {
+                content: '✓';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            .better-ui-tab {
+                flex: 1;
+                padding: 12px;
+                background: #1a1a1a;
+                border: none;
+                border-bottom: 2px solid transparent;
+                color: #888;
+                cursor: pointer;
+                font-size: 11px;
+                font-weight: bold;
+                transition: all 0.2s;
+            }
+
+            .better-ui-tab:hover {
+                background: #252525;
+                color: #ccc;
+            }
+
+            .better-ui-tab.active {
+                background: #2a2a2a;
+                color: #4CAF50;
+                border-bottom-color: #4CAF50;
+            }
+
+.better-ui-tab-content {
+    display: none;
+    height: 450px;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.better-ui-tab-content.active {
+    display: block;
+}
+
+/* Scrollbary dla zakładek */
+.better-ui-tab-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.better-ui-tab-content::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.better-ui-tab-content::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.better-ui-tab-content::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.better-ui-tab-content {
+    scrollbar-width: thin;
+    scrollbar-color: #555 #2a2a2a;
+}
+#better-ui-close-header:hover {
+    background: #f44336;
+    color: #fff;
+}
+
+            .bonus-edit-row {
+                display: flex;
+                gap: 4px;
+                align-items: center;
+                background: #2a2a2a;
+                padding: 6px;
+                border-radius: 3px;
+            }
+
+            .bonus-edit-row input {
+                flex: 1;
+                padding: 4px 8px;
+                background: #1a1a1a;
+                border: 1px solid #555;
+                border-radius: 3px;
+                color: #ccc;
+                font-size: 11px;
+            }
+
+            .bonus-edit-row input:focus {
+                outline: none;
+                border-color: #4CAF50;
+            }
+
+            .bonus-edit-row button {
+                padding: 4px 8px;
+                background: #f44336;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 11px;
+                flex-shrink: 0;
+            }
+
+            .bonus-edit-row button:hover {
+                background: #d32f2f;
             }
         `;
         document.head.appendChild(style);
     }
 
-    document.body.appendChild(panel);
+document.body.appendChild(panel);
 
-    // *** DODAJ FUNKCJONALNOŚĆ PRZECIĄGANIA ***
-    let isDragging = false;
-    let dragOffsetX = 0;
-    let dragOffsetY = 0;
-
-    const header = panel.querySelector('#better-ui-panel-header');
-    
-    header.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        const rect = panel.getBoundingClientRect();
-        dragOffsetX = e.clientX - rect.left;
-        dragOffsetY = e.clientY - rect.top;
-        e.preventDefault();
-        
-        // Dodaj visual feedback
-        header.style.background = '#444';
-        panel.style.cursor = 'grabbing';
+// BLOKADA SCROLLA
+const tabContents = panel.querySelectorAll('.better-ui-tab-content');
+tabContents.forEach(content => {
+    content.addEventListener('wheel', (e) => {
+        e.stopPropagation();
     });
+});
 
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        
-        const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
-        const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
-        
-        panel.style.left = `${x}px`;
-        panel.style.top = `${y}px`;
-        panel.style.transform = 'none';
-        
-        // Zapisz pozycję w localStorage
-        localStorage.setItem('betterUISettingsPanelPosition', JSON.stringify({x, y}));
-    });
+function renderBonusList(type, containerId) {
+    const container = document.getElementById(containerId);
+    const tempDisable = true;
+    container.innerHTML = '';
 
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-            
-            // Usuń visual feedback
-            header.style.background = '#333';
-            panel.style.cursor = 'default';
+    // Domyślne wartości
+    const defaults = {
+        'legendarne': {
+            'Cios bardzo krytyczny': '💀 POTĘŻNE PIERDOLNIĘCIE 💀',
+            'Dotyk anioła': 'Dotyczek',
+            'Klątwa': 'Klątewka',
+            'Oślepienie': 'Oślepa',
+            'Ostatni ratunek': 'OR',
+            'Krytyczna osłona': 'KO',
+            'Fasada opieki': 'Fasada',
+            'Płomienne oczyszczenie': 'Płomienne',
+            'Krwawa udręka': 'Krwawa',
+            'Przeszywająca skuteczność': 'Przeszywajka'
+        },
+        'statystyki': {
+            'Cios krytyczny': 'Kryt',
+            'Przebicie': 'Przebitka',
+            'Głęboka rana': 'GR',
+            'Unik': 'Unik',
+            'Blok': 'Blok',
+            'Blok przebicia': 'Blok Przebicia',
+            'Kontra': 'Kontra',
+            'Ogłuszenie': 'Stun',
+            'Szybkość ataku': 'SA',
+            'Zręczność': 'Zręka',
+            'Energia': 'Ena',
+            'Życie': 'HP',
+            'Wszystkie cechy': 'Cechy',
+            'Trucizna': 'Truta',
+            'Niszczenie pancerza': 'Niszczara panca',
+            'Obniżanie szybkości ataku': 'Obniżka SA',
+            'Obniżanie uniku': 'Obniżka uniku',
+            'Podczas ataku unik przeciwnika jest mniejszy o': 'Obniżka uniku o',
+            'Obniża szybkość ataku przeciwnika o': 'Obniżka SA o',
+            'Pancerz': 'Panc',
+            'pancerza': 'panca',
+            'punktów życia podczas walki': 'pkt hp podczas walki',
+            'Odporność': 'Odpy',
+            'Moc ciosu krytycznego fizycznego': 'SKF',
+            'Moc ciosu krytycznego magicznego': 'SKM',
+            'Podczas obrony szansa na cios krytyczny przeciwnika jest mniejsza o ': 'Obniżka Kryta o ',
+            'punktów procentowych': '',
+            'Obrażenia': 'DMG',
+            'fizyczne dystansowe': 'FIZ',
+            'trucizny': 'truty',
+            'Spowalnia cel o': 'Slow o',
+            'punktów pancerza podczas ciosu': 'panca',
+            'Ogłuszający cios': 'UGA BUGA MACZUGA',
+            '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75% DODATKOWO: 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
+            'Absorbuje': 'Absa',
+            'obrażeń fizycznych': 'DMG FIZ',
+            'obrażeń magicznych': 'DMG MAG',
+            'Zmniejsza o': 'Slow o',
+            'szybkość ataku celu': 'SA',
+            'Niszczenie odporności magicznych o': 'Niszczara odpów o',
+            'podczas ciosu': 'przy hicie',
+            'szans na kontratak po ciosie krytycznym': 'na kontre'
+        },
+        'interfejs': {
+            'Punkty Honoru': 'PH',
+            'Teleportuje gracza na mapę': 'Tepa na',
+            'Wewnętrzny spokój': 'umka dla cweli',
+            'Smocze Runy': 'SR',
+            'Turkanie energii': 'Przywro energii',
+            'Przywracanie energii': 'Przywro energii'
         }
+    };
+
+    // Scal domyślne z custom
+    const allBonuses = { ...defaults[type], ...editableBonuses[type] };
+
+    Object.entries(allBonuses).forEach(([original, replacement]) => {
+        const row = document.createElement('div');
+        row.className = 'bonus-edit-row';
+
+        // Sprawdź czy to custom czy domyślny
+        const isCustom = editableBonuses[type].hasOwnProperty(original) && !defaults[type].hasOwnProperty(original);
+
+        row.innerHTML = `
+            <input type="text" class="bonus-original" value="${original}" placeholder="Oryginalna nazwa" ${!isCustom ? 'readonly' : ''} style="${!isCustom ? 'background: #1a1a1a; color: #888;' : ''}">
+            <span style="color: #888;">→</span>
+            <input type="text" class="bonus-replacement" value="${replacement}" placeholder="Skrót">
+            <button class="bonus-delete" ${!isCustom ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>🗑️</button>
+        `;
+
+        const originalInput = row.querySelector('.bonus-original');
+        const replacementInput = row.querySelector('.bonus-replacement');
+        const deleteBtn = row.querySelector('.bonus-delete');
+
+        const oldOriginal = original;
+
+        // Tylko dla custom można zmieniać nazwę oryginalną
+        if (isCustom) {
+            originalInput.addEventListener('change', () => {
+                if (originalInput.value && originalInput.value !== oldOriginal) {
+                    delete editableBonuses[type][oldOriginal];
+                    editableBonuses[type][originalInput.value] = replacementInput.value;
+                    saveConfig();
+                    updateBonusNames();
+                }
+            });
+        }
+
+        // Zmiana skrótu - zawsze dozwolona
+        replacementInput.addEventListener('change', () => {
+            if (defaults[type].hasOwnProperty(original)) {
+                // To jest domyślny bonus - nadpisz tylko jeśli się zmienił
+                if (replacementInput.value !== defaults[type][original]) {
+                    editableBonuses[type][original] = replacementInput.value;
+                } else {
+                    // Przywrócono domyślną wartość - usuń z custom
+                    delete editableBonuses[type][original];
+                }
+            } else {
+                // To jest custom bonus
+                editableBonuses[type][originalInput.value] = replacementInput.value;
+            }
+            saveConfig();
+            updateBonusNames();
+        });
+
+        // Usuwanie - tylko custom
+        if (isCustom) {
+            deleteBtn.addEventListener('click', () => {
+                delete editableBonuses[type][originalInput.value];
+                saveConfig();
+                updateBonusNames();
+                renderBonusList(type, containerId);
+            });
+        }
+
+        container.appendChild(row);
+    });
+}
+
+    // Renderuj listy
+    renderBonusList('legendarne', 'legendary-bonuses-list');
+    renderBonusList('statystyki', 'stats-bonuses-list');
+    renderBonusList('interfejs', 'interface-bonuses-list');
+
+    // Przyciski dodawania
+    document.getElementById('add-legendary-bonus').addEventListener('click', () => {
+        editableBonuses.legendarne['Nowa nazwa'] = 'Skrót';
+        saveConfig();
+        renderBonusList('legendarne', 'legendary-bonuses-list');
     });
 
-    // Przywróć zapisaną pozycję przy otwieraniu
-    const savedPosition = JSON.parse(localStorage.getItem('betterUISettingsPanelPosition') || 'null');
+    document.getElementById('add-stat-bonus').addEventListener('click', () => {
+        editableBonuses.statystyki['Nowa statystyka'] = 'Skrót';
+        saveConfig();
+        renderBonusList('statystyki', 'stats-bonuses-list');
+    });
+
+    document.getElementById('add-interface-bonus').addEventListener('click', () => {
+        editableBonuses.interfejs['Nowy element'] = 'Skrót';
+        saveConfig();
+        renderBonusList('interfejs', 'interface-bonuses-list');
+    });
+
+    // ===== OBSŁUGA ZAKŁADEK =====
+    const tabs = panel.querySelectorAll('.better-ui-tab');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.getAttribute('data-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(tc => tc.classList.remove('active'));
+            tab.classList.add('active');
+            const targetContent = panel.querySelector(`.better-ui-tab-content[data-tab="${targetTab}"]`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+                targetContent.style.display = 'block';
+                 }
+                tabContents.forEach(tc => {
+                if (tc.getAttribute('data-tab') !== targetTab) {
+                    tc.style.display = 'none';
+                }
+            });
+        });
+    });
+        const savedPosition = JSON.parse(localStorage.getItem('betterUISettingsPanelPosition') || 'null');
     if (savedPosition) {
         panel.style.left = `${savedPosition.x}px`;
         panel.style.top = `${savedPosition.y}px`;
         panel.style.transform = 'none';
     }
 
-    // Event listenery dla przełączników i przycisków
+
+
+
+
+    // *** PRZECIĄGANIE OKNA ***
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    const header = panel.querySelector('#better-ui-panel-header');
+
+    header.addEventListener('mousedown', (e) => {
+        if (e.target.id === 'better-ui-close-header') return;
+
+        isDragging = true;
+        const rect = panel.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        e.preventDefault();
+
+        header.style.background = '#444';
+        panel.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
+        const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
+
+        panel.style.left = `${x}px`;
+        panel.style.top = `${y}px`;
+        panel.style.transform = 'none';
+
+        localStorage.setItem('betterUISettingsPanelPosition', JSON.stringify({x, y}));
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            header.style.background = '#333';
+            panel.style.cursor = 'default';
+        }
+    });
+
+
+    // ===== EVENT LISTENERY =====
+
+    // Checkboxy główne
     panel.querySelector('#bonusy-legendarne').addEventListener('change', (e) => {
         e.stopPropagation();
         config.bonusyLegendarne = e.target.checked;
@@ -918,17 +1430,50 @@ function createSettingsPanel() {
     });
 
     panel.querySelector('#kalkulator-ulepszen').addEventListener('change', (e) => {
-    e.stopPropagation();
-    config.kalkulatorUlepszen = e.target.checked;
-    saveConfig();
-   });
+        e.stopPropagation();
+        config.kalkulatorUlepszen = e.target.checked;
+        saveConfig();
+    });
 
+    // Checkboxy rang kalkulatora
+    panel.querySelector('#calc-rarity-zwykly').addEventListener('change', (e) => {
+        calculatorRarities.zwykly = e.target.checked;
+        saveConfig();
+    });
+
+    panel.querySelector('#calc-rarity-unikatowy').addEventListener('change', (e) => {
+        calculatorRarities.unikatowy = e.target.checked;
+        saveConfig();
+    });
+
+    panel.querySelector('#calc-rarity-heroiczny').addEventListener('change', (e) => {
+        calculatorRarities.heroiczny = e.target.checked;
+        saveConfig();
+    });
+
+    panel.querySelector('#calc-rarity-ulepszony').addEventListener('change', (e) => {
+        calculatorRarities.ulepszony = e.target.checked;
+        saveConfig();
+    });
+
+    panel.querySelector('#calc-rarity-legendarny').addEventListener('change', (e) => {
+        calculatorRarities.legendarny = e.target.checked;
+        saveConfig();
+    });
+
+    // Przyciski
     panel.querySelector('#close-settings').addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         toggleSettingsPanel();
     });
-    
+
+    panel.querySelector('#better-ui-close-header').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSettingsPanel();
+    });
+
     panel.querySelector('#reload-game').addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
