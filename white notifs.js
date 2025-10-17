@@ -543,437 +543,506 @@
         }
     }
 
-    function createSettingsPanel() {
-        const panel = document.createElement('div');
-        panel.id = 'message-styler-settings-panel';
-        panel.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #2a2a2a;
-            border: 1px solid #444;
-            border-radius: 4px;
-            padding: 0;
-            z-index: 10000;
-            display: none;
-            min-width: 360px;
-            max-width: 400px;
-            font-family: Arial, sans-serif;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            max-height: 80vh;
-            overflow-y: auto;
-        `;
+function createSettingsPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'message-styler-settings-panel';
+panel.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 0;
+    z-index: 10000;
+    display: none;
+    min-width: 360px;
+    max-width: 400px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    max-height: 80vh;
+    overflow: hidden;
+    flex-direction: column;
+`;
 
-        panel.innerHTML = `
-            <div id="message-styler-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 0; text-align: center; font-weight: bold; padding: 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
-                Chat&Notifs Styler - Settings
-            </div>
-            <div style="padding: 15px;">
-                <!-- SEKCJA CZATU -->
-                <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Chat</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="chat-enabled-toggle" ${config.chat.enabled ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
+    panel.innerHTML = `
+        <div id="message-styler-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 0; text-align: center; font-weight: bold; padding: 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0; flex-shrink: 0;">
+            Chat&Notifs Styler - Settings
+        </div>
 
-                    <div style="margin-bottom: 12px;">
-                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Rozmiar czcionki:</label>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="range" id="chat-font-size-slider" min="8" max="30" value="${config.chat.fontSize}"
-                                style="flex: 1; accent-color: #4CAF50;">
-                            <span id="chat-font-size-value" style="color: #fff; font-size: 12px; min-width: 35px;">${config.chat.fontSize}px</span>
-                        </div>
-                    </div>
+        <!-- ZAKŁADKI -->
+        <div style="display: flex; background: #1a1a1a; border-bottom: 1px solid #444; flex-shrink: 0;">
+            <button class="message-styler-tab active" data-tab="chat">Chat</button>
+            <button class="message-styler-tab" data-tab="notifications">Powiadomienia</button>
+        </div>
 
-                    <div style="margin-bottom: 12px;">
-                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
-                        <select id="chat-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
-                            ${Object.entries(fontPresets).map(([name]) =>
-                                `<option value="${name}" ${config.chat.fontFamily === name ? 'selected' : ''}>${name}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="chat-italic-toggle" ${config.chat.italic ? 'checked' : ''}>
-                                <span class="checkmark"></span>
+        <!-- KONTENER NA ZAKŁADKI -->
+        <div style="flex: 1; overflow-y: auto; min-height: 0;">
+            <!-- ZAKŁADKA: CHAT -->
+            <div class="message-styler-tab-content active" data-tab="chat">
+                <div style="padding: 15px;">
+                    <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <span style="color: #fff; font-size: 13px; font-weight: bold;">Chat</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="chat-enabled-toggle" ${config.chat.enabled ? 'checked' : ''}>
+                                <span class="slider"></span>
                             </label>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="chat-bold-toggle" ${config.chat.bold ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Rozmiar czcionki:</label>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="range" id="chat-font-size-slider" min="8" max="30" value="${config.chat.fontSize}"
+                                    style="flex: 1; accent-color: #4CAF50;">
+                                <span id="chat-font-size-value" style="color: #fff; font-size: 12px; min-width: 35px;">${config.chat.fontSize}px</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
+                            <select id="chat-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
+                                ${Object.entries(fontPresets).map(([name]) =>
+                                    `<option value="${name}" ${config.chat.fontFamily === name ? 'selected' : ''}>${name}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="chat-italic-toggle" ${config.chat.italic ? 'checked' : ''}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="chat-bold-toggle" ${config.chat.bold ? 'checked' : ''}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- SEKCJA BIG MESSAGES -->
-                <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="color: #fff; font-size: 13px; font-weight: bold;">Powiadomienia</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="big-enabled-toggle" ${config.bigMessages.enabled ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <div style="margin-bottom: 12px;">
-                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Rozmiar czcionki:</label>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="range" id="big-font-size-slider" min="8" max="30" value="${config.bigMessages.fontSize}"
-                                style="flex: 1; accent-color: #4CAF50;">
-                            <span id="big-font-size-value" style="color: #fff; font-size: 12px; min-width: 35px;">${config.bigMessages.fontSize}px</span>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 12px;">
-                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
-                        <select id="big-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
-                            ${Object.entries(fontPresets).map(([name]) =>
-                                `<option value="${name}" ${config.bigMessages.fontFamily === name ? 'selected' : ''}>${name}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-
-                    <div style="margin-bottom: 12px;">
-                        <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Kolor tekstu:</label>
-                        <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;">
-                            ${Object.entries(colorPresets).map(([name, color]) =>
-                                `<div class="color-option" data-color="${color}"
-                                    style="width: 30px; height: 30px; background: ${color}; border: 2px solid ${config.bigMessages.color === color ? '#fff' : '#666'};
-                                    border-radius: 4px; cursor: pointer;" title="${name}"></div>`
-                            ).join('')}
-                        </div>
-                        <input type="color" id="big-custom-color" value="${config.bigMessages.color}"
-                            style="width: 100%; height: 30px; border: 1px solid #666; background: #2a2a2a; border-radius: 4px;">
-                    </div>
-
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="big-italic-toggle" ${config.bigMessages.italic ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="big-bold-toggle" ${config.bigMessages.bold ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 16px;">🌈</span>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="big-rgb-toggle" ${config.bigMessages.rgbEffect ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 16px;">😊</span>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="big-emoticons-toggle" ${config.bigMessages.emoticons ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- PRZYCISK TESTOWY -->
-                    <button id="test-big-message" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
-                        Test
-                    </button>
-                </div>
-
-                <!-- PRZYCISKI -->
-                <div style="display: flex; gap: 8px; border-top: 1px solid #444; padding-top: 12px; flex-wrap: wrap;">
-                    <button id="export-message-settings" style="flex: 1; padding: 8px 12px; background: #3BA55D; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
-                        Eksportuj
-                    </button>
-                    <button id="import-message-settings" style="flex: 1; padding: 8px 12px; background: #5865F2; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
-                        Importuj
-                    </button>
-                    <button id="close-message-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
-                        Zamknij
-                    </button>
                 </div>
             </div>
+
+            <!-- ZAKŁADKA: POWIADOMIENIA -->
+            <div class="message-styler-tab-content" data-tab="notifications">
+                <div style="padding: 15px;">
+                    <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <span style="color: #fff; font-size: 13px; font-weight: bold;">Powiadomienia</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="big-enabled-toggle" ${config.bigMessages.enabled ? 'checked' : ''}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Rozmiar czcionki:</label>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="range" id="big-font-size-slider" min="8" max="30" value="${config.bigMessages.fontSize}"
+                                    style="flex: 1; accent-color: #4CAF50;">
+                                <span id="big-font-size-value" style="color: #fff; font-size: 12px; min-width: 35px;">${config.bigMessages.fontSize}px</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Czcionka:</label>
+                            <select id="big-font-family-select" style="width: 100%; padding: 6px; background: #2a2a2a; color: #ccc; border: 1px solid #666; border-radius: 4px;">
+                                ${Object.entries(fontPresets).map(([name]) =>
+                                    `<option value="${name}" ${config.bigMessages.fontFamily === name ? 'selected' : ''}>${name}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="color: #ccc; font-size: 12px; display: block; margin-bottom: 6px;">Kolor tekstu:</label>
+                            <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;">
+                                ${Object.entries(colorPresets).map(([name, color]) =>
+                                    `<div class="color-option" data-color="${color}"
+                                        style="width: 30px; height: 30px; background: ${color}; border: 2px solid ${config.bigMessages.color === color ? '#fff' : '#666'};
+                                        border-radius: 4px; cursor: pointer;" title="${name}"></div>`
+                                ).join('')}
+                            </div>
+                            <input type="color" id="big-custom-color" value="${config.bigMessages.color}"
+                                style="width: 100%; height: 30px; border: 1px solid #666; background: #2a2a2a; border-radius: 4px;">
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label style="color: #ccc; font-size: 12px;">Kursywa:</label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="big-italic-toggle" ${config.bigMessages.italic ? 'checked' : ''}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label style="color: #ccc; font-size: 12px;">Pogrubienie:</label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="big-bold-toggle" ${config.bigMessages.bold ? 'checked' : ''}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 16px;">🌈</span>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="big-rgb-toggle" ${config.bigMessages.rgbEffect ? 'checked' : ''}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 16px;">😊</span>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="big-emoticons-toggle" ${config.bigMessages.emoticons ? 'checked' : ''}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- PRZYCISK TESTOWY -->
+                        <button id="test-big-message" style="width: 100%; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                            Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRZYCISKI NA DOLE -->
+        <div style="display: flex; gap: 8px; border-top: 1px solid #444; padding: 12px 15px; flex-wrap: wrap; flex-shrink: 0; background: #2a2a2a; border-radius: 0 0 4px 4px;">
+            <button id="export-message-settings" style="flex: 1; padding: 8px 12px; background: #3BA55D; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
+                Eksportuj
+            </button>
+            <button id="import-message-settings" style="flex: 1; padding: 8px 12px; background: #5865F2; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
+                Importuj
+            </button>
+            <button id="close-message-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
+                Zamknij
+            </button>
+        </div>
+    `;
+
+    // Dodaj style przełączników, checkboxów i ZAKŁADEK
+    if (!document.getElementById('message-styler-toggle-styles')) {
+        const style = document.createElement('style');
+        style.id = 'message-styler-toggle-styles';
+        style.textContent = `
+            /* STYLE ZAKŁADEK */
+            .message-styler-tab {
+                flex: 1;
+                padding: 12px;
+                background: #1a1a1a;
+                border: none;
+                border-bottom: 2px solid transparent;
+                color: #888;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: bold;
+                transition: all 0.2s;
+            }
+            .message-styler-tab:hover {
+                background: #252525;
+                color: #ccc;
+            }
+            .message-styler-tab.active {
+                background: #2a2a2a;
+                color: #5865F2;
+                border-bottom-color: #5865F2;
+            }
+            .message-styler-tab-content {
+                display: none;
+            }
+            .message-styler-tab-content.active {
+                display: block;
+            }
+
+            /* TOGGLE SWITCH */
+            .toggle-switch {
+                position: relative;
+                display: inline-block;
+                width: 44px;
+                height: 24px;
+            }
+            .toggle-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .toggle-switch .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #555;
+                transition: 0.3s;
+                border-radius: 24px;
+                border: 1px solid #666;
+            }
+            .toggle-switch .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 2px;
+                bottom: 2px;
+                background-color: white;
+                transition: 0.3s;
+                border-radius: 50%;
+            }
+            .toggle-switch input:checked + .slider {
+                background-color: #4CAF50;
+                border-color: #4CAF50;
+            }
+            .toggle-switch input:checked + .slider:before {
+                transform: translateX(20px);
+            }
+
+            /* CHECKBOX */
+            .checkbox-container {
+                display: inline-block;
+                position: relative;
+                cursor: pointer;
+                user-select: none;
+            }
+            .checkbox-container input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+            }
+            .checkbox-container .checkmark {
+                display: inline-block;
+                height: 20px;
+                width: 20px;
+                background-color: #555;
+                border: 1px solid #666;
+                border-radius: 4px;
+                transition: all 0.3s;
+                position: relative;
+            }
+            .checkbox-container:hover .checkmark {
+                background-color: #666;
+            }
+            .checkbox-container input:checked ~ .checkmark {
+                background-color: #4CAF50;
+                border-color: #4CAF50;
+            }
+            .checkbox-container .checkmark:after {
+                content: "";
+                position: absolute;
+                display: none;
+                left: 7px;
+                top: 3px;
+                width: 5px;
+                height: 10px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+            .checkbox-container input:checked ~ .checkmark:after {
+                display: block;
+            }
         `;
+        document.head.appendChild(style);
+    }
 
-        // Dodaj style przełączników i checkboxów
-        if (!document.getElementById('message-styler-toggle-styles')) {
-            const style = document.createElement('style');
-            style.id = 'message-styler-toggle-styles';
-            style.textContent = `
-                .toggle-switch {
-                    position: relative;
-                    display: inline-block;
-                    width: 44px;
-                    height: 24px;
-                }
-                .toggle-switch input {
-                    opacity: 0;
-                    width: 0;
-                    height: 0;
-                }
-                .toggle-switch .slider {
-                    position: absolute;
-                    cursor: pointer;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: #555;
-                    transition: 0.3s;
-                    border-radius: 24px;
-                    border: 1px solid #666;
-                }
-                .toggle-switch .slider:before {
-                    position: absolute;
-                    content: "";
-                    height: 18px;
-                    width: 18px;
-                    left: 2px;
-                    bottom: 2px;
-                    background-color: white;
-                    transition: 0.3s;
-                    border-radius: 50%;
-                }
-                .toggle-switch input:checked + .slider {
-                    background-color: #4CAF50;
-                    border-color: #4CAF50;
-                }
-                .toggle-switch input:checked + .slider:before {
-                    transform: translateX(20px);
-                }
+    document.body.appendChild(panel);
 
-                .checkbox-container {
-                    display: inline-block;
-                    position: relative;
-                    cursor: pointer;
-                    user-select: none;
-                }
-                .checkbox-container input {
-                    position: absolute;
-                    opacity: 0;
-                    cursor: pointer;
-                    height: 0;
-                    width: 0;
-                }
-                .checkbox-container .checkmark {
-                    display: inline-block;
-                    height: 20px;
-                    width: 20px;
-                    background-color: #555;
-                    border: 1px solid #666;
-                    border-radius: 4px;
-                    transition: all 0.3s;
-                    position: relative;
-                }
-                .checkbox-container:hover .checkmark {
-                    background-color: #666;
-                }
-                .checkbox-container input:checked ~ .checkmark {
-                    background-color: #4CAF50;
-                    border-color: #4CAF50;
-                }
-                .checkbox-container .checkmark:after {
-                    content: "";
-                    position: absolute;
-                    display: none;
-                    left: 7px;
-                    top: 3px;
-                    width: 5px;
-                    height: 10px;
-                    border: solid white;
-                    border-width: 0 2px 2px 0;
-                    transform: rotate(45deg);
-                }
-                .checkbox-container input:checked ~ .checkmark:after {
-                    display: block;
-                }
-            `;
-            document.head.appendChild(style);
-        }
+    // ===== OBSŁUGA ZAKŁADEK =====
+    const tabs = panel.querySelectorAll('.message-styler-tab');
+    const tabContents = panel.querySelectorAll('.message-styler-tab-content');
 
-        document.body.appendChild(panel);
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.getAttribute('data-tab');
 
-        // Funkcjonalność przeciągania
-        let isDragging = false;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
-        const header = panel.querySelector('#message-styler-panel-header');
+            // Usuń active ze wszystkich
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(tc => tc.classList.remove('active'));
 
-        header.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            const rect = panel.getBoundingClientRect();
-            dragOffsetX = e.clientX - rect.left;
-            dragOffsetY = e.clientY - rect.top;
-            e.preventDefault();
-            header.style.background = '#444';
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
-            const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
-            panel.style.left = `${x}px`;
-            panel.style.top = `${y}px`;
-            panel.style.transform = 'none';
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                header.style.background = '#333';
+            // Dodaj active do klikniętej
+            tab.classList.add('active');
+            const targetContent = panel.querySelector(`.message-styler-tab-content[data-tab="${targetTab}"]`);
+            if (targetContent) {
+                targetContent.classList.add('active');
             }
         });
+    });
 
-        // Event listeners - CZAT
-        panel.querySelector('#chat-enabled-toggle').addEventListener('change', (e) => {
-            config.chat.enabled = e.target.checked;
-            updateCSS();
-            saveConfig();
-        });
+    // Funkcjonalność przeciągania
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    const header = panel.querySelector('#message-styler-panel-header');
 
-        const chatFontSizeSlider = panel.querySelector('#chat-font-size-slider');
-        const chatFontSizeValue = panel.querySelector('#chat-font-size-value');
-        chatFontSizeSlider.addEventListener('input', (e) => {
-            const size = parseInt(e.target.value);
-            config.chat.fontSize = size;
-            chatFontSizeValue.textContent = size + 'px';
-            updateCSS();
-            saveConfig();
-        });
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = panel.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        e.preventDefault();
+        header.style.background = '#444';
+    });
 
-        panel.querySelector('#chat-font-family-select').addEventListener('change', (e) => {
-            config.chat.fontFamily = e.target.value;
-            updateCSS();
-            saveConfig();
-        });
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const x = Math.min(Math.max(0, e.clientX - dragOffsetX), window.innerWidth - panel.offsetWidth);
+        const y = Math.min(Math.max(0, e.clientY - dragOffsetY), window.innerHeight - panel.offsetHeight);
+        panel.style.left = `${x}px`;
+        panel.style.top = `${y}px`;
+        panel.style.transform = 'none';
+    });
 
-        panel.querySelector('#chat-italic-toggle').addEventListener('change', (e) => {
-            config.chat.italic = e.target.checked;
-            updateCSS();
-            saveConfig();
-        });
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            header.style.background = '#333';
+        }
+    });
 
-        panel.querySelector('#chat-bold-toggle').addEventListener('change', (e) => {
-            config.chat.bold = e.target.checked;
-            updateCSS();
-            saveConfig();
-        });
+    // Event listeners - CZAT
+    panel.querySelector('#chat-enabled-toggle').addEventListener('change', (e) => {
+        config.chat.enabled = e.target.checked;
+        updateCSS();
+        saveConfig();
+    });
 
-        // Event listeners - BIG MESSAGES
-        panel.querySelector('#big-enabled-toggle').addEventListener('change', (e) => {
-            config.bigMessages.enabled = e.target.checked;
-            updateCSS();
-            saveConfig();
-        });
+    const chatFontSizeSlider = panel.querySelector('#chat-font-size-slider');
+    const chatFontSizeValue = panel.querySelector('#chat-font-size-value');
+    chatFontSizeSlider.addEventListener('input', (e) => {
+        const size = parseInt(e.target.value);
+        config.chat.fontSize = size;
+        chatFontSizeValue.textContent = size + 'px';
+        updateCSS();
+        saveConfig();
+    });
 
-        const bigFontSizeSlider = panel.querySelector('#big-font-size-slider');
-        const bigFontSizeValue = panel.querySelector('#big-font-size-value');
-        bigFontSizeSlider.addEventListener('input', (e) => {
-            const size = parseInt(e.target.value);
-            config.bigMessages.fontSize = size;
-            bigFontSizeValue.textContent = size + 'px';
-            updateCSS();
-            saveConfig();
-        });
+    panel.querySelector('#chat-font-family-select').addEventListener('change', (e) => {
+        config.chat.fontFamily = e.target.value;
+        updateCSS();
+        saveConfig();
+    });
 
-        panel.querySelector('#big-font-family-select').addEventListener('change', (e) => {
-            config.bigMessages.fontFamily = e.target.value;
-            updateCSS();
-            saveConfig();
-        });
+    panel.querySelector('#chat-italic-toggle').addEventListener('change', (e) => {
+        config.chat.italic = e.target.checked;
+        updateCSS();
+        saveConfig();
+    });
 
-        panel.querySelector('#big-italic-toggle').addEventListener('change', (e) => {
-            config.bigMessages.italic = e.target.checked;
-            updateCSS();
-            saveConfig();
-        });
+    panel.querySelector('#chat-bold-toggle').addEventListener('change', (e) => {
+        config.chat.bold = e.target.checked;
+        updateCSS();
+        saveConfig();
+    });
 
-        panel.querySelector('#big-bold-toggle').addEventListener('change', (e) => {
-            config.bigMessages.bold = e.target.checked;
-            updateCSS();
-            saveConfig();
-        });
+    // Event listeners - BIG MESSAGES
+    panel.querySelector('#big-enabled-toggle').addEventListener('change', (e) => {
+        config.bigMessages.enabled = e.target.checked;
+        updateCSS();
+        saveConfig();
+    });
 
-        // Obsługa kolorów preset
-        panel.querySelectorAll('.color-option').forEach(option => {
-            option.addEventListener('click', (e) => {
-                const color = e.target.dataset.color;
-                config.bigMessages.color = color;
-                panel.querySelector('#big-custom-color').value = color;
-                panel.querySelectorAll('.color-option').forEach(opt => {
-                    opt.style.border = `2px solid ${opt.dataset.color === color ? '#fff' : '#666'}`;
-                });
-                updateCSS();
-                saveConfig();
-            });
-        });
+    const bigFontSizeSlider = panel.querySelector('#big-font-size-slider');
+    const bigFontSizeValue = panel.querySelector('#big-font-size-value');
+    bigFontSizeSlider.addEventListener('input', (e) => {
+        const size = parseInt(e.target.value);
+        config.bigMessages.fontSize = size;
+        bigFontSizeValue.textContent = size + 'px';
+        updateCSS();
+        saveConfig();
+    });
 
-        // Custom color picker
-        panel.querySelector('#big-custom-color').addEventListener('change', (e) => {
-            config.bigMessages.color = e.target.value;
+    panel.querySelector('#big-font-family-select').addEventListener('change', (e) => {
+        config.bigMessages.fontFamily = e.target.value;
+        updateCSS();
+        saveConfig();
+    });
+
+    panel.querySelector('#big-italic-toggle').addEventListener('change', (e) => {
+        config.bigMessages.italic = e.target.checked;
+        updateCSS();
+        saveConfig();
+    });
+
+    panel.querySelector('#big-bold-toggle').addEventListener('change', (e) => {
+        config.bigMessages.bold = e.target.checked;
+        updateCSS();
+        saveConfig();
+    });
+
+    // Obsługa kolorów preset
+    panel.querySelectorAll('.color-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            const color = e.target.dataset.color;
+            config.bigMessages.color = color;
+            panel.querySelector('#big-custom-color').value = color;
             panel.querySelectorAll('.color-option').forEach(opt => {
-                opt.style.border = '2px solid #666';
+                opt.style.border = `2px solid ${opt.dataset.color === color ? '#fff' : '#666'}`;
             });
             updateCSS();
             saveConfig();
         });
+    });
 
-        // RGB Effect toggle
-        panel.querySelector('#big-rgb-toggle').addEventListener('change', (e) => {
-            config.bigMessages.rgbEffect = e.target.checked;
-            updateCSS();
-            saveConfig();
+    // Custom color picker
+    panel.querySelector('#big-custom-color').addEventListener('change', (e) => {
+        config.bigMessages.color = e.target.value;
+        panel.querySelectorAll('.color-option').forEach(opt => {
+            opt.style.border = '2px solid #666';
         });
+        updateCSS();
+        saveConfig();
+    });
 
-        // Emoticons toggle
-        panel.querySelector('#big-emoticons-toggle').addEventListener('change', (e) => {
-            config.bigMessages.emoticons = e.target.checked;
-            updateCSS();
-            saveConfig();
-        });
+    // RGB Effect toggle
+    panel.querySelector('#big-rgb-toggle').addEventListener('change', (e) => {
+        config.bigMessages.rgbEffect = e.target.checked;
+        updateCSS();
+        saveConfig();
+    });
 
-        // Przycisk testowy
-        panel.querySelector('#test-big-message').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            showTestBigMessage();
-        });
+    // Emoticons toggle
+    panel.querySelector('#big-emoticons-toggle').addEventListener('change', (e) => {
+        config.bigMessages.emoticons = e.target.checked;
+        updateCSS();
+        saveConfig();
+    });
 
-        // Export button
-        panel.querySelector('#export-message-settings').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            exportSettings();
-        });
+    // Przycisk testowy
+    panel.querySelector('#test-big-message').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showTestBigMessage();
+    });
 
-        // Import button
-        panel.querySelector('#import-message-settings').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            showImportDialog();
-        });
+    // Export button
+    panel.querySelector('#export-message-settings').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        exportSettings();
+    });
 
-        // Close button
-        panel.querySelector('#close-message-settings').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleSettingsPanel();
-        });
-    }
+    // Import button
+    panel.querySelector('#import-message-settings').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showImportDialog();
+    });
+
+    // Close button
+    panel.querySelector('#close-message-settings').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSettingsPanel();
+    });
+}
 
     function toggleSettingsPanel() {
         const panel = document.getElementById('message-styler-settings-panel');
