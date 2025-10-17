@@ -1823,13 +1823,14 @@ case 'scanner':
         <style id="custom-tooltips-style">
         /*ANIMOWANE-TIPY - WSZYSTKO Z !important*/
         .item-type{text-align:center !important;}
-        .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${characterBorderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${characterGlowColor} 0px 1px 24px -4px !important;}        .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500 !important;}
+        .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${widgetBorderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${widgetGlowColor} 0px 1px 24px -4px !important;}
+        .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500 !important;}
         .tip-wrapper .content {padding: 5px !important; background: rgba(15, 15, 15,.85) !important; word-break: break-word !important; ${fontFamilyCSS}}
         .tip-wrapper[data-type=t_item] .item-head {border:1px solid #1e1e1e66 !important; border-radius: 2px !important; background: hsl(0deg 0% 4.87% / 10%) !important;}
         .tip-wrapper[data-type=t_item] .item-head .cl-icon {border: 1px solid rgba(15, 15, 15,.3) !important;}
         .tip-wrapper[data-type=t_item] .item-tip-section {border-bottom: 1px solid rgba(15, 15, 15,.5) !important;}
         .tip-wrapper .content .info-wrapper .nick {color: #79e1c5 !important; font-family: Cinzel !important; font-size: 11px !important; text-shadow: 0 0 4px black !important; border: 1px solid ${nickBorderColor} !important; border-radius: 2px !important; background: ${nickBorderColor}20 !important;}
-        .tip-wrapper[data-type=t_other] {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${widgetBorderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${widgetGlowColor} 0px 1px 24px -4px !important;}
+        .tip-wrapper[data-type=t_other] {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${characterBorderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${characterGlowColor} 0px 1px 24px -4px !important;}
         .tip-wrapper[data-type=t_other] .line {border-bottom:1px solid ${widgetBorderColor} !important; background: none !important;}
         .tip-wrapper[data-item-type=t-leg]{box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${borderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${glowColor} 0px 1px 24px -4px !important;}
         .tip-wrapper[data-item-type=legendary] .item-head .legendary, .tip-wrapper[data-item-type=t-leg] .item-head .legendary {color: ${legendaryLabelColor} !important; text-align: center !important; font-size: 13px !important; font-weight: 700 !important; text-shadow: 1px 1px ${legendaryLabelColor}42 !important;}
@@ -1884,7 +1885,7 @@ function showSettingsDialog() {
     modal.className = 'custom-tooltips-modal';
 
     modal.innerHTML = `
-        <div class="custom-tooltips-dialog" style="width: 380px; height: 700px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="custom-tooltips-dialog" style="width: 500px; height: 600px; max-height: 90vh; display: flex; flex-direction: column;">
             <div class="custom-tooltips-header" id="tooltip-header">
                 <h3>Tooltips Styler - Settings</h3>
                 <button class="custom-tooltips-close" id="tooltip-close">×</button>
