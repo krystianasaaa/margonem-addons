@@ -1822,7 +1822,7 @@ case 'scanner':
     const tooltipStyles = `
         <style id="custom-tooltips-style">
         /*ANIMOWANE-TIPY - WSZYSTKO Z !important*/
-        .item-type{text-align:center !important;}
+        .item-type{text-align:left !important;}
         .tip-wrapper.normal-tip {box-shadow: rgb(43, 40, 42) 0px 0px 0px 0px, ${widgetBorderColor} 0px 0px 0px 1px, rgb(0 0 0) 0px 0px 0px 2px, rgb(43 39 39 / 0%) 0px 0px 0px 3px, rgb(90 89 89 / 0%) 0px 0px 0px 4px, rgb(70 163 29 / 0%) 0px 0px 0px 5px, rgb(90 88 91 / 0%) 0px 0px 0px 6px, rgb(44 38 37 / 0%) 0px 0px 0px 7px, ${widgetGlowColor} 0px 1px 24px -4px !important;}
         .tip-wrapper{box-shadow: 0 0 0 0 #000000, 0 0 0 1px ${borderColor}, 0 0 0 2px #000000, 0 0 0 3px #2b272700, 0 0 0 4px rgb(15 15 15 / 0%), 0 0 0 5px rgb(15 15 15 / 0%), 0 0 0 6px #5a585b00, 0 0 0 7px #2c262500 !important;}
         .tip-wrapper .content {padding: 5px !important; background: rgba(15, 15, 15,.85) !important; word-break: break-word !important; ${fontFamilyCSS}}
