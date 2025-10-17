@@ -1,14 +1,3 @@
-// ==UserScript==
-// @name         test czat
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  hehhe
-// @author       kaczka
-// @match        https://dream.margonem.pl/
-// @grant        GM_getValue
-// @grant        none
-// @run-at       document-end
-// ==/UserScript==
 (function() {
     'use strict';
 
