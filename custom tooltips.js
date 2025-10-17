@@ -1,3 +1,14 @@
+// ==UserScript==
+// @name         test czat
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  hehhe
+// @author       kaczka
+// @match        https://dream.margonem.pl/
+// @grant        GM_getValue
+// @grant        none
+// @run-at       document-end
+// ==/UserScript==
 (function() {
     'use strict';
 
@@ -1894,7 +1905,7 @@ function showSettingsDialog() {
             <!-- ZAKŁADKI -->
             <div style="display: flex; background: #1a1a1a; border-bottom: 1px solid #444; flex-shrink: 0;">
                 <button class="tooltip-tab active" data-tab="items">Itemy</button>
-                <button class="tooltip-tab" data-tab="widgets">Widgety</button>
+                <button class="tooltip-tab" data-tab="widgets">Widgety i NPC</button>
                 <button class="tooltip-tab" data-tab="character">Postać</button>
             </div>
 
@@ -2163,25 +2174,25 @@ function showSettingsDialog() {
                     <div class="tooltip-setting-group">
                         <label class="tooltip-setting-label">
                             <input type="checkbox" class="tooltip-checkbox" id="widget-border-enabled" ${config.widgetBorderEnabled ? 'checked' : ''}>
-                            Kolor ramki widgetów
+                            Kolor ramki widgetów i NPC
                         </label>
                         <div class="tooltip-color-input-wrapper">
                             <input type="text" class="tooltip-color-input" id="widget-border-color-text" value="${config.widgetBorderColor}" ${!config.widgetBorderEnabled ? 'disabled' : ''}>
                             <input type="color" class="tooltip-color-picker" id="widget-border-color" value="${config.widgetBorderColor}" ${!config.widgetBorderEnabled ? 'disabled' : ''}>
                         </div>
-                        <div class="tooltip-setting-description">Kolor ramki dla tooltipów widgetów</div>
+                        <div class="tooltip-setting-description">Kolor ramki dla tooltipów widgetów i NPC</div>
                     </div>
 
                     <div class="tooltip-setting-group">
                         <label class="tooltip-setting-label">
                             <input type="checkbox" class="tooltip-checkbox" id="widget-glow-enabled" ${config.widgetGlowEnabled ? 'checked' : ''}>
-                            Kolor świecenia widgetów
+                            Kolor świecenia widgetów i NPC
                         </label>
                         <div class="tooltip-color-input-wrapper">
                             <input type="text" class="tooltip-color-input" id="widget-glow-color-text" value="${config.widgetGlowColor}" ${!config.widgetGlowEnabled ? 'disabled' : ''}>
                             <input type="color" class="tooltip-color-picker" id="widget-glow-color" value="${config.widgetGlowColor}" ${!config.widgetGlowEnabled ? 'disabled' : ''}>
                         </div>
-                        <div class="tooltip-setting-description">Kolor efektu świecenia dla tooltipów widgetów</div>
+                        <div class="tooltip-setting-description">Kolor efektu świecenia dla tooltipów widgetów i NPC</div>
                     </div>
                 </div>
 
@@ -2196,7 +2207,7 @@ function showSettingsDialog() {
                             <input type="text" class="tooltip-color-input" id="character-border-color-text" value="${config.characterBorderColor}" ${!config.characterBorderEnabled ? 'disabled' : ''}>
                             <input type="color" class="tooltip-color-picker" id="character-border-color" value="${config.characterBorderColor}" ${!config.characterBorderEnabled ? 'disabled' : ''}>
                         </div>
-                        <div class="tooltip-setting-description">Kolor ramki dla tooltipów postaci (graczy, NPC)</div>
+                        <div class="tooltip-setting-description">Kolor ramki dla tooltipów postaci</div>
                     </div>
 
                     <div class="tooltip-setting-group">
