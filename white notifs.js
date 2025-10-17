@@ -559,11 +559,9 @@ panel.style.cssText = `
     display: none;
     min-width: 360px;
     max-width: 400px;
-    width: 400px;
-    height: 450px;
-    max-height: 90vh;
     font-family: Arial, sans-serif;
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    max-height: 80vh;
     overflow: hidden;
     flex-direction: column;
 `;
@@ -583,6 +581,7 @@ panel.style.cssText = `
         <div style="flex: 1; overflow-y: auto; min-height: 0;">
             <!-- ZAKŁADKA: CHAT -->
             <div class="message-styler-tab-content active" data-tab="chat">
+                <div style="padding: 15px;">
                     <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                             <span style="color: #fff; font-size: 13px; font-weight: bold;">Chat</span>
@@ -632,6 +631,7 @@ panel.style.cssText = `
 
             <!-- ZAKŁADKA: POWIADOMIENIA -->
             <div class="message-styler-tab-content" data-tab="notifications">
+                <div style="padding: 15px;">
                     <div style="background: #333; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                             <span style="color: #fff; font-size: 13px; font-weight: bold;">Powiadomienia</span>
@@ -753,35 +753,12 @@ panel.style.cssText = `
                 color: #5865F2;
                 border-bottom-color: #5865F2;
             }
-.message-styler-tab-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.message-styler-tab-content::-webkit-scrollbar-track {
-    background: #2a2a2a;
-    border-radius: 4px;
-}
-
-.message-styler-tab-content::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
-}
-
-.message-styler-tab-content::-webkit-scrollbar-thumb:hover {
-    background: #666;
-}
-
-.message-styler-tab-content {
-    display: none;
-    padding: 15px;
-    height: 100%;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #555 #2a2a2a;
-}
-.message-styler-tab-content.active {
-    display: block;
-}
+            .message-styler-tab-content {
+                display: none;
+            }
+            .message-styler-tab-content.active {
+                display: block;
+            }
 
             /* TOGGLE SWITCH */
             .toggle-switch {
@@ -898,8 +875,6 @@ panel.style.cssText = `
             }
         });
     });
-    const scrollContainer = panel.querySelector('[style*="overflow-y: auto"]');
-scrollContainer.addEventListener('wheel', e => e.stopPropagation());
 
     // Funkcjonalność przeciągania
     let isDragging = false;
