@@ -567,8 +567,9 @@ panel.style.cssText = `
 `;
 
     panel.innerHTML = `
-        <div id="message-styler-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 0; text-align: center; font-weight: bold; padding: 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0; flex-shrink: 0;">
+<div id="message-styler-panel-header" style="position: relative; color: #fff; font-size: 14px; text-align: center; font-weight: bold; padding: 15px 40px 15px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0; flex-shrink: 0;">
             Chat&Notifs Styler - Settings
+            <button id="message-styler-close-header" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #444; border: none; color: #fff; font-size: 18px; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border-radius: 3px; line-height: 1; padding: 0;">×</button>
         </div>
 
         <!-- ZAKŁADKI -->
@@ -713,15 +714,12 @@ panel.style.cssText = `
         </div>
 
         <!-- PRZYCISKI NA DOLE -->
-        <div style="display: flex; gap: 8px; border-top: 1px solid #444; padding: 12px 15px; flex-wrap: wrap; flex-shrink: 0; background: #2a2a2a; border-radius: 0 0 4px 4px;">
+<div style="display: flex; gap: 8px; border-top: 1px solid #444; padding: 12px 15px; flex-wrap: wrap; flex-shrink: 0; background: #2a2a2a; border-radius: 0 0 4px 4px;">
             <button id="export-message-settings" style="flex: 1; padding: 8px 12px; background: #3BA55D; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
                 Eksportuj
             </button>
             <button id="import-message-settings" style="flex: 1; padding: 8px 12px; background: #5865F2; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
                 Importuj
-            </button>
-            <button id="close-message-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; min-width: 80px;">
-                Zamknij
             </button>
         </div>
     `;
@@ -758,6 +756,10 @@ panel.style.cssText = `
             }
             .message-styler-tab-content.active {
                 display: block;
+            }
+             #message-styler-close-header:hover {
+                background: #f44336;
+                color: #fff;
             }
 
             /* TOGGLE SWITCH */
@@ -1036,8 +1038,7 @@ panel.style.cssText = `
         showImportDialog();
     });
 
-    // Close button
-    panel.querySelector('#close-message-settings').addEventListener('click', (e) => {
+    panel.querySelector('#message-styler-close-header').addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         toggleSettingsPanel();
