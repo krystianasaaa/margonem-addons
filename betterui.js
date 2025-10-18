@@ -73,9 +73,16 @@ function updateBonusNames() {
             'Przeszywająca skuteczność': 'Przeszywajka'
         };
 
-        // POPRAWKA: Scalamy domyślne z custom (custom ma priorytet)
+        // Scalamy domyślne z custom (custom ma priorytet)
         const merged = { ...defaultLegendary, ...editableBonuses.legendarne };
-        Object.assign(bonusNames, merged);
+
+        // Filtruj wyłączone bonusy
+        const disabledList = editableBonuses.legendarne_disabled || {};
+        Object.entries(merged).forEach(([key, value]) => {
+            if (!disabledList[key]) {
+                bonusNames[key] = value;
+            }
+        });
     }
 
     // Statystyki przedmiotów
@@ -113,7 +120,6 @@ function updateBonusNames() {
             'trucizny': 'truty',
             'Spowalnia cel o': 'Slow o',
             'punktów pancerza podczas ciosu': 'panca',
-            'Ogłuszający cios': 'UGA BUGA MACZUGA',
             '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75% DODATKOWO: 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
             'Absorbuje': 'Absa',
             'obrażeń fizycznych': 'DMG FIZ',
@@ -126,22 +132,33 @@ function updateBonusNames() {
         };
 
         const merged = { ...defaultStats, ...editableBonuses.statystyki };
-        Object.assign(bonusNames, merged);
+
+        // Filtruj wyłączone bonusy
+        const disabledList = editableBonuses.statystyki_disabled || {};
+        Object.entries(merged).forEach(([key, value]) => {
+            if (!disabledList[key]) {
+                bonusNames[key] = value;
+            }
+        });
     }
 
     // Interfejs
     if (config.interfejs) {
         const defaultInterface = {
-            'Punkty Honoru': 'PH',
             'Teleportuje gracza na mapę': 'Tepa na',
             'Wewnętrzny spokój': 'umka dla cweli',
-            'Smocze Runy': 'SR',
-            'Turkanie energii': 'Przywro energii',
-            'Przywracanie energii': 'Przywro energii'
+            'Ogłuszający cios': 'UGA BUGA MACZUGA',
         };
 
         const merged = { ...defaultInterface, ...editableBonuses.interfejs };
-        Object.assign(bonusNames, merged);
+
+        // Filtruj wyłączone bonusy
+        const disabledList = editableBonuses.interfejs_disabled || {};
+        Object.entries(merged).forEach(([key, value]) => {
+            if (!disabledList[key]) {
+                bonusNames[key] = value;
+            }
+        });
     }
 }
 
@@ -844,6 +861,178 @@ settingsBtn.addEventListener('click', (e) => {
     toggleSettingsPanel();
 });
 }
+function exportSettings() {
+    const settingsData = {
+        config: config,
+        editableBonuses: editableBonuses,
+        calculatorRarities: calculatorRarities
+    };
+
+    const dataStr = JSON.stringify(settingsData, null, 2);
+
+    // Kopiuj do schowka
+    navigator.clipboard.writeText(dataStr).then(() => {
+        showNotification('Ustawienia skopiowane do schowka!', 'success');
+    }).catch(() => {
+        // Fallback dla starszych przeglądarek
+        const textarea = document.createElement('textarea');
+        textarea.value = dataStr;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showNotification('Ustawienia skopiowane do schowka!', 'success');
+    });
+}
+
+function showImportDialog() {
+    const importModal = document.createElement('div');
+    importModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        z-index: 10001;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+
+    importModal.innerHTML = `
+        <div style="background: #2a2a2a; border: 1px solid #444; border-radius: 4px; padding: 20px; width: 500px; max-width: 90vw;">
+            <h3 style="color: #fff; margin: 0 0 15px 0; text-align: center;">Importuj ustawienia</h3>
+            <div style="margin-bottom: 10px; color: #ccc; font-size: 12px;">
+                Wklej tutaj skopiowany kod z ustawień:
+            </div>
+            <textarea id="import-textarea" style="
+                width: 100%;
+                height: 200px;
+                background: #1a1a1a;
+                border: 1px solid #444;
+                border-radius: 3px;
+                color: #fff;
+                padding: 10px;
+                font-family: 'Courier New', monospace;
+                font-size: 11px;
+                resize: vertical;
+            " placeholder='{"config":{...}}'></textarea>
+            <div style="display: flex; gap: 8px; margin-top: 15px;">
+                <button id="import-cancel" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                    Anuluj
+                </button>
+                <button id="import-confirm" style="flex: 1; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                    Importuj
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(importModal);
+
+    const textarea = importModal.querySelector('#import-textarea');
+    textarea.focus();
+
+    importModal.querySelector('#import-cancel').addEventListener('click', () => {
+        importModal.remove();
+    });
+
+    importModal.querySelector('#import-confirm').addEventListener('click', () => {
+        const code = textarea.value.trim();
+        if (!code) {
+            showNotification('Pole jest puste!', 'error');
+            return;
+        }
+
+        if (importSettings(code)) {
+            importModal.remove();
+        }
+    });
+
+    importModal.addEventListener('click', (e) => {
+        if (e.target === importModal) {
+            importModal.remove();
+        }
+    });
+}
+
+function importSettings(jsonString) {
+    try {
+        const data = JSON.parse(jsonString);
+
+        if (!data.config) {
+            throw new Error('Nieprawidłowy format - brak sekcji "config"');
+        }
+
+        // Importuj config
+        config = { ...config, ...data.config };
+
+        // Importuj editable bonuses
+        if (data.editableBonuses) {
+            editableBonuses = data.editableBonuses;
+        }
+
+        // Importuj calculator rarities
+        if (data.calculatorRarities) {
+            calculatorRarities = data.calculatorRarities;
+        }
+
+        saveConfig();
+        updateBonusNames();
+        showNotification('Ustawienia zaimportowane pomyślnie!', 'success');
+
+        // Odśwież okno ustawień jeśli jest otwarte
+        const panel = document.getElementById('kwak-better-ui-settings-panel');
+        if (panel && panel.style.display !== 'none') {
+            panel.remove();
+            createSettingsPanel();
+            toggleSettingsPanel();
+        }
+
+        return true;
+    } catch (error) {
+        showNotification('Błąd importu: ' + error.message, 'error');
+        return false;
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        z-index: 10002;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    notification.textContent = message;
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
 function createSettingsPanel() {
     const panel = document.createElement('div');
     panel.id = 'kwak-better-ui-settings-panel';
@@ -1001,15 +1190,14 @@ function createSettingsPanel() {
                 </div>
             </div>
         </div>
-
-        <div style="display: flex; gap: 8px; padding: 12px 15px; background: #2a2a2a; border-radius: 0 0 4px 4px; border-top: 1px solid #444; flex-shrink: 0;">
-            <button id="close-settings" style="flex: 1; padding: 8px 12px; background: #555; color: #ccc; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
-                Zamknij
-            </button>
-            <button id="reload-game" style="flex: 1; padding: 8px 12px; background: #ff9800; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
-                Odśwież grę
-            </button>
-        </div>
+<div style="display: flex; gap: 8px; padding: 12px 15px; background: #2a2a2a; border-radius: 0 0 4px 4px; border-top: 1px solid #444; flex-shrink: 0;">
+    <button id="export-settings" style="flex: 1; padding: 8px 12px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+        Eksportuj
+    </button>
+    <button id="import-settings" style="flex: 1; padding: 8px 12px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
+        Importuj
+    </button>
+</div>
     `;
 
     // Dodaj style
@@ -1115,45 +1303,50 @@ function createSettingsPanel() {
     color: #fff;
 }
 
-            .bonus-edit-row {
-                display: flex;
-                gap: 4px;
-                align-items: center;
-                background: #2a2a2a;
-                padding: 6px;
-                border-radius: 3px;
-            }
+.bonus-edit-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    background: #2a2a2a;
+    padding: 6px;
+    border-radius: 3px;
+}
 
-            .bonus-edit-row input {
-                flex: 1;
-                padding: 4px 8px;
-                background: #1a1a1a;
-                border: 1px solid #555;
-                border-radius: 3px;
-                color: #ccc;
-                font-size: 11px;
-            }
+.bonus-edit-row .bonus-enable-checkbox {
+    flex-shrink: 0;
+    margin-right: 4px;
+}
 
-            .bonus-edit-row input:focus {
-                outline: none;
-                border-color: #4CAF50;
-            }
+.bonus-edit-row input[type="text"] {
+    flex: 1;
+    padding: 4px 8px;
+    background: #1a1a1a;
+    border: 1px solid #555;
+    border-radius: 3px;
+    color: #ccc;
+    font-size: 11px;
+}
 
-            .bonus-edit-row button {
-                padding: 4px 8px;
-                background: #f44336;
-                color: white;
-                border: none;
-                border-radius: 3px;
-                cursor: pointer;
-                font-size: 11px;
-                flex-shrink: 0;
-            }
+.bonus-edit-row input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
 
-            .bonus-edit-row button:hover {
-                background: #d32f2f;
-            }
-        `;
+.bonus-edit-row button {
+    padding: 4px 8px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.bonus-edit-row button:hover {
+    background: #d32f2f;
+}
+`;
         document.head.appendChild(style);
     }
 
@@ -1169,7 +1362,6 @@ tabContents.forEach(content => {
 
 function renderBonusList(type, containerId) {
     const container = document.getElementById(containerId);
-    const tempDisable = true;
     container.innerHTML = '';
 
     // Domyślne wartości
@@ -1219,7 +1411,6 @@ function renderBonusList(type, containerId) {
             'trucizny': 'truty',
             'Spowalnia cel o': 'Slow o',
             'punktów pancerza podczas ciosu': 'panca',
-            'Ogłuszający cios': 'UGA BUGA MACZUGA',
             '17% szansy na zwiększenie mocy ciosu krytycznego o 75%.': '17% szansy na zwiększenie mocy ciosu krytycznego o 75% DODATKOWO: 50% szans na rozjebanie oponenta jednym strzałem   (Wymagana profesja: Wojownik lub Mag)',
             'Absorbuje': 'Absa',
             'obrażeń fizycznych': 'DMG FIZ',
@@ -1231,14 +1422,16 @@ function renderBonusList(type, containerId) {
             'szans na kontratak po ciosie krytycznym': 'na kontre'
         },
         'interfejs': {
-            'Punkty Honoru': 'PH',
             'Teleportuje gracza na mapę': 'Tepa na',
             'Wewnętrzny spokój': 'umka dla cweli',
-            'Smocze Runy': 'SR',
-            'Turkanie energii': 'Przywro energii',
-            'Przywracanie energii': 'Przywro energii'
+            'Ogłuszający cios': 'UGA BUGA MACZUGA',
         }
     };
+
+    // Inicjalizuj disabled bonuses jeśli nie istnieją
+    if (!editableBonuses[type + '_disabled']) {
+        editableBonuses[type + '_disabled'] = {};
+    }
 
     // Scal domyślne z custom
     const allBonuses = { ...defaults[type], ...editableBonuses[type] };
@@ -1249,19 +1442,34 @@ function renderBonusList(type, containerId) {
 
         // Sprawdź czy to custom czy domyślny
         const isCustom = editableBonuses[type].hasOwnProperty(original) && !defaults[type].hasOwnProperty(original);
+        const isDisabled = editableBonuses[type + '_disabled'][original] === true;
 
         row.innerHTML = `
-            <input type="text" class="bonus-original" value="${original}" placeholder="Oryginalna nazwa" ${!isCustom ? 'readonly' : ''} style="${!isCustom ? 'background: #1a1a1a; color: #888;' : ''}">
+            <input type="checkbox" class="better-ui-checkbox bonus-enable-checkbox" ${!isDisabled ? 'checked' : ''} title="Włącz/wyłącz ten bonus">
+            <input type="text" class="bonus-original" value="${original}" placeholder="Oryginalna nazwa" ${!isCustom ? 'readonly' : ''} style="${!isCustom ? 'background: #1a1a1a; color: #888;' : ''}${isDisabled ? ' opacity: 0.5;' : ''}">
             <span style="color: #888;">→</span>
-            <input type="text" class="bonus-replacement" value="${replacement}" placeholder="Skrót">
+            <input type="text" class="bonus-replacement" value="${replacement}" placeholder="Skrót" style="${isDisabled ? 'opacity: 0.5;' : ''}">
             <button class="bonus-delete" ${!isCustom ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>🗑️</button>
         `;
 
+        const enableCheckbox = row.querySelector('.bonus-enable-checkbox');
         const originalInput = row.querySelector('.bonus-original');
         const replacementInput = row.querySelector('.bonus-replacement');
         const deleteBtn = row.querySelector('.bonus-delete');
 
         const oldOriginal = original;
+
+        // Checkbox włącz/wyłącz
+        enableCheckbox.addEventListener('change', () => {
+            if (enableCheckbox.checked) {
+                delete editableBonuses[type + '_disabled'][originalInput.value];
+            } else {
+                editableBonuses[type + '_disabled'][originalInput.value] = true;
+            }
+            saveConfig();
+            updateBonusNames();
+            renderBonusList(type, containerId);
+        });
 
         // Tylko dla custom można zmieniać nazwę oryginalną
         if (isCustom) {
@@ -1269,6 +1477,13 @@ function renderBonusList(type, containerId) {
                 if (originalInput.value && originalInput.value !== oldOriginal) {
                     delete editableBonuses[type][oldOriginal];
                     editableBonuses[type][originalInput.value] = replacementInput.value;
+
+                    // Przenieś status disabled
+                    if (editableBonuses[type + '_disabled'][oldOriginal]) {
+                        delete editableBonuses[type + '_disabled'][oldOriginal];
+                        editableBonuses[type + '_disabled'][originalInput.value] = true;
+                    }
+
                     saveConfig();
                     updateBonusNames();
                 }
@@ -1297,6 +1512,7 @@ function renderBonusList(type, containerId) {
         if (isCustom) {
             deleteBtn.addEventListener('click', () => {
                 delete editableBonuses[type][originalInput.value];
+                delete editableBonuses[type + '_disabled'][originalInput.value];
                 saveConfig();
                 updateBonusNames();
                 renderBonusList(type, containerId);
@@ -1462,11 +1678,11 @@ function renderBonusList(type, containerId) {
     });
 
     // Przyciski
-    panel.querySelector('#close-settings').addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleSettingsPanel();
-    });
+panel.querySelector('#export-settings').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    exportSettings();
+});
 
     panel.querySelector('#better-ui-close-header').addEventListener('click', (e) => {
         e.preventDefault();
@@ -1474,11 +1690,11 @@ function renderBonusList(type, containerId) {
         toggleSettingsPanel();
     });
 
-    panel.querySelector('#reload-game').addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        location.reload();
-    });
+panel.querySelector('#import-settings').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showImportDialog();
+});
 }
 function toggleSettingsPanel() {
     const panel = document.getElementById('kwak-better-ui-settings-panel');
