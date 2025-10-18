@@ -75,8 +75,9 @@
         `;
 
         panel.innerHTML = `
-            <div id="mini-widgets-panel-header" style="color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding: 15px 15px 8px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
+<div id="mini-widgets-panel-header" style="position: relative; color: #fff; font-size: 14px; margin-bottom: 12px; text-align: center; font-weight: bold; padding: 15px 40px 8px 15px; border-bottom: 1px solid #444; cursor: move; user-select: none; background: #333; border-radius: 4px 4px 0 0;">
                 Custom Widgets Size - Settings
+                <button id="mini-widgets-close-header" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #444; border: none; color: #fff; font-size: 18px; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border-radius: 3px; line-height: 1; padding: 0;">×</button>
             </div>
 
             <div style="padding: 15px; max-height: calc(80vh - 60px); overflow-y: auto;">
@@ -109,12 +110,6 @@
                         Gdy zaznaczone, widgety przesuną się, aby wycentrować pozycję od krawędzi .
                     </div>
                 </div>
-
-                <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #444; padding-top: 12px;">
-                    <button id="close-mini-widgets-settings" style="flex: 1; padding: 8px 12px; background: #e67e22; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">
-                        Zamknij
-                    </button>
-                </div>
             </div>
         `;
 
@@ -132,6 +127,17 @@
             dragOffsetY = e.clientY - rect.top;
             e.preventDefault();
         });
+            if (!document.getElementById('mini-widgets-hover-style')) {
+            const style = document.createElement('style');
+            style.id = 'mini-widgets-hover-style';
+            style.textContent = `
+                #mini-widgets-close-header:hover {
+                    background: #f44336 !important;
+                    color: #fff !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
 
         document.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
@@ -192,8 +198,9 @@
             applyScaling();
         });
 
-        panel.querySelector('#close-mini-widgets-settings').addEventListener('click', (e) => {
+        panel.querySelector('#mini-widgets-close-header').addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             toggleSettingsPanel();
         });
     }
