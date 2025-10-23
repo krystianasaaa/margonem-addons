@@ -485,7 +485,7 @@
     }
 }
 
-    async function sendHeroRespawnNotification(heroName, heroLevel, heroData = {}) {
+async function sendHeroRespawnNotification(heroName, heroLevel, heroData = {}) {
     const webhookUrl = getWebhookUrl();
     if (!webhookUrl || !isNotifierEnabled()) return false;
 
