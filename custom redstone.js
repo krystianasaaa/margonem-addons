@@ -1,13 +1,3 @@
-// ==UserScript==
-// @name         Kamyki - Enhanced
-// @namespace    http://tampermonkey.net/
-// @version      2.0
-// @description  Kamyki z pełnymi ustawieniami i zakładkami
-// @author       Enhanced
-// @match        https://dream.margonem.pl/
-// @grant        none
-// ==/UserScript==
-
 (function() {
     'use strict';
 
