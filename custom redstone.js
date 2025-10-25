@@ -1,3 +1,13 @@
+// ==UserScript==
+// @name         Kamyki - Enhanced
+// @namespace    http://tampermonkey.net/
+// @version      2.0
+// @description  Kamyki z pełnymi ustawieniami i zakładkami
+// @author       Enhanced
+// @match        https://dream.margonem.pl/
+// @grant        none
+// ==/UserScript==
+
 (function() {
     'use strict';
 
@@ -6,65 +16,198 @@
     }
     window.kamykiEnhancedRunning = true;
 
-    // ===== KONFIGURACJA =====
-    let config = {
+// ===== KONFIGURACJA =====
+const defaultTytani = {
+    "189": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/dziewicza_orlica.gif" },
+    "1746": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/zabojczy_krolik.gif" },
+    "6949": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/renegat_baulus.gif" },
+    "7060": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/archdemon.gif" },
+    "7477": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/titangoblin.gif" },
+    "6477": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/lowcz-wspo-driady.gif" },
+    "6476": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/przyz_demon_sekta.gif" },
+    "7848": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/maddok_magua-1b.gif" },
+    "5709": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/tezcatlipoca.gif" },
+    "3312": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/hebrehoth_smokoludzie.gif" },
+    "2355": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/ice_king.gif" }
+};
+
+const defaultKolosy = {
+    "3361": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/mamlambo_final2.gif" },
+    "3883": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/bazyliszek.gif" },
+    "202": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/bazyliszek.gif" },
+    "2149": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-wodnik.gif" },
+    "2310": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-wodnik.gif" },
+    "4046": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/soploreki.gif" },
+    "1387": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/soploreki.gif" },
+    "4066": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/hydrokora.gif" },
+    "3535": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/hydrokora.gif" },
+    "1876": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-wazka.gif" },
+    "6052": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolkrucz.gif" },
+    "4206": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-pajak.gif" },
+    "1131": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-pajak.gif" },
+    "4266": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-dendro.gif" },
+    "3596": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-dendro.gif" },
+    "4268": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-drakolisz.gif" },
+    "3037": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-drakolisz.gif" }
+};
+
+const defaultE2List = [
+    { id: "580", name: "Mushita", lvl: 23, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/st-puma.gif" },
+    { id: "632", name: "Kotołak Tropiciel", lvl: 27, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e1/kotolak_lowca.gif" },
+    { id: "5738", name: "Shae Phu", lvl: 30, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/demonszef.gif" },
+    { id: "2532", name: "Zorg Jednooki Baron", lvl: 33, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/zbir-e2-zorg.gif" },
+    { id: "727", name: "Władca rzek", lvl: 37, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/gobmag2.gif" },
+    { id: "3149", name: "Gobbos", lvl: 40, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/gobsamurai.gif" },
+    { id: "4157", name: "Tyrtajos", lvl: 42, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/dzik.gif" },
+    { id: "5293", name: "Tollok Shimger", lvl: 47, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/tollok_shimger.gif" },
+    { id: "2308", name: "Szczęt alias Gładki", lvl: 47, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/zbir-szczet.gif" },
+    { id: "177", name: "Agar", lvl: 51, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/glut_agar.gif" },
+    { id: "125", name: "Razuglag Oklash", lvl: 51, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/razuglag.gif" },
+    { id: "2729", name: "Foverk Turrim", lvl: 57, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/kobold07.gif" },
+    { id: "5395", name: "Owadzia Matka", lvl: 58, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/zadlak-e2-owadzia-matka.gif" },
+    { id: "333", name: "Vari Kruger", lvl: 65, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/gnoll11.gif" },
+    { id: "3437", name: "Furruk Kozug", lvl: 66, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/gnoll12.gif" },
+    { id: "6537", name: "Jotun", lvl: 70, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/kam_olbrzym-b.gif" },
+    { id: "6633", name: "Tollok Utumutu", lvl: 73, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/tollok_jask_utumatu.gif" },
+    { id: "6632", name: "Tollok Atamatu", lvl: 73, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/tollok_jask_atamatu.gif" },
+    { id: "6625", name: "Lisz", lvl: 75, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/lisz_demilisze.gif" },
+    { id: "6623", name: "Grabarz świątynny", lvl: 80, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/nieu_mnich_grabarz.gif" },
+    { id: "3530", name: "Wielka Stopa", lvl: 82, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/wlochacze_wielka_stopa.gif" },
+    { id: "6615", name: "Podły zbrojmistrz", lvl: 82, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/magaz_zbrojmistrz.gif" },
+    { id: "6634", name: "Choukker", lvl: 84, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/dlawiciel5.gif" },
+    { id: "6772", name: "Nadzorczyni krasnoludów", lvl: 88, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/nadzorczyni_krasnoludow.gif" },
+    { id: "6773", name: "Morthen", lvl: 89, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/krasnolud_boss.gif" },
+    { id: "1325", name: "Leśne Widmo", lvl: 92, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/lesne_widmo.gif" },
+    { id: "3466", name: "Żelazoręki Ohydziarz", lvl: 92, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/ugrape2.gif" },
+    { id: "1151", name: "Goplana", lvl: 93, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/goplana.gif" },
+    { id: "6781", name: "Gnom Figlid", lvl: 96, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/gnom_figlid.gif" },
+    { id: "3765", name: "Centaur Zyfryd", lvl: 99, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/cent-zyfryd.gif" },
+    { id: "4998", name: "Kambion", lvl: 101, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/kambion.gif" },
+    { id: "6938", name: "Jertek Moxos", lvl: 105, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/moloch-jertek.gif" },
+    { id: "6944", name: "Miłośnik rycerzy", lvl: 108, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/blotniaki_milosnik_rycerzy.gif" },
+    { id: "6946", name: "Miłośnik magii", lvl: 108, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/blotniaki_milosnik_magii.gif" },
+    { id: "6945", name: "Miłośnik łowców", lvl: 108, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/blotniaki_milosnik_lowcow.gif" },
+    { id: "7066", name: "Łowca czaszek", lvl: 112, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/alghul-czaszka-1a.gif" },
+    { id: "7069", name: "Ozirus Władca Hieroglifów", lvl: 115, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/mumia-ozirus.gif" },
+    { id: "7357", name: "Morski potwór", lvl: 118, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/osmiornica-1b.gif" },
+    { id: "7370", name: "Krab pustelnik", lvl: 124, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/krab_big3.gif" },
+    { id: "7368", name: "Borgoros Garamir III", lvl: 124, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/ingotia_minotaur-7a.gif" },
+    { id: "7375", name: "Stworzyciel", lvl: 125, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/stworzyciel.gif" },
+    { id: "7057", name: "Ifryt", lvl: 128, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/magradit_ifryt.gif" },
+    { id: "3409", name: "Młody Jack Truciciel", lvl: 131, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/pirat01.gif" },
+    { id: "1527", name: "Helga Opiekunka Rumu", lvl: 131, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/pirat-2b.gif" },
+    { id: "1526", name: "Henry Kaprawe Oko", lvl: 131, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e1/pirat5b.gif" },
+    { id: "7352", name: "Eol", lvl: 135, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/piaskowy_potwor-6a.gif" },
+    { id: "6956", name: "Grubber Ochlaj", lvl: 136, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/grubber-ochlaj.gif" },
+    { id: "7466", name: "Mistrz Worundriel", lvl: 139, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/worundriel02.gif" },
+    { id: "7340", name: "Wójt Fistuła", lvl: 144, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/goral-e2-wojt-fistula.gif" },
+    { id: "7338", name: "Teściowa Rumcajsa", lvl: 145, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/goral-e2-tesciowa-rumcajsa.gif" },
+    { id: "7454", name: "Berserker Amuno", lvl: 148, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/amuno.gif" },
+    { id: "7441", name: "Fodug Zolash", lvl: 150, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/fodug_zolash.gif" },
+    { id: "7474", name: "Goons Asterus", lvl: 154, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/goons_asterus-1a.gif" },
+    { id: "1322", name: "Adariel", lvl: 155, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/tri_adariel.gif" },
+    { id: "5856", name: "Burkog Lorulk", lvl: 160, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/orkczd.gif" },
+    { id: "5851", name: "Sheba Orcza Szamanka", lvl: 160, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/r_orc_sheba.gif" },
+    { id: "5872", name: "Duch Władcy Klanów", lvl: 165, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/duch_wladcy_kl.gif" },
+    { id: "5861", name: "Bragarth Myśliwy Dusz", lvl: 170, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/praork_low_elita.gif" },
+    { id: "5862", name: "Lusgrathera Królowa Pramatka", lvl: 175, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/prakrolowa.gif" },
+    { id: "7345", name: "Królowa Śniegu", lvl: 175, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/krolowa-sniegu.gif" },
+    { id: "6055", name: "Wrzosera", lvl: 177, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/chryzoprenia-1a.gif" },
+    { id: "7693", name: "Ogr Stalowy Pazur", lvl: 183, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/ogr_stalowy_pazur-1a.gif" },
+    { id: "6053", name: "Torunia Ankelwald", lvl: 186, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/thuz-patr1.gif" },
+    { id: "4185", name: "Pięknotka Mięsożerna", lvl: 189, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/zmutowana-roslinka.gif" },
+    { id: "2063", name: "Breheret Żelazny Łeb", lvl: 192, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/draki-breheret-1b.gif" },
+    { id: "7689", name: "Cerasus", lvl: 193, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/cerasus-1a.gif" },
+    { id: "7701", name: "Mysiur Myświórowy Król", lvl: 197, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/mysiur_myswiorowy_krol-1a.gif" },
+    { id: "5940", name: "Sadolia Nadzorczyni Hurys", lvl: 200, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/sekta-sadolia.gif" },
+    { id: "7694", name: "Sataniel Skrytobójca", lvl: 204, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/sekta-sataniel.gif" },
+    { id: "5945", name: "Bergermona Krwawa Hrabina", lvl: 204, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/sekta-bergermona.gif" },
+    { id: "5941", name: "Annaniel Wysysacz Marzeń", lvl: 204, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/sekta-gothardus.gif" },
+    { id: "5943", name: "Zufulus Smakosz Serc", lvl: 205, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/sekta-zufulus.gif" },
+    { id: "1912", name: "Czempion Furboli", lvl: 210, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/forbol03.gif" },
+    { id: "1159", name: "Arachniregina Colosseus", lvl: 214, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/regina-e2.gif" },
+    { id: "7859", name: "Al'diphrin Ilythirahel", lvl: 218, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/drow-aldiphrin-wladca.gif" },
+    { id: "7864", name: "Marlloth Malignitas", lvl: 220, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/drider-marlloth.gif" },
+    { id: "7827", name: "Arytodam olbrzymi", lvl: 226, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/arytodam_olbrzymi-1b.gif" },
+    { id: "7843", name: "Mocny Maddoks", lvl: 231, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/mocny_maddoks-1b.gif" },
+    { id: "3627", name: "Silvanasus", lvl: 235, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/silvanasus.gif" },
+    { id: "3610", name: "Dendroculus", lvl: 240, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/dendroculus.gif" },
+    { id: "5657", name: "Tolypeutes", lvl: 245, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/bolita.gif" },
+    { id: "1901", name: "Cuaitl Citlalin", lvl: 250, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/maho-cuaitl.gif" },
+    { id: "4057", name: "Pogardliwa Sybilla", lvl: 255, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/tri2_witch_e2.gif" },
+    { id: "5694", name: "Yaotl", lvl: 258, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/mahoplowca.gif" },
+    { id: "5685", name: "Quetzalcoatl", lvl: 260, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/quetzalcoatl.gif" },
+    { id: "3035", name: "Chopesz", lvl: 267, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/chopesh2.gif" },
+    { id: "3039", name: "Neferkar Set", lvl: 274, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/szkiel_set.gif" },
+    { id: "3327", name: "Terrozaur", lvl: 280, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/terrorzaur_pus.gif" },
+    { id: "3340", name: "Vaenra Charkhaam", lvl: 280, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/bar_smoczyca.gif" },
+    { id: "3341", name: "Chaegd Agnrakh", lvl: 280, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/bar_smokoszef.gif" },
+    { id: "6065", name: "Nymphemonia", lvl: 287, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/nymphemonia.gif" },
+    { id: "2353", name: "Artenius", lvl: 300, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/wl-mrozu03.gif" },
+    { id: "2356", name: "Furion", lvl: 300, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/wl-mrozu02.gif" },
+    { id: "2354", name: "Zorin", lvl: 300, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/wl-mrozu01.gif" }
+];
+
+// Konwersja listy do obiektu dla kompatybilności
+const defaultE2 = Object.fromEntries(
+    defaultE2List.map(boss => [boss.id, { enabled: boss.enabled, url: boss.url }])
+);
+
+function loadConfig() {
+    const savedTytani = localStorage.getItem('kamykiTytani');
+    const savedKolosy = localStorage.getItem('kamykiKolosy');
+    const savedE2 = localStorage.getItem('kamykiE2');
+
+
+
+    // Merguj zapisane dane z defaultami (aby dodać nowe bossów bez resetowania starych ustawień)
+    function mergeWithDefaults(saved, defaults) {
+        if (!saved) return { ...defaults };
+
+        const parsed = JSON.parse(saved);
+        const merged = { ...defaults };
+
+        // Nadpisz wartościami z localStorage (zachowaj ustawienia użytkownika)
+        Object.keys(parsed).forEach(id => {
+            if (merged[id]) {
+                merged[id] = { ...merged[id], ...parsed[id] };
+            }
+        });
+
+        // Dodaj nowe wpisy z defaults, które nie były w localStorage
+        Object.keys(defaults).forEach(id => {
+            if (!parsed[id]) {
+                merged[id] = { ...defaults[id] };
+            }
+        });
+
+        return merged;
+    }
+
+    const loadedConfig = {
         enabled: localStorage.getItem('kamykiEnabled') !== 'false',
-        
-        // Tytani
+
         tytaniEnabled: localStorage.getItem('kamykiTytaniEnabled') !== 'false',
-        tytani: JSON.parse(localStorage.getItem('kamykiTytani') || JSON.stringify({
-            "189": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/dziewicza_orlica.gif" },
-            "1746": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/zabojczy_krolik.gif" },
-            "6949": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/renegat_baulus.gif" },
-            "7060": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/archdemon.gif" },
-            "7477": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/titangoblin.gif" },
-            "6477": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/lowcz-wspo-driady.gif" },
-            "6476": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/przyz_demon_sekta.gif" },
-            "7848": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/maddok-tytan.gif" },
-            "5709": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/tezcatlipoca.gif" },
-            "3312": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/hebrehoth_smokoludzie.gif" },
-            "2355": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/ice_king.gif" }
-        })),
+        tytani: mergeWithDefaults(savedTytani, defaultTytani),
 
-        // Kolosy
         kolosyEnabled: localStorage.getItem('kamykiKolosyEnabled') !== 'false',
-        kolosy: JSON.parse(localStorage.getItem('kamykiKolosy') || JSON.stringify({
-            "3361": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/mamlambo_final2.gif" },
-            "3883": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/bazyliszek.gif" },
-            "202": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/bazyliszek.gif" },
-            "2149": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-wodnik.gif" },
-            "2310": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-wodnik.gif" },
-            "4046": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/soploreki.gif" },
-            "1387": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/soploreki.gif" },
-            "4066": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/hydrokora.gif" },
-            "3535": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/hydrokora.gif" },
-            "1876": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-wazka.gif" },
-            "6052": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolkrucz.gif" },
-            "4206": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-pajak.gif" },
-            "1131": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-pajak.gif" },
-            "4266": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-dendro.gif" },
-            "3596": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-dendro.gif" },
-            "4268": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-drakolisz.gif" },
-            "3037": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-drakolisz.gif" }
-        })),
+        kolosy: mergeWithDefaults(savedKolosy, defaultKolosy),
 
-        // E2
         e2Enabled: localStorage.getItem('kamykiE2Enabled') !== 'false',
-        e2: JSON.parse(localStorage.getItem('kamykiE2') || JSON.stringify({
-            "580": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/st-puma.gif" },
-            "632": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e1/kotolak_lowca.gif" },
-            "5738": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/demonszef.gif" },
-            "2532": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/zbir-e2-zorg.gif" },
-            "727": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/gobmag2.gif" },
-            "3149": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/gobsamurai.gif" },
-            "4157": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/dzik.gif" },
-            "5293": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/tollok_shimger.gif" },
-            "2308": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/zbir-szczet.gif" },
-            "177": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/glut_agar.gif" }
-        }))
+        e2: mergeWithDefaults(savedE2, defaultE2)
     };
 
-    function saveConfig() {
+
+
+    return loadedConfig;
+}
+
+let config = loadConfig();
+
+function saveConfig() {
+
+
+    try {
         localStorage.setItem('kamykiEnabled', config.enabled.toString());
         localStorage.setItem('kamykiTytaniEnabled', config.tytaniEnabled.toString());
         localStorage.setItem('kamykiKolosyEnabled', config.kolosyEnabled.toString());
@@ -72,7 +215,12 @@
         localStorage.setItem('kamykiTytani', JSON.stringify(config.tytani));
         localStorage.setItem('kamykiKolosy', JSON.stringify(config.kolosy));
         localStorage.setItem('kamykiE2', JSON.stringify(config.e2));
+
+
+    } catch (error) {
+        console.error('❌ Błąd zapisu do localStorage:', error);
     }
+}
 
     // ===== STYLE CSS =====
     const styles = `
@@ -461,18 +609,9 @@
             "4268": "Wernoradzki Drakolisz (279lvl)",
             "3037": "Wernoradzki Drakolisz (279lvl) ALT"
         },
-        e2: {
-            "580": "Mushita (23lvl)",
-            "632": "Kotołak Tropiciel (27lvl)",
-            "5738": "Shae Phu (30lvl)",
-            "2532": "Zorg Jednooki Baron (33lvl)",
-            "727": "Władca rzek (37lvl)",
-            "3149": "Gobbos (40lvl)",
-            "4157": "Tyrtajos (42lvl)",
-            "5293": "Tollok Shimger (47lvl)",
-            "2308": "Szczęt alias Gładki (47lvl)",
-            "177": "Agar (51lvl)"
-        }
+e2: Object.fromEntries(
+            defaultE2List.map(boss => [boss.id, `${boss.name} (${boss.lvl}lvl)`])
+        )
     };
 
     // ===== FUNKCJE POWIADOMIEŃ =====
@@ -530,51 +669,78 @@
         });
     }
 
-    async function appendItemOverlay(id, url) {
-        if (NI) {
-            const $it = document.querySelector(`.item-id-${id}`);
-            if ($it) {
-                $it.classList.add("priw8-item-small-icon");
-                const $newImg = await loadItemImage(url);
-                $newImg.style.position = "absolute";
-                $newImg.zIndex = 1;
-                const $canv = $it.querySelector("canvas");
+async function appendItemOverlay(id, url) {
+    if (NI) {
+        const $it = document.querySelector(`.item-id-${id}`);
+        if ($it) {
+            $it.classList.add("priw8-item-small-icon");
+            const $newImg = await loadItemImage(url);
+            $newImg.style.position = "absolute";
+            $newImg.style.zIndex = "1";
+            const $canv = $it.querySelector("canvas");
+            if ($canv && $canv.parentElement) {
                 $canv.parentElement.appendChild($newImg);
             }
-        } else {
-            g.loadQueue.push({
-                fun: async () => {
-                    const $it = document.querySelector(`#item${id}`);
-                    if ($it) {
-                        $it.classList.add("priw8-item-small-icon");
-                        const $newImg = await loadItemImage(url);
-                        const $img = $it.querySelector("img");
-                        if ($img) {
-                            $img.parentElement.appendChild($newImg);
-                        }
+        }
+    } else {
+        g.loadQueue.push({
+            fun: async () => {
+                const $it = document.querySelector(`#item${id}`);
+                if ($it) {
+                    $it.classList.add("priw8-item-small-icon");
+                    const $newImg = await loadItemImage(url);
+                    const $img = $it.querySelector("img");
+                    if ($img) {
+                        $img.parentElement.appendChild($newImg);
                     }
                 }
-            });
-        }
+            }
+        });
     }
+}
+function onItem(items) {
+    for (const id in items) {
+        const it = items[id];
+        const tp = getItemTp(it);
+        const tpMap = getTpMap(tp);
 
-    function onItem(items) {
-        if (!config.enabled) return;
+        let entry = null;
 
-        for (const id in items) {
-            const it = items[id];
-            const tp = getItemTp(it);
-            
-            // Sprawdź w każdej kategorii
-            if (config.tytaniEnabled && config.tytani[tp] && config.tytani[tp].enabled) {
-                appendItemOverlay(id, config.tytani[tp].url);
-            } else if (config.kolosyEnabled && config.kolosy[tp] && config.kolosy[tp].enabled) {
-                appendItemOverlay(id, config.kolosy[tp].url);
-            } else if (config.e2Enabled && config.e2[tp] && config.e2[tp].enabled) {
-                appendItemOverlay(id, config.e2[tp].url);
+        // Sprawdź tytani
+        if (config.tytaniEnabled) {
+            if (config.tytani[tp] && config.tytani[tp].enabled) {
+                entry = config.tytani[tp].url;
+            }
+            if (!entry && config.tytani[tpMap] && config.tytani[tpMap].enabled) {
+                entry = config.tytani[tpMap].url;
             }
         }
+
+        // Sprawdź kolosy
+        if (!entry && config.kolosyEnabled) {
+            if (config.kolosy[tp] && config.kolosy[tp].enabled) {
+                entry = config.kolosy[tp].url;
+            }
+            if (!entry && config.kolosy[tpMap] && config.kolosy[tpMap].enabled) {
+                entry = config.kolosy[tpMap].url;
+            }
+        }
+
+        // Sprawdź e2
+        if (!entry && config.e2Enabled) {
+            if (config.e2[tp] && config.e2[tp].enabled) {
+                entry = config.e2[tp].url;
+            }
+            if (!entry && config.e2[tpMap] && config.e2[tpMap].enabled) {
+                entry = config.e2[tpMap].url;
+            }
+        }
+
+        if (entry) {
+            appendItemOverlay(id, entry);
+        }
     }
+}
 
     function parseStats(stats) {
         if (!stats) return {};
@@ -679,13 +845,13 @@
                                 <input type="checkbox" class="kamyki-section-toggle" id="e2-toggle" ${config.e2Enabled ? 'checked' : ''}>
                                 <span class="kamyki-section-title">Wszystkie E2</span>
                             </div>
-                            <div class="kamyki-items-grid" id="e2-items">
-                                ${Object.entries(bossData.e2).map(([id, name]) => `
-                                    <div class="kamyki-item">
-                                        <input type="checkbox" class="kamyki-item-checkbox" data-category="e2" data-id="${id}" ${config.e2[id]?.enabled ? 'checked' : ''}>
-                                        <span class="kamyki-item-label">${name}</span>
-                                    </div>
-                                `).join('')}
+<div class="kamyki-items-grid" id="e2-items">
+    ${defaultE2List.map(boss => `
+        <div class="kamyki-item">
+            <input type="checkbox" class="kamyki-item-checkbox" data-category="e2" data-id="${boss.id}" ${config.e2[boss.id]?.enabled ? 'checked' : ''}>
+            <span class="kamyki-item-label">${boss.name} (${boss.lvl}lvl)</span>
+        </div>
+    `).join('')}
                             </div>
                         </div>
                     </div>
@@ -700,7 +866,14 @@
             </div>
         `;
 
-        document.body.appendChild(modal);
+document.body.appendChild(modal);
+
+        // Zapobiegaj przewijaniu tła podczas przewijania w dialogu
+        const tabContents = modal.querySelectorAll('.kamyki-tab-content');
+        tabContents.forEach(content => {
+            content.addEventListener("wheel", e => e.stopPropagation());
+        });
+
 
         // ===== PRZECIĄGANIE OKNA =====
         let isDragging = false;
@@ -732,7 +905,6 @@
 
         // ===== OBSŁUGA ZAKŁADEK =====
         const tabs = modal.querySelectorAll('.kamyki-tab');
-        const tabContents = modal.querySelectorAll('.kamyki-tab-content');
 
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -745,6 +917,7 @@
                     targetContent.classList.add('active');
                 }
             });
+            saveConfig();
         });
 
         // ===== OBSŁUGA CHECKBOXÓW KATEGORII =====
@@ -760,6 +933,7 @@
                     const id = item.getAttribute('data-id');
                     config[category][id].enabled = isEnabled;
                 });
+                saveConfig();
             });
 
             // Obsługa pojedynczych itemów
@@ -767,11 +941,11 @@
                 item.addEventListener('change', (e) => {
                     const id = item.getAttribute('data-id');
                     config[category][id].enabled = e.target.checked;
-                    
+
                     // Sprawdź czy wszystkie są zaznaczone/odznaczone
                     const allChecked = Array.from(items).every(i => i.checked);
                     const noneChecked = Array.from(items).every(i => !i.checked);
-                    
+
                     if (allChecked) {
                         toggle.checked = true;
                         config[`${category}Enabled`] = true;
@@ -794,39 +968,77 @@
             }
         });
 
-        document.getElementById('kamyki-enable-all').addEventListener('click', () => {
-            ['tytani', 'kolosy', 'e2'].forEach(category => {
-                config[`${category}Enabled`] = true;
-                Object.keys(config[category]).forEach(id => {
-                    config[category][id].enabled = true;
-                });
-            });
-            
-            // Odśwież UI
-            modal.querySelectorAll('.kamyki-section-toggle, .kamyki-item-checkbox').forEach(cb => {
-                cb.checked = true;
-            });
-            
-            showNotification('Wszystkie grafiki włączone', 'success');
-        });
+document.getElementById('kamyki-enable-all').addEventListener('click', () => {
+    // Najpierw wypełnij brakujące wpisy z defaultów
+    Object.keys(defaultTytani).forEach(id => {
+        if (!config.tytani[id]) {
+            config.tytani[id] = { ...defaultTytani[id] };
+        }
+    });
+    Object.keys(defaultKolosy).forEach(id => {
+        if (!config.kolosy[id]) {
+            config.kolosy[id] = { ...defaultKolosy[id] };
+        }
+    });
+    Object.keys(defaultE2).forEach(id => {
+        if (!config.e2[id]) {
+            config.e2[id] = { ...defaultE2[id] };
+        }
+    });
 
-        document.getElementById('kamyki-disable-all').addEventListener('click', () => {
-            ['tytani', 'kolosy', 'e2'].forEach(category => {
-                config[`${category}Enabled`] = false;
-                Object.keys(config[category]).forEach(id => {
-                    config[category][id].enabled = false;
-                });
-            });
-            
-            // Odśwież UI
-            modal.querySelectorAll('.kamyki-section-toggle, .kamyki-item-checkbox').forEach(cb => {
-                cb.checked = false;
-            });
-            
-            showNotification('Wszystkie grafiki wyłączone', 'info');
+    // Teraz włącz wszystkie
+    ['tytani', 'kolosy', 'e2'].forEach(category => {
+        config[`${category}Enabled`] = true;
+        Object.keys(config[category]).forEach(id => {
+            config[category][id].enabled = true;
         });
+    });
 
-        document.getElementById('kamyki-reset').addEventListener('click', () => {
+    // Odśwież UI
+    modal.querySelectorAll('.kamyki-section-toggle, .kamyki-item-checkbox').forEach(cb => {
+        cb.checked = true;
+    });
+
+    saveConfig();
+    showNotification('Wszystkie grafiki włączone', 'success');
+});
+
+document.getElementById('kamyki-disable-all').addEventListener('click', () => {
+    // Najpierw wypełnij brakujące wpisy z defaultów
+    Object.keys(defaultTytani).forEach(id => {
+        if (!config.tytani[id]) {
+            config.tytani[id] = { ...defaultTytani[id] };
+        }
+    });
+    Object.keys(defaultKolosy).forEach(id => {
+        if (!config.kolosy[id]) {
+            config.kolosy[id] = { ...defaultKolosy[id] };
+        }
+    });
+    Object.keys(defaultE2).forEach(id => {
+        if (!config.e2[id]) {
+            config.e2[id] = { ...defaultE2[id] };
+        }
+    });
+
+    // Teraz wyłącz wszystkie
+    ['tytani', 'kolosy', 'e2'].forEach(category => {
+        config[`${category}Enabled`] = false;
+        Object.keys(config[category]).forEach(id => {
+            config[category][id].enabled = false;
+        });
+    });
+
+    // Odśwież UI
+    modal.querySelectorAll('.kamyki-section-toggle, .kamyki-item-checkbox').forEach(cb => {
+        cb.checked = false;
+    });
+
+    saveConfig();
+    showNotification('Wszystkie grafiki wyłączone', 'info');
+});
+
+document.getElementById('kamyki-reset').addEventListener('click', () => {
             if (!confirm('Czy na pewno chcesz przywrócić domyślne ustawienia?')) {
                 return;
             }
@@ -848,17 +1060,14 @@
             showNotification('Ustawienia zresetowane', 'success');
         });
 
-        document.getElementById('kamyki-save').addEventListener('click', () => {
-            saveConfig();
-            showNotification('Ustawienia zapisane!', 'success');
-        });
-
-        // Scroll w zakładkach
-        modal.querySelectorAll('.kamyki-tab-content').forEach(content => {
-            content.addEventListener('wheel', e => e.stopPropagation());
-        });
+document.getElementById('kamyki-save').addEventListener('click', () => {
+    saveConfig();
+    showNotification('Ustawienia zapisane!', 'success');
+    setTimeout(() => {
+        location.reload();
+    }, 500);
+});
     }
-
     // ===== INTEGRACJA Z MANAGEREM =====
     function addManagerSettingsButton(container) {
         const helpIcon = container.querySelector('.kwak-addon-help-icon');
@@ -910,11 +1119,16 @@
     }
 
     // ===== INICJALIZACJA =====
-    function init() {
-        // Dodaj style
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
-        document.head.appendChild(styleSheet);
+function init() {
+    // Dodaj style CSS
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = styles + `
+        .priw8-item-overlay {
+            display: block;
+            position: absolute;
+        }
+    `;
+    document.head.appendChild(styleSheet);
 
         // Hook do parseJSON/parseInput
         const org = NI ? window.Engine.communication.parseJSON : window.parseInput;
@@ -925,7 +1139,7 @@
             }
             return res;
         }
-        
+
         if (NI)
             window.Engine.communication.parseJSON = override;
         else
@@ -958,7 +1172,6 @@
             const tp = getItemTp(it);
             if (tp != "") {
                 const tpMap = getTpMap(tp);
-                console.log(`${it.name} (${stats.opis}): ${tpMap} (${tp})`);
             }
         });
     }
