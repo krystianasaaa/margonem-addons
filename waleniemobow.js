@@ -1,3 +1,15 @@
+// ==UserScript==
+// @name         Margonem - Toggle Agresywności z Bindem
+// @namespace    http://tampermonkey.net/
+// @version      3.4
+// @description  Bind klawisza do włączania/wyłączania agresywności mobów + przycisk do zmiany klawisza
+// @author       You
+// @match        https://*.margonem.pl/
+// @match        https://*.margonem.com/
+// @grant        GM_getValue
+// @grant        GM_setValue
+// ==/UserScript==
+
 (function() {
     'use strict';
 
