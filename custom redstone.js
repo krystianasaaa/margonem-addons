@@ -828,7 +828,7 @@ function onItem(items) {
                     <!-- E2 -->
                     <div class="kamyki-tab-content" data-tab="e2">
                         <div class="kamyki-description">
-                            Włącz lub wyłącz grafiki dla kamieni teleportacji do bossów E2
+                            Włącz lub wyłącz grafiki dla kamieni teleportacji do E2
                         </div>
                         <div class="kamyki-section">
                             <div class="kamyki-section-header" id="e2-header">
