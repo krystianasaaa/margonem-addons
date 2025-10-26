@@ -15,7 +15,7 @@ const defaultTytani = {
     "7477": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/titangoblin.gif" },
     "6477": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/lowcz-wspo-driady.gif" },
     "6476": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/przyz_demon_sekta.gif" },
-    "7848": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/maddok_magua-1b.gif" },
+    "7848": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/maddok_magua-1a.gif" },
     "5709": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/tezcatlipoca.gif" },
     "3312": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/hebrehoth_smokoludzie.gif" },
     "2355": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/tyt/ice_king.gif" }
