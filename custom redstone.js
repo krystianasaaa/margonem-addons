@@ -1121,7 +1121,6 @@ document.getElementById('kamyki-save').addEventListener('click', () => {
             });
 
             if (Object.keys(existingItems).length > 0) {
-                console.log('🔄 Przetwarzam istniejące kamienie:', Object.keys(existingItems).length);
                 onItem(existingItems);
             }
         } catch (error) {
