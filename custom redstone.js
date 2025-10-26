@@ -1108,6 +1108,27 @@ document.getElementById('kamyki-save').addEventListener('click', () => {
         setTimeout(() => clearInterval(checkForManager), 20000);
     }
 
+// ===== FUNKCJA PRZETWARZAJĄCA ISTNIEJĄCE ITEMY =====
+    function processExistingItems() {
+        try {
+            const getLocationItems = (loc) => {
+                return NI ? Engine.items.fetchLocationItems(loc).map(it => it) : Object.values(g.item).filter(it => it.loc == loc);
+            };
+
+            const existingItems = {};
+            getLocationItems("g").forEach(it => {
+                existingItems[it.id] = it;
+            });
+
+            if (Object.keys(existingItems).length > 0) {
+                console.log('🔄 Przetwarzam istniejące kamienie:', Object.keys(existingItems).length);
+                onItem(existingItems);
+            }
+        } catch (error) {
+            console.warn('⚠️ Błąd przetwarzania istniejących itemów:', error);
+        }
+    }
+
     // ===== INICJALIZACJA =====
 function init() {
     // Dodaj style CSS
@@ -1134,6 +1155,11 @@ function init() {
             window.Engine.communication.parseJSON = override;
         else
             window.parseInput = override;
+
+        // Przetwórz istniejące itemy po krótkiej chwili (daj czas na pełne załadowanie)
+        setTimeout(() => {
+            processExistingItems();
+        }, 1000);
 
         // Integracja z managerem
         try {
