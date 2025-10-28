@@ -585,7 +585,7 @@ function saveConfig() {
             "4066": "Hydrokora Chimeryczna (167lvl)",
             "3535": "Hydrokora Chimeryczna (167lvl) ALT",
             "1876": "Vashkar (144lvl)",
-            "6052": "Lulukav (190lvl)",
+            "4196": "Lulukav (190lvl)",
             "4206": "Arachin Podstępny (213lvl)",
             "1131": "Arachin Podstępny (213lvl) ALT",
             "4266": "Reuzen (252lvl)",
