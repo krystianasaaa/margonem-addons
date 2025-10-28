@@ -40,6 +40,7 @@ const defaultKolosy = {
     "4268": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-drakolisz.gif" },
     "3037": { enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/kol/kolos-drakolisz.gif" }
 };
+const defaultWlasne = {};
 
 const defaultE2List = [
     { id: "580", name: "Mushita", lvl: 23, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/st-puma.gif" },
@@ -149,24 +150,16 @@ function loadConfig() {
     const savedTytani = localStorage.getItem('kamykiTytani');
     const savedKolosy = localStorage.getItem('kamykiKolosy');
     const savedE2 = localStorage.getItem('kamykiE2');
+    const savedWlasne = localStorage.getItem('kamykiWlasne');
 
-
-
-    // Merguj zapisane dane z defaultami (aby dodać nowe bossów bez resetowania starych ustawień)
+    // Funkcja która NAJPIERW bierze zapisane, a potem DODAJE nowe z defaults
     function mergeWithDefaults(saved, defaults) {
         if (!saved) return { ...defaults };
 
         const parsed = JSON.parse(saved);
-        const merged = { ...defaults };
+        const merged = { ...parsed }; // START Z ZAPISANYCH!
 
-        // Nadpisz wartościami z localStorage (zachowaj ustawienia użytkownika)
-        Object.keys(parsed).forEach(id => {
-            if (merged[id]) {
-                merged[id] = { ...merged[id], ...parsed[id] };
-            }
-        });
-
-        // Dodaj nowe wpisy z defaults, które nie były w localStorage
+        // Dodaj TYLKO nowe wpisy z defaults, których nie ma w zapisanych
         Object.keys(defaults).forEach(id => {
             if (!parsed[id]) {
                 merged[id] = { ...defaults[id] };
@@ -186,10 +179,11 @@ function loadConfig() {
         kolosy: mergeWithDefaults(savedKolosy, defaultKolosy),
 
         e2Enabled: localStorage.getItem('kamykiE2Enabled') !== 'false',
-        e2: mergeWithDefaults(savedE2, defaultE2)
+        e2: mergeWithDefaults(savedE2, defaultE2),
+
+        wlasneEnabled: localStorage.getItem('kamykiWlasneEnabled') !== 'false',
+        wlasne: savedWlasne ? JSON.parse(savedWlasne) : {} // WŁASNE NIE MAJĄ DEFAULTS!
     };
-
-
 
     return loadedConfig;
 }
@@ -197,18 +191,16 @@ function loadConfig() {
 let config = loadConfig();
 
 function saveConfig() {
-
-
     try {
         localStorage.setItem('kamykiEnabled', config.enabled.toString());
         localStorage.setItem('kamykiTytaniEnabled', config.tytaniEnabled.toString());
         localStorage.setItem('kamykiKolosyEnabled', config.kolosyEnabled.toString());
         localStorage.setItem('kamykiE2Enabled', config.e2Enabled.toString());
+        localStorage.setItem('kamykiWlasneEnabled', config.wlasneEnabled.toString());
         localStorage.setItem('kamykiTytani', JSON.stringify(config.tytani));
         localStorage.setItem('kamykiKolosy', JSON.stringify(config.kolosy));
         localStorage.setItem('kamykiE2', JSON.stringify(config.e2));
-
-
+        localStorage.setItem('kamykiWlasne', JSON.stringify(config.wlasne));
     } catch (error) {
         console.error('❌ Błąd zapisu do localStorage:', error);
     }
@@ -603,7 +595,8 @@ function saveConfig() {
         },
 e2: Object.fromEntries(
             defaultE2List.map(boss => [boss.id, `${boss.name} (${boss.lvl}lvl)`])
-        )
+        ),
+wlasne: {}
     };
 
     // ===== FUNKCJE POWIADOMIEŃ =====
@@ -728,6 +721,16 @@ function onItem(items) {
             }
         }
 
+        // Sprawdź własne
+        if (!entry && config.wlasneEnabled) {
+            if (config.wlasne[tp] && config.wlasne[tp].enabled) {
+                entry = config.wlasne[tp].url;
+            }
+            if (!entry && config.wlasne[tpMap] && config.wlasne[tpMap].enabled) {
+                entry = config.wlasne[tpMap].url;
+            }
+        }
+
         if (entry) {
             appendItemOverlay(id, entry);
         }
@@ -774,7 +777,7 @@ function onItem(items) {
         modal.innerHTML = `
             <div class="kamyki-dialog">
                 <div class="kamyki-header" id="kamyki-header">
-                    <h3>Kamyki - Ustawienia</h3>
+                    <h3>Custom Stones - Settings</h3>
                     <button class="kamyki-close" id="kamyki-close">×</button>
                 </div>
 
@@ -782,6 +785,7 @@ function onItem(items) {
                     <button class="kamyki-tab active" data-tab="tytani">Tytani</button>
                     <button class="kamyki-tab" data-tab="kolosy">Kolosy</button>
                     <button class="kamyki-tab" data-tab="e2">E2</button>
+                    <button class="kamyki-tab" data-tab="wlasne">Własne</button>
                 </div>
 
                 <div class="kamyki-content">
@@ -848,6 +852,39 @@ function onItem(items) {
                         </div>
                     </div>
                 </div>
+<!-- WŁASNE -->
+                    <div class="kamyki-tab-content" data-tab="wlasne">
+                        <div class="kamyki-description">
+                            Dodaj własne grafiki dla kamieni teleportacji wpisując ID mapy i URL obrazka
+                        </div>
+                        <div class="kamyki-section">
+                            <div class="kamyki-section-header" id="wlasne-header">
+                                <input type="checkbox" class="kamyki-section-toggle" id="wlasne-toggle" ${config.wlasneEnabled ? 'checked' : ''}>
+                                <span class="kamyki-section-title">Włącz własne grafiki</span>
+                            </div>
+
+                            <div style="padding-left: 26px; margin-bottom: 15px;">
+                                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                                    <input type="text" id="wlasne-map-id" placeholder="ID mapy (np. 1234)" style="flex: 1; padding: 8px; background: #333; border: 1px solid #555; border-radius: 3px; color: #ccc; font-size: 12px;">
+                                    <input type="text" id="wlasne-name" placeholder="Nazwa (opcjonalnie)" style="flex: 1; padding: 8px; background: #333; border: 1px solid #555; border-radius: 3px; color: #ccc; font-size: 12px;">
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                                    <input type="text" id="wlasne-url" placeholder="URL obrazka (https://...)" style="flex: 1; padding: 8px; background: #333; border: 1px solid #555; border-radius: 3px; color: #ccc; font-size: 12px;">
+                                    <button class="kamyki-btn kamyki-btn-success" id="wlasne-add" style="flex: 0 0 auto;">Dodaj</button>
+                                </div>
+                            </div>
+
+<div class="kamyki-items-grid" id="wlasne-items">
+    ${Object.entries(config.wlasne || {}).map(([id, data]) => `
+        <div class="kamyki-item" data-wlasne-id="${id}">
+            <input type="checkbox" class="kamyki-item-checkbox" data-category="wlasne" data-id="${id}" ${data.enabled ? 'checked' : ''}>
+            <span class="kamyki-item-label">${data.name || `Mapa ${id}`}</span>
+            <button class="kamyki-btn-remove-wlasne kamyki-btn-reset" data-remove-id="${id}" style="margin-left: auto; padding: 4px 8px; font-size: 10px;">Usuń</button>
+        </div>
+    `).join('')}
+</div>
+                        </div>
+                    </div>
 
                 <div class="kamyki-buttons">
                     <button class="kamyki-btn kamyki-btn-success" id="kamyki-enable-all">Włącz wszystkie</button>
@@ -913,7 +950,48 @@ document.body.appendChild(modal);
         });
 
         // ===== OBSŁUGA CHECKBOXÓW KATEGORII =====
-        ['tytani', 'kolosy', 'e2'].forEach(category => {
+        ['tytani', 'kolosy', 'e2', 'wlasne'].forEach(category => {
+// Obsługa przycisków "Usuń" dla już załadowanych własnych grafik
+        document.querySelectorAll('.kamyki-btn-remove-wlasne').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const mapId = this.getAttribute('data-remove-id');
+                const itemDiv = this.closest('.kamyki-item');
+
+                if (confirm(`Czy na pewno chcesz usunąć grafikę dla mapy ${mapId}?`)) {
+                    itemDiv.remove();
+                    delete config.wlasne[mapId];
+                    saveConfig();
+                    showNotification('Grafika usunięta', 'info');
+                }
+            });
+// Osobna obsługa dla checkboxów własnych grafik
+        document.querySelectorAll('.kamyki-item-checkbox[data-category="wlasne"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function(e) {
+                const mapId = this.getAttribute('data-id');
+                if (config.wlasne && config.wlasne[mapId]) {
+                    config.wlasne[mapId].enabled = e.target.checked;
+                    saveConfig();
+                }
+            });
+        });
+
+        // Obsługa przycisków "Usuń" dla już załadowanych własnych grafik
+        document.querySelectorAll('.kamyki-btn-remove-wlasne').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const mapId = this.getAttribute('data-remove-id');
+                const itemDiv = this.closest('.kamyki-item');
+
+                if (confirm(`Czy na pewno chcesz usunąć grafikę dla mapy ${mapId}?`)) {
+                    itemDiv.remove();
+                    delete config.wlasne[mapId];
+                    saveConfig();
+                    showNotification('Grafika usunięta', 'info');
+                }
+            });
+        });
+        });
             const toggle = document.getElementById(`${category}-toggle`);
             const items = document.querySelectorAll(`.kamyki-item-checkbox[data-category="${category}"]`);
 
@@ -1050,6 +1128,85 @@ document.getElementById('kamyki-reset').addEventListener('click', () => {
             modal.remove();
             showSettingsDialog();
             showNotification('Ustawienia zresetowane', 'success');
+        });
+// Obsługa dodawania własnych grafik
+        document.getElementById('wlasne-add').addEventListener('click', () => {
+            const mapId = document.getElementById('wlasne-map-id').value.trim();
+            const name = document.getElementById('wlasne-name').value.trim();
+            const url = document.getElementById('wlasne-url').value.trim();
+
+            if (!mapId) {
+                showNotification('Podaj ID mapy!', 'error');
+                return;
+            }
+
+            if (!url) {
+                showNotification('Podaj URL obrazka!', 'error');
+                return;
+            }
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                showNotification('URL musi zaczynać się od http:// lub https://', 'error');
+                return;
+            }
+
+            // Sprawdź czy już istnieje
+            if (config.wlasne && config.wlasne[mapId]) {
+                if (!confirm(`Grafika dla mapy ${mapId} już istnieje. Czy chcesz ją nadpisać?`)) {
+                    return;
+                }
+                // Usuń stary element z UI
+                const oldItem = document.querySelector(`[data-wlasne-id="${mapId}"]`);
+                if (oldItem) oldItem.remove();
+            }
+
+            // Dodaj do konfiguracji
+            if (!config.wlasne) config.wlasne = {};
+            config.wlasne[mapId] = {
+                enabled: true,
+                url: url,
+                name: name || `Mapa ${mapId}`
+            };
+
+            // Dodaj do listy w UI
+            const container = document.getElementById('wlasne-items');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'kamyki-item';
+            itemDiv.setAttribute('data-wlasne-id', mapId);
+            itemDiv.innerHTML = `
+                <input type="checkbox" class="kamyki-item-checkbox" data-category="wlasne" data-id="${mapId}" checked>
+                <span class="kamyki-item-label">${name || `Mapa ${mapId}`}</span>
+                <button class="kamyki-btn kamyki-btn-reset" style="margin-left: auto; padding: 4px 8px; font-size: 10px;">Usuń</button>
+            `;
+
+            // Obsługa usuwania
+            const removeBtn = itemDiv.querySelector('.kamyki-btn-reset');
+            removeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm(`Czy na pewno chcesz usunąć grafikę dla mapy ${mapId}?`)) {
+                    itemDiv.remove();
+                    delete config.wlasne[mapId];
+                    saveConfig();
+                    showNotification('Grafika usunięta', 'info');
+                }
+            });
+
+            // Obsługa checkboxa
+            itemDiv.querySelector('.kamyki-item-checkbox').addEventListener('change', function(e) {
+                if (!config.wlasne[mapId]) return;
+                config.wlasne[mapId].enabled = e.target.checked;
+                saveConfig();
+            });
+
+            container.appendChild(itemDiv);
+
+            // Wyczyść pola
+            document.getElementById('wlasne-map-id').value = '';
+            document.getElementById('wlasne-name').value = '';
+            document.getElementById('wlasne-url').value = '';
+
+            saveConfig();
+            showNotification('Grafika dodana!', 'success');
         });
 
 document.getElementById('kamyki-save').addEventListener('click', () => {
