@@ -123,7 +123,7 @@ const defaultE2List = [
     { id: "7827", name: "Arytodam olbrzymi", lvl: 226, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/arytodam_olbrzymi-1b.gif" },
     { id: "7843", name: "Mocny Maddoks", lvl: 231, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/mocny_maddoks-1b.gif" },
     { id: "3627", name: "Silvanasus", lvl: 235, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/silvanasus.gif" },
-    { id: "3610", name: "Dendroculus", lvl: 240, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/dendroculus.gif" },
+    { id: "3610", "3597", name: "Dendroculus", lvl: 240, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/dendroculus.gif" },
     { id: "5657", name: "Tolypeutes", lvl: 245, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/bolita.gif" },
     { id: "1901", name: "Cuaitl Citlalin", lvl: 250, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/maho-cuaitl.gif" },
     { id: "4056", name: "Pogardliwa Sybilla", lvl: 255, enabled: true, url: "https://micc.garmory-cdn.cloud/obrazki/npc/e2/tri2_witch_e2.gif" },
