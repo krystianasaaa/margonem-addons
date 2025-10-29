@@ -154,10 +154,17 @@ let refreshRequired = false;
         },
         addon15: {
             id: 'berserk',
-            name: 'Berserk[DEV]',
+            name: 'Berserk',
             description: 'BInd toggle dodatku z agresywnością potworów',
             enabled: false,
             url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/waleniemobow.js'
+        },
+        addon16: {
+            id: 'whofirst',
+            name: 'Who first?',
+            description: 'Kto pierwszy ten lepszy!',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/whofirst.js'
         },
     };
 // Obiekt do przechowywania załadowanych dodatków
