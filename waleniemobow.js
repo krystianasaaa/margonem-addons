@@ -27,7 +27,7 @@ buttonPosition: (() => {
                 return {x: 10, y: 10};
             }
         })(),
-        settingValue: localStorage.getItem('berserkSettingValue') === '1'
+        settingValue: false
     };
 
     function saveConfig() {
@@ -40,6 +40,12 @@ buttonPosition: (() => {
         localStorage.setItem('berserkStatusPosition', JSON.stringify(config.statusPosition));
         localStorage.setItem('berserkSettingValue', config.settingValue.toString());
     }
+    function getBerserkStatusFromGame() {
+    if (typeof isSettingsOptionsBerserk === 'function') {
+        return isSettingsOptionsBerserk();
+    }
+    return false;
+}
 
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
@@ -683,21 +689,25 @@ function waitForGame() {
 }
 
 function toggleSetting() {
-    config.settingValue = !config.settingValue;
-    saveConfig();
+    // Pobierz aktualny stan z gry
+    const currentState = getBerserkStatusFromGame();
+    const newState = !currentState;
 
     if (typeof _g === 'function') {
         // Wyślij dla id=34
-        _g(`settings&action=update&id=34&v=${config.settingValue ? '1' : '0'}`);
+        _g(`settings&action=update&id=34&v=${newState ? '1' : '0'}`);
         // Wyślij dla id=35
-        _g(`settings&action=update&id=35&v=${config.settingValue ? '1' : '0'}`);
+        _g(`settings&action=update&id=35&v=${newState ? '1' : '0'}`);
     }
 
-    updateButton();
-    showNotification(
-        `Berserk ${config.settingValue ? 'włączony' : 'wyłączony'}`,
-        config.settingValue ? 'success' : 'info'
-    );
+    // Czekaj chwilę i odśwież przycisk
+    setTimeout(() => {
+        updateButton();
+        showNotification(
+            `Berserk ${newState ? 'włączony' : 'wyłączony'}`,
+            newState ? 'success' : 'info'
+        );
+    }, 100);
 }
 
 function updateButton() {
@@ -707,7 +717,8 @@ function updateButton() {
     const checkbox = box.querySelector('.box-checkbox');
     if (!checkbox) return;
 
-    checkbox.checked = config.settingValue;
+    // Pobierz stan z gry zamiast z configu
+    checkbox.checked = getBerserkStatusFromGame();
 }
 function initButton() {
     // Usuń stary box jeśli istnieje
@@ -737,7 +748,7 @@ function initButton() {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.className = 'box-checkbox';
-    checkbox.checked = config.settingValue;
+    checkbox.checked = getBerserkStatusFromGame()
 
     box.appendChild(label);
     box.appendChild(checkbox);
@@ -919,6 +930,11 @@ function init() {
     } catch (error) {
         console.warn('Addon manager integration failed:', error);
     }
+
+    // Odświeżaj stan przycisku co sekundę
+    setInterval(() => {
+        updateButton();
+    }, 1000);
 }
 
 // Uruchom gdy strona się załaduje
