@@ -166,6 +166,13 @@ let refreshRequired = false;
             enabled: false,
             url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/whofirst.js'
         },
+         addon17: {
+            id: 'wakeup',
+            name: 'Wake up!',
+            description: 'Dźwięk przy zzz',
+            enabled: false,
+            url: 'https://raw.githubusercontent.com/krystianasaaa/margonem-addons/refs/heads/main/wakeup.js'
+        },
     };
 // Obiekt do przechowywania załadowanych dodatków
     const loadedAddons = {};
