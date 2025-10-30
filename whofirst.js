@@ -160,6 +160,20 @@
                 border-color: #555;
                 transform: translateX(-2px);
             }
+           .player-list-item.self {
+               background: #2d4a2d;
+               border-color: #4CAF50;
+            }
+
+          .player-list-item.self:hover {
+               background: #345a34;
+               border-color: #5bc05b;
+            }
+
+          .player-list-item.self .player-list-item-nick {
+               color: #4CAF50;
+               font-weight: bold;
+            }
 
             .player-list-item-left {
                 display: flex;
@@ -535,15 +549,15 @@
         if (sortedPlayers.length === 0) {
             playerList.innerHTML = '<div class="player-list-empty">Brak graczy</div>';
         } else {
-            playerList.innerHTML = sortedPlayers.map(([id, data], index) => `
-                <div class="player-list-item">
-                    <div class="player-list-item-left">
-                        <span class="player-list-item-number">${index + 1}.</span>
-                        <span class="player-list-item-nick">${data.nick}</span>
-                    </div>
-                    <span class="player-list-item-time">${data.entry_time}</span>
-                </div>
-            `).join('');
+playerList.innerHTML = sortedPlayers.map(([id, data], index) => `
+    <div class="player-list-item${data.isSelf ? ' self' : ''}">
+        <div class="player-list-item-left">
+            <span class="player-list-item-number">${index + 1}.</span>
+            <span class="player-list-item-nick">${data.nick}</span>
+        </div>
+        <span class="player-list-item-time">${data.entry_time}</span>
+    </div>
+`).join('');
         }
     };
 
@@ -787,13 +801,26 @@
         setTimeout(() => clearInterval(checkForManager), 20000);
     }
 
+const selfNick = () => {
+    if (Engine.hero && Engine.hero.d && Engine.hero.d.nick) {
+        const timestamp = new Date();
+        const timeString = getTimeString(timestamp);
+        entryTimes['self'] = {
+            nick: Engine.hero.d.nick,
+            entry_time: timeString,
+            isSelf: true
+        };
+        updateWindow();
+    }
+};
+
     // Inicjalizacja po załadowaniu gry
     const init = () => {
         if (typeof Engine === 'undefined' || typeof API === 'undefined') {
             setTimeout(init, 500);
             return;
         }
-
+        selfNick();
         createWindow();
 
         // Nasłuchiwanie na nowych graczy
@@ -824,12 +851,14 @@
         Engine.map.onUpdate.name = function(mapName, i) {
             originalMapNameUpdate.call(this, mapName, i);
             currentMapName = mapName;
+            selfNick();
             updateWindow();
         };
 
         // Pobierz aktualną nazwę mapy
         if (Engine.map && Engine.map.d && Engine.map.d.name) {
             currentMapName = Engine.map.d.name;
+            selfNick();
             updateWindow();
         }
 
