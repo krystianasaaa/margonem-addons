@@ -503,28 +503,42 @@
             windowDiv.style.display = 'none';
         });
 
-        // Przeciąganie okna
-        let isDragging = false;
-        let offsetX, offsetY;
+// Przeciąganie okna
+let isDragging = false;
+let offsetX, offsetY;
 
-        const header = document.getElementById('playerListHeader');
-        header.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            offsetX = e.clientX - windowDiv.offsetLeft;
-            offsetY = e.clientY - windowDiv.offsetTop;
-        });
+const header = document.getElementById('playerListHeader');
+header.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    offsetX = e.clientX - windowDiv.offsetLeft;
+    offsetY = e.clientY - windowDiv.offsetTop;
+});
 
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                windowDiv.style.left = (e.clientX - offsetX) + 'px';
-                windowDiv.style.top = (e.clientY - offsetY) + 'px';
-                windowDiv.style.right = 'auto';
-            }
-        });
+document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+        // Oblicz nową pozycję
+        let newX = e.clientX - offsetX;
+        let newY = e.clientY - offsetY;
+        
+        // Pobierz wymiary okna i ekranu
+        const windowWidth = windowDiv.offsetWidth;
+        const windowHeight = windowDiv.offsetHeight;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        // Ogranicz pozycję do granic ekranu
+        newX = Math.max(0, Math.min(newX, screenWidth - windowWidth));
+        newY = Math.max(0, Math.min(newY, screenHeight - windowHeight));
+        
+        windowDiv.style.left = newX + 'px';
+        windowDiv.style.top = newY + 'px';
+        windowDiv.style.right = 'auto';
+    }
+});
 
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+});
 
         windowElement = windowDiv;
         return windowDiv;
