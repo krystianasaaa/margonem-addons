@@ -2,7 +2,7 @@
     'use strict';
 
     let lastStasisValue = null;
-    const soundUrl = 'https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/sounds/iPhone%206%20Plus%20Original%20Ringtone.mp3';
+    const soundUrl = 'https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/sounds/dog%20sleeping%20meme.mp3';
 
     function waitForEngine() {
         if (typeof Engine === 'undefined' ||
