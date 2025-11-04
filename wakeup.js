@@ -473,7 +473,6 @@
 
             saveConfig();
             showNotification('Ustawienia zapisane!', 'success');
-            modal.remove();
         });
     }
 
