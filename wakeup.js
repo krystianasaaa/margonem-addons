@@ -371,7 +371,7 @@
                                value="${config.customSoundUrl}"
                                ${!config.useCustomSound ? 'disabled' : ''}>
                         <div class="wakeup-setting-description" style="margin-top: 8px;">
-                            Przykład: https://www.myinstants.com/media/sounds/example.mp3
+                            POLECAM GITHUB DO HOSTOWANIA!
                         </div>
                     </div>
 
