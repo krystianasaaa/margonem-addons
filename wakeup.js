@@ -10,14 +10,12 @@
     const defaultSoundUrl = 'https://github.com/krystianasaaa/margonem-addons/raw/refs/heads/main/sounds/dog%20sleeping%20meme.mp3';
 
     let config = {
-        enabled: localStorage.getItem('wakeupEnabled') !== 'false',
         customSoundUrl: localStorage.getItem('wakeupCustomSound') || '',
         useCustomSound: localStorage.getItem('wakeupUseCustomSound') === 'true',
         volume: parseFloat(localStorage.getItem('wakeupVolume') || '1.0')
     };
 
     function saveConfig() {
-        localStorage.setItem('wakeupEnabled', config.enabled.toString());
         localStorage.setItem('wakeupCustomSound', config.customSoundUrl);
         localStorage.setItem('wakeupUseCustomSound', config.useCustomSound.toString());
         localStorage.setItem('wakeupVolume', config.volume.toString());
@@ -318,24 +316,6 @@
             background: #4752C4;
         }
 
-        .wakeup-btn-secondary {
-            background: #4e4e4e;
-            color: white;
-        }
-
-        .wakeup-btn-secondary:hover {
-            background: #5a5a5a;
-        }
-
-        .wakeup-btn-reset {
-            background: #ED4245;
-            color: white;
-        }
-
-        .wakeup-btn-reset:hover {
-            background: #C03537;
-        }
-
         .wakeup-btn-test {
             background: #FFA500;
             color: white;
@@ -367,16 +347,6 @@
                 </div>
 
                 <div class="wakeup-settings-content">
-                    <div class="wakeup-setting-group">
-                        <label class="wakeup-setting-label">
-                            <input type="checkbox" class="wakeup-checkbox" id="wakeup-enabled" ${config.enabled ? 'checked' : ''}>
-                            <span>Włącz powiadomienia dźwiękowe</span>
-                        </label>
-                        <div class="wakeup-setting-description">
-                            Odtwarza dźwięk gdy zbliża się stasis
-                        </div>
-                    </div>
-
                     <div class="wakeup-setting-group">
                         <label class="wakeup-setting-label">
                             Głośność
@@ -413,7 +383,6 @@
                 </div>
 
                 <div class="wakeup-buttons">
-                    <button class="wakeup-btn wakeup-btn-reset" id="wakeup-reset">Reset</button>
                     <button class="wakeup-btn wakeup-btn-primary" id="wakeup-save">Zapisz</button>
                 </div>
             </div>
@@ -496,23 +465,8 @@
             }
         });
 
-        // Reset
-        document.getElementById('wakeup-reset').addEventListener('click', () => {
-            config.enabled = true;
-            config.customSoundUrl = '';
-            config.useCustomSound = false;
-            config.volume = 1.0;
-
-            saveConfig();
-            showNotification('Ustawienia zresetowane do domyślnych', 'info');
-
-            modal.remove();
-            showSettingsDialog();
-        });
-
         // Zapisz
         document.getElementById('wakeup-save').addEventListener('click', () => {
-            config.enabled = document.getElementById('wakeup-enabled').checked;
             config.useCustomSound = document.getElementById('wakeup-use-custom').checked;
             config.customSoundUrl = document.getElementById('wakeup-custom-url').value.trim();
             config.volume = parseFloat(document.getElementById('wakeup-volume').value);
@@ -524,8 +478,6 @@
     }
 
     function playSound() {
-        if (!config.enabled) return;
-
         try {
             const soundUrl = (config.useCustomSound && config.customSoundUrl) 
                 ? config.customSoundUrl 
