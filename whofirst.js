@@ -448,6 +448,27 @@
             .player-list-btn-primary:hover {
                 background: #4752C4;
             }
+                .player-list-item-reset {
+    background: #d32f2f;
+    border: none;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 9px;
+    font-weight: bold;
+    margin-left: 6px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.player-list-item-reset:hover {
+    background: #f44336;
+}
+
+.player-list-item-reset:active {
+    background: #b71c1c;
+}
         </style>
     `;
 
@@ -543,6 +564,15 @@ document.addEventListener('mouseup', () => {
         windowElement = windowDiv;
         return windowDiv;
     };
+    // Funkcja resetowania czasu gracza
+const resetPlayerTime = (playerId) => {
+    if (entryTimes[playerId]) {
+        const timestamp = new Date();
+        const timeString = getTimeString(timestamp);
+        entryTimes[playerId].entry_time = timeString;
+        updateWindow();
+    }
+};
 
     // Aktualizacja wyświetlanej listy graczy
     const updateWindow = () => {
@@ -564,16 +594,24 @@ document.addEventListener('mouseup', () => {
             playerList.innerHTML = '<div class="player-list-empty">Brak graczy</div>';
         } else {
 playerList.innerHTML = sortedPlayers.map(([id, data], index) => `
-    <div class="player-list-item${data.isSelf ? ' self' : ''}">
+    <div class="player-list-item${data.isSelf ? ' self' : ''}" data-player-id="${id}">
         <div class="player-list-item-left">
             <span class="player-list-item-number">${index + 1}.</span>
             <span class="player-list-item-nick">${data.nick}</span>
         </div>
         <span class="player-list-item-time">${data.entry_time}</span>
+        <button class="player-list-item-reset" data-reset-id="${id}">↻</button>
     </div>
 `).join('');
-        }
-    };
+
+// Dodaj event listenery do przycisków reset
+document.querySelectorAll('.player-list-item-reset').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const playerId = btn.getAttribute('data-reset-id');
+        resetPlayerTime(playerId);
+    });
+});
 
     // Toggle okna
     function toggleWindow() {
