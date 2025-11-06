@@ -540,17 +540,17 @@ document.addEventListener('mousemove', (e) => {
         // Oblicz nową pozycję
         let newX = e.clientX - offsetX;
         let newY = e.clientY - offsetY;
-        
+
         // Pobierz wymiary okna i ekranu
         const windowWidth = windowDiv.offsetWidth;
         const windowHeight = windowDiv.offsetHeight;
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
-        
+
         // Ogranicz pozycję do granic ekranu
         newX = Math.max(0, Math.min(newX, screenWidth - windowWidth));
         newY = Math.max(0, Math.min(newY, screenHeight - windowHeight));
-        
+
         windowDiv.style.left = newX + 'px';
         windowDiv.style.top = newY + 'px';
         windowDiv.style.right = 'auto';
@@ -574,44 +574,46 @@ const resetPlayerTime = (playerId) => {
     }
 };
 
-    // Aktualizacja wyświetlanej listy graczy
-    const updateWindow = () => {
-        const mapNameText = document.getElementById('mapNameText');
-        const playerList = document.getElementById('playerList');
-        const playerCount = document.getElementById('playerCount');
+// Aktualizacja wyświetlanej listy graczy
+const updateWindow = () => {
+    const mapNameText = document.getElementById('mapNameText');
+    const playerList = document.getElementById('playerList');
+    const playerCount = document.getElementById('playerCount');
 
-        if (!mapNameText || !playerList || !playerCount) return;
+    if (!mapNameText || !playerList || !playerCount) return;
 
-        mapNameText.textContent = currentMapName || 'Nieznana mapa';
+    mapNameText.textContent = currentMapName || 'Nieznana mapa';
 
-        const sortedPlayers = Object.entries(entryTimes).sort((a, b) => {
-            return a[1].entry_time.localeCompare(b[1].entry_time);
-        });
-
-        playerCount.innerHTML = `Graczy: <strong>${sortedPlayers.length}</strong>`;
-
-        if (sortedPlayers.length === 0) {
-            playerList.innerHTML = '<div class="player-list-empty">Brak graczy</div>';
-        } else {
-playerList.innerHTML = sortedPlayers.map(([id, data], index) => `
-    <div class="player-list-item${data.isSelf ? ' self' : ''}" data-player-id="${id}">
-        <div class="player-list-item-left">
-            <span class="player-list-item-number">${index + 1}.</span>
-            <span class="player-list-item-nick">${data.nick}</span>
-        </div>
-        <span class="player-list-item-time">${data.entry_time}</span>
-        <button class="player-list-item-reset" data-reset-id="${id}">↻</button>
-    </div>
-`).join('');
-
-// Dodaj event listenery do przycisków reset
-document.querySelectorAll('.player-list-item-reset').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const playerId = btn.getAttribute('data-reset-id');
-        resetPlayerTime(playerId);
+    const sortedPlayers = Object.entries(entryTimes).sort((a, b) => {
+        return a[1].entry_time.localeCompare(b[1].entry_time);
     });
-});
+
+    playerCount.innerHTML = `Graczy: <strong>${sortedPlayers.length}</strong>`;
+
+    if (sortedPlayers.length === 0) {
+        playerList.innerHTML = '<div class="player-list-empty">Brak graczy</div>';
+    } else {
+        playerList.innerHTML = sortedPlayers.map(([id, data], index) => `
+            <div class="player-list-item${data.isSelf ? ' self' : ''}" data-player-id="${id}">
+                <div class="player-list-item-left">
+                    <span class="player-list-item-number">${index + 1}.</span>
+                    <span class="player-list-item-nick">${data.nick}</span>
+                </div>
+                <span class="player-list-item-time">${data.entry_time}</span>
+                <button class="player-list-item-reset" data-reset-id="${id}">↻</button>
+            </div>
+        `).join('');
+
+        // Dodaj event listenery do przycisków reset
+        document.querySelectorAll('.player-list-item-reset').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const playerId = btn.getAttribute('data-reset-id');
+                resetPlayerTime(playerId);
+            });
+        });
+    }
+};
 
     // Toggle okna
     function toggleWindow() {
