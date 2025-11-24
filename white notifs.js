@@ -36,6 +36,7 @@
     };
 
     const fontPresets = {
+        'Domyślna': '',
         'Arial': 'Arial, sans-serif',
         'Times New Roman': 'Times New Roman, serif',
         'Courier New': 'Courier New, monospace',
