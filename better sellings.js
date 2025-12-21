@@ -466,7 +466,6 @@
         // Timeout po 30 sekundach
         setTimeout(() => {
             clearInterval(checkForManager);
-            console.warn('Shop Hotkey: Nie znaleziono managera dodatków');
         }, 30000);
     }
 
