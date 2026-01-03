@@ -282,6 +282,19 @@
             border: 1px solid #222222 !important;
         }
 
+        /* Complete removal of .fback-list:before pseudoelement */
+        .account-config .config-background-container .fback-list:before,
+        .account-config .config-background-container .fback-list::before {
+            display: none !important;
+            content: none !important;
+        }
+
+        .account-config .config-background-container .fback-list {
+            background-color: #000000 !important;
+            background-image: none !important;
+            border: 1px solid #222222 !important;
+        }
+
         .requirement-met, .requirement-not-met {
             background-color: transparent !important;
         }
