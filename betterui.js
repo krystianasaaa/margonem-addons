@@ -1,7 +1,15 @@
+// ==UserScript==
+// @name         Better UI - Kaczor DEV Final Fix
+// @version      15.0
+// @author       kaczka
+// @match        https://dream.margonem.pl/
+// @grant        none
+// ==/UserScript==
+
 (function() {
     'use strict';
 
-
+    // --- KLASA OKNA (TWOJA) ---
     const activeWnds = {};
     class Window {
         constructor(options) {
